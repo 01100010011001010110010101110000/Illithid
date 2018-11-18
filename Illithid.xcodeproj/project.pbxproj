@@ -14,6 +14,18 @@
 		6D4B6B3621A130930064E471 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6D4B6B3421A130930064E471 /* Main.storyboard */; };
 		6D4B6B4221A130930064E471 /* IllithidTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4B6B4121A130930064E471 /* IllithidTests.swift */; };
 		6D4B6B4D21A130930064E471 /* IllithidUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4B6B4C21A130930064E471 /* IllithidUITests.swift */; };
+		6D67C7DE21A1353100A4AB93 /* Alamofire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D67C7DA21A1353000A4AB93 /* Alamofire.framework */; };
+		6D67C7DF21A1353100A4AB93 /* Alamofire.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6D67C7DA21A1353000A4AB93 /* Alamofire.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6D67C7E021A1353100A4AB93 /* CleanroomLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D67C7DB21A1353000A4AB93 /* CleanroomLogger.framework */; };
+		6D67C7E121A1353100A4AB93 /* CleanroomLogger.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6D67C7DB21A1353000A4AB93 /* CleanroomLogger.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6D67C7E221A1353100A4AB93 /* OAuth2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D67C7DC21A1353000A4AB93 /* OAuth2.framework */; };
+		6D67C7E321A1353100A4AB93 /* OAuth2.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6D67C7DC21A1353000A4AB93 /* OAuth2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6D67C7E421A1353100A4AB93 /* SwiftyJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D67C7DD21A1353100A4AB93 /* SwiftyJSON.framework */; };
+		6D67C7E521A1353100A4AB93 /* SwiftyJSON.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6D67C7DD21A1353100A4AB93 /* SwiftyJSON.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6D67C7EC21A1356C00A4AB93 /* Alamofire.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6D67C7E821A1356C00A4AB93 /* Alamofire.framework.dSYM */; };
+		6D67C7ED21A1356C00A4AB93 /* OAuth2.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6D67C7E921A1356C00A4AB93 /* OAuth2.framework.dSYM */; };
+		6D67C7EE21A1356C00A4AB93 /* CleanroomLogger.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6D67C7EA21A1356C00A4AB93 /* CleanroomLogger.framework.dSYM */; };
+		6D67C7EF21A1356C00A4AB93 /* SwiftyJSON.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6D67C7EB21A1356C00A4AB93 /* SwiftyJSON.framework.dSYM */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,6 +45,36 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		6D67C7E621A1353100A4AB93 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				6D67C7E521A1353100A4AB93 /* SwiftyJSON.framework in Embed Frameworks */,
+				6D67C7DF21A1353100A4AB93 /* Alamofire.framework in Embed Frameworks */,
+				6D67C7E321A1353100A4AB93 /* OAuth2.framework in Embed Frameworks */,
+				6D67C7E121A1353100A4AB93 /* CleanroomLogger.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6D67C7E721A1355300A4AB93 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 16;
+			files = (
+				6D67C7EC21A1356C00A4AB93 /* Alamofire.framework.dSYM in CopyFiles */,
+				6D67C7ED21A1356C00A4AB93 /* OAuth2.framework.dSYM in CopyFiles */,
+				6D67C7EE21A1356C00A4AB93 /* CleanroomLogger.framework.dSYM in CopyFiles */,
+				6D67C7EF21A1356C00A4AB93 /* SwiftyJSON.framework.dSYM in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		6D4B6B2821A130920064E471 /* Illithid.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Illithid.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6D4B6B2B21A130920064E471 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -48,6 +90,14 @@
 		6D4B6B4821A130930064E471 /* IllithidUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IllithidUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6D4B6B4C21A130930064E471 /* IllithidUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IllithidUITests.swift; sourceTree = "<group>"; };
 		6D4B6B4E21A130930064E471 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6D67C7DA21A1353000A4AB93 /* Alamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Alamofire.framework; path = Carthage/Build/Mac/Alamofire.framework; sourceTree = "<group>"; };
+		6D67C7DB21A1353000A4AB93 /* CleanroomLogger.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CleanroomLogger.framework; path = Carthage/Build/Mac/CleanroomLogger.framework; sourceTree = "<group>"; };
+		6D67C7DC21A1353000A4AB93 /* OAuth2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OAuth2.framework; path = Carthage/Build/Mac/OAuth2.framework; sourceTree = "<group>"; };
+		6D67C7DD21A1353100A4AB93 /* SwiftyJSON.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyJSON.framework; path = Carthage/Build/Mac/SwiftyJSON.framework; sourceTree = "<group>"; };
+		6D67C7E821A1356C00A4AB93 /* Alamofire.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = Alamofire.framework.dSYM; path = Carthage/Build/Mac/Alamofire.framework.dSYM; sourceTree = "<group>"; };
+		6D67C7E921A1356C00A4AB93 /* OAuth2.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = OAuth2.framework.dSYM; path = Carthage/Build/Mac/OAuth2.framework.dSYM; sourceTree = "<group>"; };
+		6D67C7EA21A1356C00A4AB93 /* CleanroomLogger.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = CleanroomLogger.framework.dSYM; path = Carthage/Build/Mac/CleanroomLogger.framework.dSYM; sourceTree = "<group>"; };
+		6D67C7EB21A1356C00A4AB93 /* SwiftyJSON.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = SwiftyJSON.framework.dSYM; path = Carthage/Build/Mac/SwiftyJSON.framework.dSYM; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,6 +105,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6D67C7E421A1353100A4AB93 /* SwiftyJSON.framework in Frameworks */,
+				6D67C7DE21A1353100A4AB93 /* Alamofire.framework in Frameworks */,
+				6D67C7E221A1353100A4AB93 /* OAuth2.framework in Frameworks */,
+				6D67C7E021A1353100A4AB93 /* CleanroomLogger.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +132,14 @@
 		6D4B6B1F21A130920064E471 = {
 			isa = PBXGroup;
 			children = (
+				6D67C7E821A1356C00A4AB93 /* Alamofire.framework.dSYM */,
+				6D67C7EA21A1356C00A4AB93 /* CleanroomLogger.framework.dSYM */,
+				6D67C7E921A1356C00A4AB93 /* OAuth2.framework.dSYM */,
+				6D67C7EB21A1356C00A4AB93 /* SwiftyJSON.framework.dSYM */,
+				6D67C7DA21A1353000A4AB93 /* Alamofire.framework */,
+				6D67C7DB21A1353000A4AB93 /* CleanroomLogger.framework */,
+				6D67C7DC21A1353000A4AB93 /* OAuth2.framework */,
+				6D67C7DD21A1353100A4AB93 /* SwiftyJSON.framework */,
 				6D4B6B2A21A130920064E471 /* Illithid */,
 				6D4B6B4021A130930064E471 /* IllithidTests */,
 				6D4B6B4B21A130930064E471 /* IllithidUITests */,
@@ -137,6 +199,8 @@
 				6D4B6B2421A130920064E471 /* Sources */,
 				6D4B6B2521A130920064E471 /* Frameworks */,
 				6D4B6B2621A130920064E471 /* Resources */,
+				6D67C7E621A1353100A4AB93 /* Embed Frameworks */,
+				6D67C7E721A1355300A4AB93 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -429,6 +493,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 5799SHLZ3R;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+				);
 				INFOPLIST_FILE = Illithid/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -448,6 +516,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 5799SHLZ3R;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+				);
 				INFOPLIST_FILE = Illithid/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
