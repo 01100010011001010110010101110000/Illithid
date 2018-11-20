@@ -22,10 +22,10 @@
 		6D67C7E321A1353100A4AB93 /* OAuth2.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6D67C7DC21A1353000A4AB93 /* OAuth2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6D67C7E421A1353100A4AB93 /* SwiftyJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D67C7DD21A1353100A4AB93 /* SwiftyJSON.framework */; };
 		6D67C7E521A1353100A4AB93 /* SwiftyJSON.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6D67C7DD21A1353100A4AB93 /* SwiftyJSON.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		6D67C7EC21A1356C00A4AB93 /* Alamofire.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6D67C7E821A1356C00A4AB93 /* Alamofire.framework.dSYM */; };
-		6D67C7ED21A1356C00A4AB93 /* OAuth2.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6D67C7E921A1356C00A4AB93 /* OAuth2.framework.dSYM */; };
-		6D67C7EE21A1356C00A4AB93 /* CleanroomLogger.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6D67C7EA21A1356C00A4AB93 /* CleanroomLogger.framework.dSYM */; };
-		6D67C7EF21A1356C00A4AB93 /* SwiftyJSON.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6D67C7EB21A1356C00A4AB93 /* SwiftyJSON.framework.dSYM */; };
+		6D67C7EC21A1356C00A4AB93 /* Alamofire.framework.dSYM in Copy Debug Symbols */ = {isa = PBXBuildFile; fileRef = 6D67C7E821A1356C00A4AB93 /* Alamofire.framework.dSYM */; };
+		6D67C7ED21A1356C00A4AB93 /* OAuth2.framework.dSYM in Copy Debug Symbols */ = {isa = PBXBuildFile; fileRef = 6D67C7E921A1356C00A4AB93 /* OAuth2.framework.dSYM */; };
+		6D67C7EE21A1356C00A4AB93 /* CleanroomLogger.framework.dSYM in Copy Debug Symbols */ = {isa = PBXBuildFile; fileRef = 6D67C7EA21A1356C00A4AB93 /* CleanroomLogger.framework.dSYM */; };
+		6D67C7EF21A1356C00A4AB93 /* SwiftyJSON.framework.dSYM in Copy Debug Symbols */ = {isa = PBXBuildFile; fileRef = 6D67C7EB21A1356C00A4AB93 /* SwiftyJSON.framework.dSYM */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -60,17 +60,18 @@
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		6D67C7E721A1355300A4AB93 /* CopyFiles */ = {
+		6D67C7E721A1355300A4AB93 /* Copy Debug Symbols */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
-				6D67C7EC21A1356C00A4AB93 /* Alamofire.framework.dSYM in CopyFiles */,
-				6D67C7ED21A1356C00A4AB93 /* OAuth2.framework.dSYM in CopyFiles */,
-				6D67C7EE21A1356C00A4AB93 /* CleanroomLogger.framework.dSYM in CopyFiles */,
-				6D67C7EF21A1356C00A4AB93 /* SwiftyJSON.framework.dSYM in CopyFiles */,
+				6D67C7EC21A1356C00A4AB93 /* Alamofire.framework.dSYM in Copy Debug Symbols */,
+				6D67C7ED21A1356C00A4AB93 /* OAuth2.framework.dSYM in Copy Debug Symbols */,
+				6D67C7EE21A1356C00A4AB93 /* CleanroomLogger.framework.dSYM in Copy Debug Symbols */,
+				6D67C7EF21A1356C00A4AB93 /* SwiftyJSON.framework.dSYM in Copy Debug Symbols */,
 			);
+			name = "Copy Debug Symbols";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -200,7 +201,7 @@
 				6D4B6B2521A130920064E471 /* Frameworks */,
 				6D4B6B2621A130920064E471 /* Resources */,
 				6D67C7E621A1353100A4AB93 /* Embed Frameworks */,
-				6D67C7E721A1355300A4AB93 /* CopyFiles */,
+				6D67C7E721A1355300A4AB93 /* Copy Debug Symbols */,
 			);
 			buildRules = (
 			);
