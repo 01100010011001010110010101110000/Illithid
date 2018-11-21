@@ -67,7 +67,7 @@ class RedditClientBroker {
     var headers = Alamofire.SessionManager.defaultHTTPHeaders
     let osVersion = ProcessInfo().operatingSystemVersion
     let platform = "\( os ) \( osVersion.majorVersion ).\( osVersion.minorVersion ).\( osVersion.patchVersion )"
-    headers[ "User-Agent" ] = "\( platform ):\( RedditClientBroker.clientId ):\( RedditClientBroker.VERSION ) (by \( RedditClientBroker.REDDIT_AUTHOR ))"
+    headers[ "User-Agent" ] = "\( platform ):\( RedditClientBroker.clientId ):\( RedditClientBroker.VERSION  ?? "0.0.1") (by \( RedditClientBroker.REDDIT_AUTHOR ))"
     RedditClientBroker.alamoConfiguration.httpAdditionalHeaders = headers
 
     RedditClientBroker.session = Alamofire.SessionManager( configuration: RedditClientBroker.alamoConfiguration )

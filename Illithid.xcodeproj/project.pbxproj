@@ -29,6 +29,8 @@
 		6D67C7ED21A1356C00A4AB93 /* OAuth2.framework.dSYM in Copy Debug Symbols */ = {isa = PBXBuildFile; fileRef = 6D67C7E921A1356C00A4AB93 /* OAuth2.framework.dSYM */; };
 		6D67C7EE21A1356C00A4AB93 /* CleanroomLogger.framework.dSYM in Copy Debug Symbols */ = {isa = PBXBuildFile; fileRef = 6D67C7EA21A1356C00A4AB93 /* CleanroomLogger.framework.dSYM */; };
 		6D67C7EF21A1356C00A4AB93 /* SwiftyJSON.framework.dSYM in Copy Debug Symbols */ = {isa = PBXBuildFile; fileRef = 6D67C7EB21A1356C00A4AB93 /* SwiftyJSON.framework.dSYM */; };
+		6D7C859621A4BE8C009A9C00 /* AccountsPreferencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D7C859521A4BE8C009A9C00 /* AccountsPreferencesViewController.swift */; };
+		6DC12ADE21A46413002AB578 /* PreferencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC12ADD21A46413002AB578 /* PreferencesViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -105,6 +107,8 @@
 		6D67C7E921A1356C00A4AB93 /* OAuth2.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = OAuth2.framework.dSYM; path = Carthage/Build/Mac/OAuth2.framework.dSYM; sourceTree = "<group>"; };
 		6D67C7EA21A1356C00A4AB93 /* CleanroomLogger.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = CleanroomLogger.framework.dSYM; path = Carthage/Build/Mac/CleanroomLogger.framework.dSYM; sourceTree = "<group>"; };
 		6D67C7EB21A1356C00A4AB93 /* SwiftyJSON.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = SwiftyJSON.framework.dSYM; path = Carthage/Build/Mac/SwiftyJSON.framework.dSYM; sourceTree = "<group>"; };
+		6D7C859521A4BE8C009A9C00 /* AccountsPreferencesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsPreferencesViewController.swift; sourceTree = "<group>"; };
+		6DC12ADD21A46413002AB578 /* PreferencesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -187,6 +191,8 @@
 			children = (
 				6D4B6B2B21A130920064E471 /* AppDelegate.swift */,
 				6D4B6B2D21A130920064E471 /* ViewController.swift */,
+				6D7C859521A4BE8C009A9C00 /* AccountsPreferencesViewController.swift */,
+				6DC12ADD21A46413002AB578 /* PreferencesViewController.swift */,
 				6D4B6B3221A130930064E471 /* Assets.xcassets */,
 				6D4B6B3421A130930064E471 /* Main.storyboard */,
 				6D4B6B3721A130930064E471 /* Info.plist */,
@@ -350,8 +356,10 @@
 				6D4B6B2E21A130920064E471 /* ViewController.swift in Sources */,
 				6D4B6B2C21A130920064E471 /* AppDelegate.swift in Sources */,
 				6D4B6B3121A130920064E471 /* Illithid.xcdatamodeld in Sources */,
+				6D7C859621A4BE8C009A9C00 /* AccountsPreferencesViewController.swift in Sources */,
 				22F269D91C83A932704989D9 /* RedditClientBroker.swift in Sources */,
 				22F2621A77FEABB89CCD4BC6 /* RedditPost.swift in Sources */,
+				6DC12ADE21A46413002AB578 /* PreferencesViewController.swift in Sources */,
 				22F266E9D2F324C661F50445 /* Subreddit.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
