@@ -52,6 +52,7 @@ class OAuth2RetryHandler: RequestRetrier, RequestAdapter {
 }
 
 class RedditClientBroker {
+  static let broker: RedditClientBroker = RedditClientBroker()
   static let clientId: String = "f7SCggcYGArzHg"
   static let redditBaseUrl: String = "https://www.reddit.com/api/v1"
   static let redirectUri: String = "illithid://oauth2/auth_callback"
