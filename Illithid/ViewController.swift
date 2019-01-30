@@ -17,7 +17,6 @@ class ViewController: NSViewController {
   
   override func viewDidAppear() {
     super.viewDidAppear()
-    RedditClientBroker.broker.configureOAuth2(window: self.view.window!)
   }
 
   override var representedObject: Any? {

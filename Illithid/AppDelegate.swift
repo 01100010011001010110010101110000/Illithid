@@ -6,21 +6,36 @@
 //  Copyright © 2018 flayware. All rights reserved.
 //
 
-import CleanroomLogger
 import Cocoa
+
+import CleanroomLogger
+import OAuthSwift
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
   func applicationWillFinishLaunching(_: Notification) {
-    Log.enable(configuration: XcodeLogConfiguration())
+    Log.enable(configuration: XcodeLogConfiguration(minimumSeverity: .debug, debugMode: true))
+    let _ = RedditClientBroker.broker
   }
 
   func application(_: NSApplication, open _: [URL]) {}
 
   func applicationDidFinishLaunching(_: Notification) {
     // Insert code here to initialize your application
+    NSAppleEventManager.shared().setEventHandler(self,
+                                                 andSelector:#selector(AppDelegate.handleGetURL(event:withReplyEvent:)),
+                                                 forEventClass: AEEventClass(kInternetEventClass),
+                                                 andEventID: AEEventID(kAEGetURL)
+    )
   }
 
+  @objc func handleGetURL(event: NSAppleEventDescriptor!, withReplyEvent: NSAppleEventDescriptor!) {
+    if let urlString = event.paramDescriptor(forKeyword: AEKeyword(keyDirectObject))?.stringValue {
+      // TODO: Handle malformed URLs
+      OAuthSwift.handle(url: URL(string: urlString)!)
+    }
+  }
+  
   func applicationWillTerminate(_: Notification) {
     // Insert code here to tear down your application
   }
