@@ -84,8 +84,8 @@ final class RedditClientBroker {
       )
       oauth.accessTokenBasicAuthentification = true
       oauth.client = OAuthSwiftClient(credential: credential)
-      session.adapter = OAuthSwiftRequestAdapter(oauth)
-      session.retrier = OAuthSwiftRequestAdapter(oauth) as? RequestRetrier
+      session.adapter = oauth.requestAdapter
+      session.retrier = oauth.requestAdapter
 
       Log.debug?.message("...Fetching \(account) data")
       session.request("https://oauth.reddit.com/api/v1/me", method: .get).validate().responseData { response in
@@ -120,8 +120,8 @@ final class RedditClientBroker {
       )
       oauth.accessTokenBasicAuthentification = true
       oauth.client = OAuthSwiftClient(credential: (accountDetails.credential))
-      session.adapter = OAuthSwiftRequestAdapter(oauth)
-      session.retrier = OAuthSwiftRequestAdapter(oauth) as? RequestRetrier
+      session.adapter = oauth.requestAdapter
+      session.retrier = oauth.requestAdapter
     } else {
       Log.error?.message("Failed to set current account to: \(username)")
     }
