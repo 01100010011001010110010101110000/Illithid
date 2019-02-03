@@ -177,7 +177,6 @@
 			isa = PBXGroup;
 			children = (
 				6D3E767421E0237000171495 /* Protocols */,
-				22F268E8E6541AFCADFED16C /* RedditClientBroker.swift */,
 				22F2672CE3BAF1E5656D6F8A /* RedditObjects */,
 			);
 			path = RedditClient;
@@ -262,6 +261,7 @@
 				6D4B6B3721A130930064E471 /* Info.plist */,
 				6D4B6B3821A130930064E471 /* Illithid.entitlements */,
 				6D4B6B2F21A130920064E471 /* Illithid.xcdatamodeld */,
+				22F268E8E6541AFCADFED16C /* RedditClientBroker.swift */,
 				22F269252156C47FD18D82B2 /* RedditClient */,
 			);
 			path = Illithid;

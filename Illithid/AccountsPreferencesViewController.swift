@@ -45,7 +45,7 @@ class AccountsPreferencesViewController: NSViewController {
 
 extension AccountsPreferencesViewController: NSTableViewDataSource {
   func numberOfRows(in _: NSTableView) -> Int {
-    let accounts = RedditClientBroker.defaults.stringArray(forKey: "RedditUsernames") ?? []
+    let accounts = RedditClientBroker.broker.listAccounts()
     return accounts.count
   }
 }
@@ -59,8 +59,8 @@ extension AccountsPreferencesViewController: NSTableViewDelegate {
   }
 
   func tableView(_ tableView: NSTableView, viewFor _: NSTableColumn?, row: Int) -> NSView? {
-    var accounts = RedditClientBroker.defaults.stringArray(forKey: "RedditUsernames") ?? []
-    let account = accounts[row]
+    var accountNames = Array(RedditClientBroker.broker.listAccounts().keys)
+    let account = accountNames[row]
 
     if let cell = tableView.makeView(withIdentifier: CellIdentifiers.UsernameCell, owner: nil) as? NSTableCellView {
       cell.textField?.stringValue = account

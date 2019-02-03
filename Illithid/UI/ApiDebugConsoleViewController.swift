@@ -20,14 +20,26 @@ class ApiDebugConsoleViewController: NSViewController {
   @IBOutlet var responseScrollView: NSScrollView!
 
   @IBAction func callApiButton(_: NSButton) {
-    self.responseScrollView.documentView!.insertText("")
+    let textView = self.responseScrollView.documentView as! NSTextView
+    let resultString = textView.textStorage?.mutableString
+    resultString?.setString("")
     RedditClientBroker.broker.session.request(self.urlTextField.stringValue).validate().responseData { response in
       switch response.result {
       case let .success(data):
         let object = try! JSON(data: data)
-        self.responseScrollView.documentView!.insertText(object.rawString() ?? "We have a successful call but no JSON raw string")
+        resultString?.setString(object.rawString() ?? "We have a successful call but no JSON raw string")
+        textView.textStorage?.addAttribute(NSAttributedString.Key.foregroundColor,
+                                           value: NSColor.white,
+                                           range: (NSRange(location: 0, length: resultString?.length ?? 0))
+        )
       case let .failure(error):
-        Log.error?.message("Failed to execute: \(self.urlTextField.stringValue)\n\n\(error)")
+        let error = "Failed to execute: \(self.urlTextField.stringValue)\n\n\(error)"
+        Log.error?.message(error)
+        resultString?.setString(error)
+        textView.textStorage?.addAttribute(NSAttributedString.Key.foregroundColor,
+                                           value: NSColor.red,
+                                           range: (NSRange(location: 0, length: resultString?.length ?? 0))
+        )
       }
     }
   }

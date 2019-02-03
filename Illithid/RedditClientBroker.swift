@@ -32,16 +32,21 @@ final class RedditClientBroker {
 
   // MARK: OAuth2 parameters
 
-  static let clientId: String = "f7SCggcYGArzHg"
-  static let duration: String = "permanent"
-  static let scope: String = "identity mysubreddits read vote wikiread"
+  let baseParameters: [String: String] = [
+    "consumerKey": "f7SCggcYGArzHg",
+    "consumerSecret": "",
+    "duration": "permanent",
+    "authorizeUrl": "\(RedditClientBroker.redditBaseUrl)/authorize.compact",
+    "accessTokenUrl": "\(RedditClientBroker.redditBaseUrl)/access_token",
+    "responseType": "code",
+    "scope": "identity mysubreddits read vote wikiread"
+  ]
 
-  private static let keychain = Keychain(server: RedditClientBroker.redditBaseUrl, protocolType: .https)
-    .synchronizable(true)
-  static let defaults = UserDefaults.standard
+  private let keychain = Keychain(server: RedditClientBroker.redditBaseUrl, protocolType: .https).synchronizable(true)
+  private let defaults = UserDefaults.standard
   let session: SessionManager
 
-  private static var clients = [String: accountTokenTuple]()
+  private var clients = [String: accountTokenTuple]()
   private var currentAccount: RedditAccount?
 
   private init() {
@@ -51,7 +56,7 @@ final class RedditClientBroker {
     let osVersion = ProcessInfo().operatingSystemVersion
     let platform = "macOS \(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion)"
     let headers = [
-      "User-Agent": "\(platform):\(RedditClientBroker.clientId):\(RedditClientBroker.VERSION) (by \(RedditClientBroker.REDDIT_AUTHOR))",
+      "User-Agent": "\(platform):\(self.baseParameters["consumerKey"]!):\(RedditClientBroker.VERSION) (by \(RedditClientBroker.REDDIT_AUTHOR))",
       "Accept": "application/json",
       "Content-Type": "application/json"
     ]
@@ -59,7 +64,7 @@ final class RedditClientBroker {
     session = SessionManager(configuration: alamoConfiguration)
 
     loadSavedAccounts {
-      if let lastSelectedAccount = RedditClientBroker.defaults.string(forKey: "SelectedAccount") {
+      if let lastSelectedAccount = self.defaults.string(forKey: "SelectedAccount") {
         Log.debug?.message("Setting \(lastSelectedAccount) as current account")
         RedditClientBroker.broker.setCurrentAccount(name: lastSelectedAccount)
       }
@@ -68,20 +73,14 @@ final class RedditClientBroker {
 
   func loadSavedAccounts(completion _: @escaping () -> Void) {
     let decoder = JSONDecoder()
-    let savedAccounts = RedditClientBroker.defaults.stringArray(forKey: "RedditUsernames") ?? []
+    let savedAccounts = defaults.stringArray(forKey: "RedditUsernames") ?? []
 
     /// ToDo: Ensure there is no race condition in this loop
     for account in savedAccounts {
       Log.debug?.message("...Loading \(account)")
-      let credential: OAuthSwiftCredential = try! decoder.decode(OAuthSwiftCredential.self, from: RedditClientBroker.keychain.getData(account)!)
+      let credential: OAuthSwiftCredential = try! decoder.decode(OAuthSwiftCredential.self, from: keychain.getData(account)!)
       Log.debug?.message("Found refresh token: \(credential.oauthRefreshToken) for \(account)")
-      let oauth = OAuth2Swift(
-        consumerKey: RedditClientBroker.clientId,
-        consumerSecret: "",
-        authorizeUrl: "\(RedditClientBroker.redditBaseUrl)/authorize.compact",
-        accessTokenUrl: "\(RedditClientBroker.redditBaseUrl)/access_token",
-        responseType: "code"
-      )
+      let oauth = OAuth2Swift(parameters: baseParameters)!
       oauth.accessTokenBasicAuthentification = true
       oauth.client = OAuthSwiftClient(credential: credential)
       session.adapter = oauth.requestAdapter
@@ -90,14 +89,10 @@ final class RedditClientBroker {
       Log.debug?.message("...Fetching \(account) data")
       session.request("https://oauth.reddit.com/api/v1/me", method: .get).validate().responseData { response in
         switch response.result {
-        case .success:
-          if let data = response.data {
-            Log.debug?.message("...Loaded \(account):\n\(String(decoding: data, as: UTF8.self))")
-            let accountObject = try! decoder.decode(RedditAccount.self, from: data)
-            RedditClientBroker.clients[account] = (account: accountObject, credential: oauth.client.credential)
-          } else {
-            Log.error?.message("Retrieved nothing for account: \(account)")
-          }
+        case let .success(data):
+          Log.debug?.message("...Loaded \(account):\n\(String(decoding: data, as: UTF8.self))")
+          let accountObject = try! decoder.decode(RedditAccount.self, from: data)
+          self.clients[account] = (account: accountObject, credential: oauth.client.credential)
 
         case let .failure(error):
           Log.error?.message("Failed to retrieve account data: \(error)")
@@ -108,16 +103,10 @@ final class RedditClientBroker {
 
   func setCurrentAccount(name username: String) {
     Log.debug?.message("Username to save: \(username)")
-    if let accountDetails = RedditClientBroker.clients[username] {
+    if let accountDetails = self.clients[username] {
       currentAccount = accountDetails.account
-      RedditClientBroker.defaults.set(username, forKey: "SelectedAccount")
-      let oauth = OAuth2Swift(
-        consumerKey: RedditClientBroker.clientId,
-        consumerSecret: "",
-        authorizeUrl: "\(RedditClientBroker.redditBaseUrl)/authorize.compact",
-        accessTokenUrl: "\(RedditClientBroker.redditBaseUrl)/access_token",
-        responseType: "code"
-      )
+      defaults.set(username, forKey: "SelectedAccount")
+      let oauth = OAuth2Swift(parameters: baseParameters)!
       oauth.accessTokenBasicAuthentification = true
       oauth.client = OAuthSwiftClient(credential: (accountDetails.credential))
       session.adapter = oauth.requestAdapter
@@ -135,7 +124,6 @@ final class RedditClientBroker {
 
    - Precondition: The `authorize` method must have returned successfully on `oauth` prior to invocation
 
-   - ToDo: Persist the client credential to keychain (it conforms to Codable)
    */
   func fetchNewAccount(oauth: OAuth2Swift, completion: @escaping () -> Void) {
     let decoder = JSONDecoder()
@@ -145,13 +133,17 @@ final class RedditClientBroker {
       success: { response in
         let account = try! decoder.decode(RedditAccount.self, from: response.data)
 
-        RedditClientBroker.clients[account.name] = (account: account, credential: oauth.client.credential)
+        self.clients[account.name] = (account: account, credential: oauth.client.credential)
         RedditClientBroker.broker.setCurrentAccount(name: account.name)
-        var savedAccounts = RedditClientBroker.defaults.stringArray(forKey: "RedditUsernames") ?? []
+        var savedAccounts = self.defaults.stringArray(forKey: "RedditUsernames") ?? []
         savedAccounts.append(account.name)
-        RedditClientBroker.defaults.set(savedAccounts, forKey: "RedditUsernames")
+        self.defaults.set(savedAccounts, forKey: "RedditUsernames")
 
-        try! RedditClientBroker.keychain.set(try! encoder.encode(oauth.client.credential), key: account.name)
+        do {
+          try self.keychain.set(encoder.encode(oauth.client.credential), key: account.name)
+        } catch {
+          Log.error?.message("Error persisting new account \(account.name) credentials - \(error)")
+        }
 
         completion()
       },
@@ -162,26 +154,18 @@ final class RedditClientBroker {
   }
 
   func addAccount(window _: NSWindow, completion: @escaping () -> Void) {
-    let oauth = OAuth2Swift(
-      consumerKey: RedditClientBroker.clientId,
-      consumerSecret: "",
-      authorizeUrl: "\(RedditClientBroker.redditBaseUrl)/authorize.compact",
-      accessTokenUrl: "\(RedditClientBroker.redditBaseUrl)/access_token",
-      responseType: "code"
-    )
+    let oauth = OAuth2Swift(parameters: baseParameters)!
     oauth.accessTokenBasicAuthentification = true
 
     let state = ((0 ... 11).map { _ in Int.random(in: (0 ... 9)) }).reduce("") {
       (accumulator: String, next: Int) -> String in
-      return accumulator + String(next)
+      accumulator + String(next)
     }
-    var defaultOAuthParams = oauth.parameters
-    defaultOAuthParams["duration"] = "permanent"
 
     oauth.authorize(
       withCallbackURL: RedditClientBroker.redirectUri,
-      scope: RedditClientBroker.scope,
-      state: state, parameters: defaultOAuthParams,
+      scope: baseParameters["scope"]!,
+      state: state,
       success: { _, _, parameters in
         Log.debug?.message("Authorization successful")
         Log.debug?.message("Returned parameters: \(parameters)")
@@ -196,12 +180,19 @@ final class RedditClientBroker {
 
   func removeAccount(toRemove username: String) {
     /// Remove username from saved account names
-    let accounts = RedditClientBroker.defaults.stringArray(forKey: "RedditUsernames") ?? []
+    let accounts = defaults.stringArray(forKey: "RedditUsernames") ?? []
     let filteredAccounts = accounts.filter { username != $0 }
-    RedditClientBroker.defaults.set(filteredAccounts, forKey: "RedditUsernames")
+    defaults.set(filteredAccounts, forKey: "RedditUsernames")
 
     /// Remove user credentials from the keychain
-    /// ToDo: Implement error handling
-    try? RedditClientBroker.keychain.remove(username)
+    do {
+      try keychain.remove(username)
+    } catch {
+      Log.error?.message("Error removing key for: \(username) - \(error)")
+    }
+  }
+
+  func listAccounts() -> [String: accountTokenTuple] {
+    return clients
   }
 }
