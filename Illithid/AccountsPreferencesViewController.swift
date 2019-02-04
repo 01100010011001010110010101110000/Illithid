@@ -30,7 +30,7 @@ class AccountsPreferencesViewController: NSViewController {
         return
       }
       RedditClientBroker.broker.removeAccount(toRemove: username)
-      self.accountsTableView.reloadData()
+      accountsTableView.reloadData()
     } else {
       Log.info?.message("Attempted to delete nonexistant row")
     }
@@ -46,6 +46,7 @@ class AccountsPreferencesViewController: NSViewController {
 extension AccountsPreferencesViewController: NSTableViewDataSource {
   func numberOfRows(in _: NSTableView) -> Int {
     let accounts = RedditClientBroker.broker.listAccounts()
+    Log.debug?.message("We have \(accounts.count) reddit clients")
     return accounts.count
   }
 }
@@ -54,6 +55,7 @@ extension AccountsPreferencesViewController: NSTableViewDelegate {
   fileprivate enum CellIdentifiers {
     static let UsernameCell = NSUserInterfaceItemIdentifier("UsernameCellID")
   }
+
   fileprivate enum ColumnIdentifiers {
     static let UsernameColumn = NSUserInterfaceItemIdentifier("UsernameColumnID")
   }
@@ -61,6 +63,7 @@ extension AccountsPreferencesViewController: NSTableViewDelegate {
   func tableView(_ tableView: NSTableView, viewFor _: NSTableColumn?, row: Int) -> NSView? {
     var accountNames = Array(RedditClientBroker.broker.listAccounts().keys)
     let account = accountNames[row]
+    Log.debug?.message("Writing \(account) to preferences table")
 
     if let cell = tableView.makeView(withIdentifier: CellIdentifiers.UsernameCell, owner: nil) as? NSTableCellView {
       cell.textField?.stringValue = account
@@ -69,9 +72,9 @@ extension AccountsPreferencesViewController: NSTableViewDelegate {
       return nil
     }
   }
-  
-  func tableViewSelectionDidChange(_ notification: Notification) -> Void {
-    let rowIndex = self.accountsTableView.selectedRow
+
+  func tableViewSelectionDidChange(_: Notification) {
+    let rowIndex = accountsTableView.selectedRow
     let columnIndex = accountsTableView.column(withIdentifier: ColumnIdentifiers.UsernameColumn)
     let usernameColumn = accountsTableView.tableColumns[columnIndex]
     if let usernameView = self.tableView(accountsTableView, viewFor: usernameColumn, row: rowIndex) as? NSTableCellView {

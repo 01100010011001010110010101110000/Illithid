@@ -77,7 +77,6 @@ final class RedditClientBroker {
 
     /// ToDo: Ensure there is no race condition in this loop
     for account in savedAccounts {
-      Log.debug?.message("...Loading \(account)")
       let credential: OAuthSwiftCredential = try! decoder.decode(OAuthSwiftCredential.self, from: keychain.getData(account)!)
       Log.debug?.message("Found refresh token: \(credential.oauthRefreshToken) for \(account)")
       let oauth = OAuth2Swift(parameters: baseParameters)!
@@ -86,11 +85,11 @@ final class RedditClientBroker {
       session.adapter = oauth.requestAdapter
       session.retrier = oauth.requestAdapter
 
-      Log.debug?.message("...Fetching \(account) data")
+      Log.debug?.message("...Loading \(account)")
       session.request("https://oauth.reddit.com/api/v1/me", method: .get).validate().responseData { response in
         switch response.result {
         case let .success(data):
-          Log.debug?.message("...Loaded \(account):\n\(String(decoding: data, as: UTF8.self))")
+          Log.debug?.message("...Loaded \(account)")
           let accountObject = try! decoder.decode(RedditAccount.self, from: data)
           self.clients[account] = (account: accountObject, credential: oauth.client.credential)
 
@@ -165,7 +164,7 @@ final class RedditClientBroker {
     oauth.authorize(
       withCallbackURL: RedditClientBroker.redirectUri,
       scope: baseParameters["scope"]!,
-      state: state,
+      state: state, parameters: baseParameters,
       success: { _, _, parameters in
         Log.debug?.message("Authorization successful")
         Log.debug?.message("Returned parameters: \(parameters)")
@@ -179,6 +178,9 @@ final class RedditClientBroker {
   }
 
   func removeAccount(toRemove username: String) {
+    /// Remove account from in memory accounts dictionary
+    clients.removeValue(forKey: username)
+    
     /// Remove username from saved account names
     let accounts = defaults.stringArray(forKey: "RedditUsernames") ?? []
     let filteredAccounts = accounts.filter { username != $0 }
@@ -194,5 +196,16 @@ final class RedditClientBroker {
 
   func listAccounts() -> [String: accountTokenTuple] {
     return clients
+  }
+
+  func persistAccounts() {
+    let encoder = JSONEncoder()
+    for (_, tuple) in clients {
+      do {
+        try keychain.set(encoder.encode(tuple.credential), key: tuple.account.name)
+      } catch {
+        Log.error?.message("Error persisting \(tuple.account.name) - \(error)")
+      }
+    }
   }
 }
