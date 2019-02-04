@@ -22,7 +22,7 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="VOq-y0-SEH"/>
-                                        <menuItem title="Preferences…" keyEquivalent="," id="BOF-NM-1cW">
+                                        <menuItem title="Preferences…" keyEquivalent="," allowsKeyEquivalentWhenHidden="YES" id="BOF-NM-1cW">
                                             <connections>
                                                 <segue destination="SKp-Bc-rmf" kind="show" id="kDt-mw-Lw7"/>
                                             </connections>
@@ -639,8 +639,7 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Debug" id="JPE-FT-k48">
                                     <items>
-                                        <menuItem title="Reddit API Debug Console" id="XDO-3r-577">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                        <menuItem title="Reddit API Debug Console" keyEquivalent="d" id="XDO-3r-577">
                                             <connections>
                                                 <segue destination="fVo-yd-jFv" kind="modal" id="h9y-8U-eDL"/>
                                             </connections>
@@ -794,7 +793,7 @@
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rs8-HW-w3Q">
-                                <rect key="frame" x="20" y="513" width="540" height="22"/>
+                                <rect key="frame" x="20" y="513" width="556" height="22"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="Olw-Xt-lXJ">
                                     <font key="font" usesAppearanceFont="YES"/>
@@ -808,6 +807,9 @@
                                 <buttonCell key="cell" type="push" title="Submit" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="kEN-pJ-ev0">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
+                                    <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
                                 </buttonCell>
                                 <connections>
                                     <action selector="callApiButton:" target="MsB-8P-ZHC" id="wbP-0W-aOK"/>
@@ -845,7 +847,7 @@
                 </viewController>
                 <customObject id="M3W-GO-4RV" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2038" y="226"/>
+            <point key="canvasLocation" x="2038" y="225.5"/>
         </scene>
         <!--View Controller-->
         <scene sceneID="SG0-LF-PR1">

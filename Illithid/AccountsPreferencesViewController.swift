@@ -61,7 +61,7 @@ extension AccountsPreferencesViewController: NSTableViewDelegate {
   }
 
   func tableView(_ tableView: NSTableView, viewFor _: NSTableColumn?, row: Int) -> NSView? {
-    var accountNames = Array(RedditClientBroker.broker.listAccounts().keys)
+    var accountNames = Array(RedditClientBroker.broker.listAccounts().keys).sorted()
     let account = accountNames[row]
     Log.debug?.message("Writing \(account) to preferences table")
 

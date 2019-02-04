@@ -16,11 +16,16 @@ import OAuthSwiftAlamofire
 import SwiftyJSON
 
 class ApiDebugConsoleViewController: NSViewController {
+  var textView: NSTextView?
+  
   @IBOutlet var urlTextField: NSTextField!
   @IBOutlet var responseScrollView: NSScrollView!
 
   @IBAction func callApiButton(_: NSButton) {
-    let textView = self.responseScrollView.documentView as! NSTextView
+    guard let textView = self.responseScrollView.documentView as? NSTextView else {
+      Log.error?.message("The debug console's textview is unavailable")
+      return
+    }
     let resultString = textView.textStorage?.mutableString
     resultString?.setString("")
     RedditClientBroker.broker.session.request(self.urlTextField.stringValue).validate().responseData { response in
@@ -28,18 +33,13 @@ class ApiDebugConsoleViewController: NSViewController {
       case let .success(data):
         let object = try! JSON(data: data)
         resultString?.setString(object.rawString() ?? "We have a successful call but no JSON raw string")
-        textView.textStorage?.addAttribute(NSAttributedString.Key.foregroundColor,
-                                           value: NSColor.white,
-                                           range: (NSRange(location: 0, length: resultString?.length ?? 0))
-        )
+        textView.textColor = NSColor.white
+        
       case let .failure(error):
         let error = "Failed to execute: \(self.urlTextField.stringValue)\n\n\(error)"
         Log.error?.message(error)
         resultString?.setString(error)
-        textView.textStorage?.addAttribute(NSAttributedString.Key.foregroundColor,
-                                           value: NSColor.red,
-                                           range: (NSRange(location: 0, length: resultString?.length ?? 0))
-        )
+        textView.textColor = NSColor.red
       }
     }
   }
@@ -48,5 +48,10 @@ class ApiDebugConsoleViewController: NSViewController {
     super.viewDidLoad()
     
     self.urlTextField.stringValue = "https://oauth.reddit.com/"
+    guard let textView = self.responseScrollView.documentView as? NSTextView else {
+      Log.error?.message("The debug console's textview is unavailable")
+      return
+    }
+    textView.isEditable = false
   }
 }
