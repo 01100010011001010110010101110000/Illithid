@@ -1,0 +1,6 @@
+github "Alamofire/Alamofire" ~> 4.8.0
+github "OAuthSwift/OAuthSwift" ~> 1.2.0
+github "OAuthSwift/OAuthSwiftAlamofire" ~> 0.2.0
+github "SwiftyJSON/SwiftyJSON" ~> 4.2.0
+github "emaloney/CleanroomLogger" ~> 7.0.0
+github "kishikawakatsumi/KeychainAccess" ~> 3.1.2
