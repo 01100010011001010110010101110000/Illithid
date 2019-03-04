@@ -6,19 +6,12 @@
 //  Copyright © 2018 flayware. All rights reserved.
 //
 
-#if os(OSX)
-  var os = "macOS"
-#elseif os(iOS)
-  var os = "iOS"
-#endif
-
 import Foundation
-
-import OAuthSwift
 
 struct RedditAccount: RedditObject, Codable {
   var id: String
   var name: String
+  var type: String
   
   var isEmployee: Bool
   var noProfanity: Bool
@@ -26,6 +19,7 @@ struct RedditAccount: RedditObject, Codable {
   enum CodingKeys: String, CodingKey {
     case id
     case name
+    case type
     case isEmployee = "is_employee"
     case noProfanity = "pref_no_profanity"
   }

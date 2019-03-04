@@ -14,7 +14,7 @@ import OAuthSwiftAlamofire
 
 /// Handles Reddit API meta-operations
 final class RedditClientBroker {
-  typealias accountTokenTuple = (account: RedditAccount, credential: OAuthSwiftCredential)
+  typealias AccountTokenTuple = (account: RedditAccount, credential: OAuthSwiftCredential)
 
   static let broker: RedditClientBroker = RedditClientBroker()
 
@@ -28,7 +28,7 @@ final class RedditClientBroker {
   /// The version of Illithid
   static let VERSION: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.0.1"
   /// The author's Reddit username
-  static let REDDIT_AUTHOR: String = "Tyler1-66"
+  static let REDDIT_AUTHOR: String = "Tyler1-66" //swiftlint:disable:this identifier_name
 
   // MARK: OAuth2 parameters
 
@@ -46,17 +46,22 @@ final class RedditClientBroker {
   private let defaults = UserDefaults.standard
   let session: SessionManager
 
-  private var clients = [String: accountTokenTuple]()
+  private var clients = [String: AccountTokenTuple]()
   private var currentAccount: RedditAccount?
 
   private init() {
     Log.debug?.message("Loading Reddit accounts...")
 
     let alamoConfiguration = URLSessionConfiguration.default
+    
     let osVersion = ProcessInfo().operatingSystemVersion
-    let platform = "macOS \(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion)"
+    let userAgentComponents = [
+      "macOS \(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion)",
+      "\(baseParameters["consumerKey"]!)",
+      "\(RedditClientBroker.VERSION) (by \(RedditClientBroker.REDDIT_AUTHOR))"
+    ]
     let headers = [
-      "User-Agent": "\(platform):\(self.baseParameters["consumerKey"]!):\(RedditClientBroker.VERSION) (by \(RedditClientBroker.REDDIT_AUTHOR))",
+      "User-Agent": userAgentComponents.joined(separator: ":"),
       "Accept": "application/json",
       "Content-Type": "application/json"
     ]
@@ -77,7 +82,10 @@ final class RedditClientBroker {
 
     /// ToDo: Ensure there is no race condition in this loop
     for account in savedAccounts {
-      let credential: OAuthSwiftCredential = try! decoder.decode(OAuthSwiftCredential.self, from: keychain.getData(account)!)
+      let credential: OAuthSwiftCredential = try! decoder.decode(
+        OAuthSwiftCredential.self,
+        from: keychain.getData(account)!
+      )
       Log.debug?.message("Found refresh token: \(credential.oauthRefreshToken) for \(account)")
       let oauth = OAuth2Swift(parameters: baseParameters)!
       oauth.accessTokenBasicAuthentification = true
@@ -194,7 +202,7 @@ final class RedditClientBroker {
     }
   }
 
-  func listAccounts() -> [String: accountTokenTuple] {
+  func listAccounts() -> [String: AccountTokenTuple] {
     return clients
   }
 
