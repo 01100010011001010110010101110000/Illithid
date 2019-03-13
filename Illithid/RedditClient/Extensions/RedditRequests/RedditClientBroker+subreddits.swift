@@ -12,10 +12,11 @@ import Alamofire
 import CleanroomLogger
 
 extension RedditClientBroker {
-  func listSubreddits(where subredditSort: SubredditSort, before: String = "", after: String = "", count: Int = 0,
+  func listSubreddits(sortBy subredditSort: SubredditSort, before: String = "", after: String = "", count: Int = 0,
                       includeCategories: Bool = false, limit: Int = 25, show: ShowAllPreference = .filtered,
                       srDetail: Bool = false, completion: @escaping (Listable<Subreddit>) -> Void) {
     let decoder = JSONDecoder()
+    decoder.dateDecodingStrategy = .secondsSince1970
     let parameters: Parameters = [
       "before": before,
       "after": after,

@@ -15,7 +15,7 @@ enum ShowAllPreference: CustomStringConvertible {
     default: return ""
     }
   }
-  
+
   case all
   case filtered
 }
@@ -23,11 +23,11 @@ enum ShowAllPreference: CustomStringConvertible {
 /// The base class for all user-generated content on Reddit
 protocol RedditObject: Codable {
   /// The object's unique identifier
-  var id: String { get }  //swiftlint:disable:this identifier_name
-  
+  var id: String { get } // swiftlint:disable:this identifier_name
+
   /// The object's full name
   var name: String { get }
-  
+
   /// The object's type as defined by the Reddit API
   /// e.g. "t5"
   var type: String { get }

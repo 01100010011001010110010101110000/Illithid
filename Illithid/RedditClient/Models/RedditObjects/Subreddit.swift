@@ -13,7 +13,24 @@ enum SubredditSort {
 }
 
 class Subreddit: RedditObject {
-  var id: String  //swiftlint:disable:this identifier_name
-  var name: String
-  var type: String
+  let id: String  //swiftlint:disable:this identifier_name
+  let name: String
+  let type: String = "t5"
+  let publicDescription: String
+  let displayName: String
+  let wikiEnabled: Bool?
+  let headerImage: URL?
+  let over18: Bool
+  let createdUTC: Date
+  
+  enum CodingKeys: String, CodingKey {
+    case id //swiftlint:disable:this identifier_name
+    case name
+    case publicDescription = "public_description"
+    case displayName = "display_name"
+    case wikiEnabled = "wiki_enabled"
+    case headerImage = "header_img"
+    case over18
+    case createdUTC = "created_utc"
+  }
 }

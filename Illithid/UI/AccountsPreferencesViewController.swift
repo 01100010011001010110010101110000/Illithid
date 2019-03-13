@@ -16,8 +16,8 @@ class AccountsPreferencesViewController: NSViewController {
   @IBOutlet var removeRedditAccountButton: NSButton!
 
   @IBAction func addRedditAccountButtonClicked(_: NSButton) {
-    RedditClientBroker.broker.addAccount(window: view.window!, completion: {
-      self.accountsTableView.reloadData()
+    RedditClientBroker.broker.addAccount(window: view.window!, completion: { [weak self] in
+      self?.accountsTableView.reloadData()
     })
   }
 

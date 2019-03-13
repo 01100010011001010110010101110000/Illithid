@@ -11,8 +11,20 @@ import Cocoa
 import CleanroomLogger
 
 class SubredditsViewController: NSViewController {
-    @IBOutlet var subredditsTableView: NSTableView!
-    
+  var subreddits: [Subreddit] = []
+  
+  @IBOutlet var subredditsTableView: NSTableView!
+  
+  override func viewWillAppear() {
+    super.viewWillAppear()
+    RedditClientBroker.broker.listSubreddits(sortBy: .default, completion: { [unowned self] (list) in
+      list.data.children.forEach { [unowned self] (child) in
+        self.subreddits.append(child.data)
+      }
+      self.subredditsTableView.reloadData()
+    })
+  }
+  
     override func viewDidLoad() {
         super.viewDidLoad()
         subredditsTableView.delegate = self
@@ -22,7 +34,7 @@ class SubredditsViewController: NSViewController {
 
 extension SubredditsViewController: NSTableViewDelegate {
     func numberOfRows(in tableView: NSTableView) -> Int {
-        return 2
+        return subreddits.count
     }
 }
 
@@ -30,13 +42,12 @@ extension SubredditsViewController: NSTableViewDataSource {
     func tableView(_ tableView: NSTableView, viewFor _: NSTableColumn?, row: Int) -> NSView? {
         let identifier = NSUserInterfaceItemIdentifier(rawValue: "Post")
         if let cell = subredditsTableView.makeView(withIdentifier: identifier, owner: self) as? SubredditTableCellView {
-            cell.title?.stringValue = "title test"
-            cell.subredditDescription?.stringValue = "description test"
+            cell.title?.stringValue = self.subreddits[row].displayName
+            cell.subredditDescription?.stringValue = self.subreddits[row].publicDescription
             cell.preview.image = NSImage(named: "NSUser")
-            Log.debug?.message("Returning post table cell view")
             return cell
         } else {
-            Log.error?.message("I failed to create a cell")
+            Log.error?.message("Failed to create a cell")
             return nil
         }
     }

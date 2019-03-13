@@ -11,7 +11,7 @@ import Foundation
 struct RedditAccount: RedditObject, Codable {
   var id: String
   var name: String
-  var type: String
+  var type: String = "t2"
   
   var isEmployee: Bool
   var noProfanity: Bool
@@ -19,7 +19,6 @@ struct RedditAccount: RedditObject, Codable {
   enum CodingKeys: String, CodingKey {
     case id
     case name
-    case type
     case isEmployee = "is_employee"
     case noProfanity = "pref_no_profanity"
   }
