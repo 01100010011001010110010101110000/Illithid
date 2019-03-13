@@ -18,8 +18,8 @@ class SubredditsViewController: NSViewController {
   override func viewWillAppear() {
     super.viewWillAppear()
     RedditClientBroker.broker.listSubreddits(sortBy: .default, completion: { [unowned self] (list) in
-      list.data.children.forEach { [unowned self] (child) in
-        self.subreddits.append(child.data)
+      list.metadata.children.forEach { [unowned self] (child) in
+        self.subreddits.append(child.object)
       }
       self.subredditsTableView.reloadData()
     })

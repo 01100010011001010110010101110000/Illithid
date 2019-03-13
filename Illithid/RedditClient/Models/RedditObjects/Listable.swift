@@ -11,7 +11,12 @@ import Foundation
 struct Listable<RedditType: RedditObject>: Codable {
   
   let kind: String
-  let data: ListableData
+  let metadata: ListableData
+  
+  enum CodingKeys: String, CodingKey {
+    case kind
+    case metadata = "data"
+  }
   
   struct ListableData: Codable {
     let modhash: String?
@@ -23,6 +28,11 @@ struct Listable<RedditType: RedditObject>: Codable {
   
   struct ListableChild: Codable {
     let kind: String
-    let data: RedditType
+    let object: RedditType
+    
+    enum CodingKeys: String, CodingKey {
+      case kind
+      case object = "data"
+    }
   }
 }
