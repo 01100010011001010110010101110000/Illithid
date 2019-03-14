@@ -12,7 +12,7 @@
 	<true/>
 	<key>keychain-access-groups</key>
 	<array>
-		<string>$(AppIdentifierPrefix)com.flayware.Illithid</string>
+		<string>$(AppIdentifierPrefix)com.flayware.app.Illithid</string>
 	</array>
 </dict>
 </plist>

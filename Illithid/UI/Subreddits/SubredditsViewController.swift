@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import Foundation
 
 import CleanroomLogger
 
@@ -36,10 +37,6 @@ extension SubredditsViewController: NSTableViewDelegate {
   func numberOfRows(in tableView: NSTableView) -> Int {
     return subreddits.count
   }
-//  func tableView(_ tableView: NSTableView, heightOfRow row: Int) -> CGFloat {
-      // TODO replace this with a computation based on the object at the corresponding index in subreddits
-//    return toMeasureView.subredditDescription.bounds.height + toMeasureView.title.bounds.height + 19
-//  }
 }
 
 extension SubredditsViewController: NSTableViewDataSource {

@@ -997,13 +997,13 @@ DQ
                         <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <scrollView autohidesScrollers="YES" horizontalLineScroll="102" horizontalPageScroll="10" verticalLineScroll="102" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wnF-3m-geM">
+                            <scrollView autohidesScrollers="YES" horizontalLineScroll="96" horizontalPageScroll="10" verticalLineScroll="96" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wnF-3m-geM">
                                 <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
                                 <clipView key="contentView" id="FEy-k7-VQV">
                                     <rect key="frame" x="1" y="1" width="478" height="268"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowHeight="100" viewBased="YES" id="3hO-GM-EKl">
+                                        <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowHeight="94" rowSizeStyle="automatic" usesAutomaticRowHeights="YES" viewBased="YES" id="3hO-GM-EKl">
                                             <rect key="frame" x="0.0" y="0.0" width="478" height="268"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <size key="intercellSpacing" width="3" height="2"/>
@@ -1024,11 +1024,15 @@ DQ
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView identifier="Post" id="eK3-Nh-dwk" customClass="SubredditTableCellView" customModule="Illithid" customModuleProvider="target">
-                                                            <rect key="frame" x="1" y="1" width="475" height="60"/>
+                                                            <rect key="frame" x="1" y="1" width="475" height="94"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
+                                                                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="dgw-X2-H7Y">
+                                                                    <rect key="frame" x="19" y="31" width="32" height="32"/>
+                                                                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="NSAdvanced" id="aEk-dF-IQI"/>
+                                                                </imageView>
                                                                 <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="19" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kvC-0v-Xli">
-                                                                    <rect key="frame" x="59" y="3" width="396" height="54"/>
+                                                                    <rect key="frame" x="59" y="20" width="396" height="54"/>
                                                                     <subviews>
                                                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lms-sK-nOy">
                                                                             <rect key="frame" x="-2" y="36" width="380" height="18"/>
@@ -1061,16 +1065,14 @@ DQ
                                                                         <real value="3.4028234663852886e+38"/>
                                                                     </customSpacing>
                                                                 </stackView>
-                                                                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="dgw-X2-H7Y">
-                                                                    <rect key="frame" x="19" y="14" width="32" height="32"/>
-                                                                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="NSAdvanced" id="aEk-dF-IQI"/>
-                                                                </imageView>
                                                             </subviews>
                                                             <constraints>
-                                                                <constraint firstItem="dgw-X2-H7Y" firstAttribute="centerY" secondItem="eK3-Nh-dwk" secondAttribute="centerY" id="8kB-Yh-MUP"/>
+                                                                <constraint firstItem="dgw-X2-H7Y" firstAttribute="centerY" secondItem="eK3-Nh-dwk" secondAttribute="centerY" id="4fM-tw-PCx"/>
+                                                                <constraint firstAttribute="bottom" secondItem="kvC-0v-Xli" secondAttribute="bottom" constant="20" symbolic="YES" id="7Rf-Ze-Im0"/>
+                                                                <constraint firstItem="kvC-0v-Xli" firstAttribute="top" secondItem="eK3-Nh-dwk" secondAttribute="top" constant="20" symbolic="YES" id="HEf-i6-DKo"/>
+                                                                <constraint firstItem="kvC-0v-Xli" firstAttribute="centerY" secondItem="eK3-Nh-dwk" secondAttribute="centerY" id="Kxe-aK-ozX"/>
                                                                 <constraint firstItem="kvC-0v-Xli" firstAttribute="leading" secondItem="dgw-X2-H7Y" secondAttribute="trailing" constant="8" id="OGt-VG-ckD"/>
                                                                 <constraint firstAttribute="trailing" secondItem="kvC-0v-Xli" secondAttribute="trailing" constant="20" symbolic="YES" id="YYV-EH-mTU"/>
-                                                                <constraint firstItem="kvC-0v-Xli" firstAttribute="centerY" secondItem="eK3-Nh-dwk" secondAttribute="centerY" id="w0P-dp-Zho"/>
                                                                 <constraint firstItem="dgw-X2-H7Y" firstAttribute="leading" secondItem="eK3-Nh-dwk" secondAttribute="leading" constant="19" id="yAu-W1-5D8"/>
                                                             </constraints>
                                                             <connections>
