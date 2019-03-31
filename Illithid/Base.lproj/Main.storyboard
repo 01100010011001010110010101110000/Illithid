@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14460.31"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -623,7 +623,7 @@
                                         <menuItem title="Show Sidebar" keyEquivalent="s" id="kIP-vf-haE">
                                             <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
                                             <connections>
-                                                <action selector="toggleSourceList:" target="Ady-hI-5gd" id="iwa-gc-5KM"/>
+                                                <action selector="toggleSidebar:" target="Ady-hI-5gd" id="iwa-gc-5KM"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Enter Full Screen" keyEquivalent="f" id="4J7-dP-txa">
@@ -833,6 +833,10 @@ DQ
                                         </textView>
                                     </subviews>
                                 </clipView>
+                                <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="85e-dU-iPN">
+                                    <rect key="frame" x="-100" y="-100" width="635" height="16"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
                                 <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="WUj-GL-pbd">
                                     <rect key="frame" x="619" y="0.0" width="16" height="485"/>
                                     <autoresizingMask key="autoresizingMask"/>
@@ -1028,7 +1032,7 @@ DQ
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="dgw-X2-H7Y">
-                                                                    <rect key="frame" x="19" y="31" width="32" height="32"/>
+                                                                    <rect key="frame" x="19" y="20" width="32" height="54"/>
                                                                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="NSAdvanced" id="aEk-dF-IQI"/>
                                                                 </imageView>
                                                                 <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="19" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kvC-0v-Xli">
@@ -1069,6 +1073,8 @@ DQ
                                                             <constraints>
                                                                 <constraint firstItem="dgw-X2-H7Y" firstAttribute="centerY" secondItem="eK3-Nh-dwk" secondAttribute="centerY" id="4fM-tw-PCx"/>
                                                                 <constraint firstAttribute="bottom" secondItem="kvC-0v-Xli" secondAttribute="bottom" constant="20" symbolic="YES" id="7Rf-Ze-Im0"/>
+                                                                <constraint firstItem="dgw-X2-H7Y" firstAttribute="top" secondItem="eK3-Nh-dwk" secondAttribute="top" constant="20" symbolic="YES" id="7dS-B2-lYl"/>
+                                                                <constraint firstAttribute="bottom" secondItem="dgw-X2-H7Y" secondAttribute="bottom" constant="20" symbolic="YES" id="E9z-do-Csh"/>
                                                                 <constraint firstItem="kvC-0v-Xli" firstAttribute="top" secondItem="eK3-Nh-dwk" secondAttribute="top" constant="20" symbolic="YES" id="HEf-i6-DKo"/>
                                                                 <constraint firstItem="kvC-0v-Xli" firstAttribute="centerY" secondItem="eK3-Nh-dwk" secondAttribute="centerY" id="Kxe-aK-ozX"/>
                                                                 <constraint firstItem="kvC-0v-Xli" firstAttribute="leading" secondItem="dgw-X2-H7Y" secondAttribute="trailing" constant="8" id="OGt-VG-ckD"/>
@@ -1105,6 +1111,7 @@ DQ
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="subredditsScrollView" destination="wnF-3m-geM" id="QOH-zr-ZAS"/>
                         <outlet property="subredditsTableView" destination="3hO-GM-EKl" id="c47-zr-jaN"/>
                     </connections>
                 </viewController>

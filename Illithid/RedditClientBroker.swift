@@ -7,6 +7,7 @@ import Cocoa
 import Foundation
 
 import Alamofire
+import AlamofireImage
 import CleanroomLogger
 import KeychainAccess
 import OAuthSwift
@@ -45,6 +46,7 @@ final class RedditClientBroker {
   private let keychain = Keychain(server: RedditClientBroker.redditBaseUrl, protocolType: .https).synchronizable(true)
   private let defaults = UserDefaults.standard
   let session: SessionManager
+  let imageDownloader: ImageDownloader = ImageDownloader()
 
   private var clients = [String: AccountTokenTuple]()
   private var currentAccount: RedditAccount?

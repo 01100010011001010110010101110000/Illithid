@@ -31,6 +31,10 @@
 		6D4B6B3621A130930064E471 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6D4B6B3421A130930064E471 /* Main.storyboard */; };
 		6D4B6B4221A130930064E471 /* IllithidTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4B6B4121A130930064E471 /* IllithidTests.swift */; };
 		6D4B6B4D21A130930064E471 /* IllithidUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4B6B4C21A130930064E471 /* IllithidUITests.swift */; };
+		6D4D0B74223C3C5C00B76B22 /* AlamofireImage.framework.dSYM in Resources */ = {isa = PBXBuildFile; fileRef = 6D4D0B72223C3C5B00B76B22 /* AlamofireImage.framework.dSYM */; };
+		6D4D0B75223C3C5C00B76B22 /* AlamofireImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D4D0B73223C3C5B00B76B22 /* AlamofireImage.framework */; };
+		6D4D0B76223C3C9100B76B22 /* AlamofireImage.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6D4D0B73223C3C5B00B76B22 /* AlamofireImage.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6D4D0B77223C3C9700B76B22 /* AlamofireImage.framework.dSYM in Copy Debug Symbols */ = {isa = PBXBuildFile; fileRef = 6D4D0B72223C3C5B00B76B22 /* AlamofireImage.framework.dSYM */; };
 		6D67C7DE21A1353100A4AB93 /* Alamofire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D67C7DA21A1353000A4AB93 /* Alamofire.framework */; };
 		6D67C7DF21A1353100A4AB93 /* Alamofire.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6D67C7DA21A1353000A4AB93 /* Alamofire.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6D67C7E021A1353100A4AB93 /* CleanroomLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D67C7DB21A1353000A4AB93 /* CleanroomLogger.framework */; };
@@ -68,6 +72,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				6D4D0B76223C3C9100B76B22 /* AlamofireImage.framework in Embed Frameworks */,
 				6D3BE78621DDBF5400091506 /* OAuthSwiftAlamofire.framework in Embed Frameworks */,
 				6D3BE78121DDB2F400091506 /* KeychainAccess.framework in Embed Frameworks */,
 				6D229B8321DAE832005DC34C /* OAuthSwift.framework in Embed Frameworks */,
@@ -84,6 +89,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
+				6D4D0B77223C3C9700B76B22 /* AlamofireImage.framework.dSYM in Copy Debug Symbols */,
 				6D3BE78821DDBF6600091506 /* OAuthSwiftAlamofire.framework.dSYM in Copy Debug Symbols */,
 				6D3BE78321DDB30A00091506 /* KeychainAccess.framework.dSYM in Copy Debug Symbols */,
 				6D229B8521DAE843005DC34C /* OAuthSwift.framework.dSYM in Copy Debug Symbols */,
@@ -128,6 +134,8 @@
 		6D4B6B4821A130930064E471 /* IllithidUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IllithidUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6D4B6B4C21A130930064E471 /* IllithidUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IllithidUITests.swift; sourceTree = "<group>"; };
 		6D4B6B4E21A130930064E471 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6D4D0B72223C3C5B00B76B22 /* AlamofireImage.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = AlamofireImage.framework.dSYM; path = Carthage/Build/Mac/AlamofireImage.framework.dSYM; sourceTree = "<group>"; };
+		6D4D0B73223C3C5B00B76B22 /* AlamofireImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AlamofireImage.framework; path = Carthage/Build/Mac/AlamofireImage.framework; sourceTree = "<group>"; };
 		6D67C7DA21A1353000A4AB93 /* Alamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Alamofire.framework; path = Carthage/Build/Mac/Alamofire.framework; sourceTree = "<group>"; };
 		6D67C7DB21A1353000A4AB93 /* CleanroomLogger.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CleanroomLogger.framework; path = Carthage/Build/Mac/CleanroomLogger.framework; sourceTree = "<group>"; };
 		6D67C7DD21A1353100A4AB93 /* SwiftyJSON.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyJSON.framework; path = Carthage/Build/Mac/SwiftyJSON.framework; sourceTree = "<group>"; };
@@ -146,6 +154,7 @@
 				6D67C7E421A1353100A4AB93 /* SwiftyJSON.framework in Frameworks */,
 				6D67C7DE21A1353100A4AB93 /* Alamofire.framework in Frameworks */,
 				6D67C7E021A1353100A4AB93 /* CleanroomLogger.framework in Frameworks */,
+				6D4D0B75223C3C5C00B76B22 /* AlamofireImage.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -251,13 +260,15 @@
 		6D4B6B1F21A130920064E471 = {
 			isa = PBXGroup;
 			children = (
+				6D67C7DA21A1353000A4AB93 /* Alamofire.framework */,
+				6D4D0B73223C3C5B00B76B22 /* AlamofireImage.framework */,
 				6D3BE78521DDBF5400091506 /* OAuthSwiftAlamofire.framework */,
 				6D3BE78021DDB2F400091506 /* KeychainAccess.framework */,
 				6D229B8221DAE831005DC34C /* OAuthSwift.framework */,
-				6D67C7DA21A1353000A4AB93 /* Alamofire.framework */,
 				6D67C7DB21A1353000A4AB93 /* CleanroomLogger.framework */,
 				6D67C7DD21A1353100A4AB93 /* SwiftyJSON.framework */,
 				6D3BE78221DDB30900091506 /* KeychainAccess.framework.dSYM */,
+				6D4D0B72223C3C5B00B76B22 /* AlamofireImage.framework.dSYM */,
 				6D229B8421DAE842005DC34C /* OAuthSwift.framework.dSYM */,
 				6D3BE78721DDBF6600091506 /* OAuthSwiftAlamofire.framework.dSYM */,
 				6D67C7E821A1356C00A4AB93 /* Alamofire.framework.dSYM */,
@@ -439,6 +450,7 @@
 				6D4B6B3321A130930064E471 /* Assets.xcassets in Resources */,
 				6D4B6B3621A130930064E471 /* Main.storyboard in Resources */,
 				6D21C22D21FE9FB900345B1A /* ApiDebugConsoleViewController.xib in Resources */,
+				6D4D0B74223C3C5C00B76B22 /* AlamofireImage.framework.dSYM in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

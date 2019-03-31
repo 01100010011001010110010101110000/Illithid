@@ -9,6 +9,7 @@
 import Foundation
 
 import Alamofire
+import AlamofireImage
 import CleanroomLogger
 
 extension RedditClientBroker {
@@ -44,5 +45,13 @@ extension RedditClientBroker {
           Log.error?.message("Failed to call subreddits API endpoint: \(error)")
         }
       }
+  }
+  func fetchSubredditHeaderImages(_ subreddits: [Subreddit], downloader: ImageDownloader,
+                                  completion: @escaping ImageDownloader.CompletionHandler) {
+    let headerImageURLs: [URLRequest] = subreddits.compactMap { subreddit in
+      guard let url = subreddit.headerImageURL else { return nil }
+      return URLRequest(url: url)
+    }
+    downloader.download(headerImageURLs) { completion($0) }
   }
 }

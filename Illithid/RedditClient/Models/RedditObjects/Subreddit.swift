@@ -3,6 +3,7 @@
 // Copyright (c) 2018 flayware. All rights reserved.
 //
 
+import Cocoa
 import Foundation
 
 enum SubredditSort {
@@ -19,7 +20,8 @@ class Subreddit: RedditObject {
   let publicDescription: String
   let displayName: String
   let wikiEnabled: Bool?
-  let headerImage: URL?
+  let headerImageURL: URL?
+  var headerImage: NSImage?
   let over18: Bool
   let createdUTC: Date
   
@@ -29,7 +31,7 @@ class Subreddit: RedditObject {
     case publicDescription = "public_description"
     case displayName = "display_name"
     case wikiEnabled = "wiki_enabled"
-    case headerImage = "header_img"
+    case headerImageURL = "header_img"
     case over18
     case createdUTC = "created_utc"
   }
