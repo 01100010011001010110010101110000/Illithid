@@ -25,6 +25,23 @@ class Subreddit: RedditObject {
   let over18: Bool
   let createdUTC: Date
   
+  required init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.id = try container.decode(String.self, forKey: .id)
+    self.name = try container.decode(String.self, forKey: .name)
+    self.publicDescription = try container.decode(String.self, forKey: .publicDescription)
+    self.displayName = try container.decode(String.self, forKey: .displayName)
+    self.wikiEnabled = try container.decodeIfPresent(Bool.self, forKey: .wikiEnabled)
+    let headerImageURLString = try container.decodeIfPresent(String.self, forKey: .headerImageURL)
+    self.over18 = try container.decode(Bool.self, forKey: .over18)
+    self.createdUTC = try container.decode(Date.self, forKey: .createdUTC)
+    if headerImageURLString != nil && !headerImageURLString!.isEmpty {
+      self.headerImageURL = try container.decode(URL.self, forKey: .headerImageURL)
+    } else {
+      self.headerImageURL = nil
+    }
+  }
+  
   enum CodingKeys: String, CodingKey {
     case id //swiftlint:disable:this identifier_name
     case name
