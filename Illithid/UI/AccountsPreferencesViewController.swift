@@ -77,7 +77,8 @@ extension AccountsPreferencesViewController: NSTableViewDelegate {
     let rowIndex = accountsTableView.selectedRow
     let columnIndex = accountsTableView.column(withIdentifier: ColumnIdentifiers.UsernameColumn)
     let usernameColumn = accountsTableView.tableColumns[columnIndex]
-    if let usernameView = self.tableView(accountsTableView, viewFor: usernameColumn, row: rowIndex) as? NSTableCellView {
+    if let usernameView = self.tableView(accountsTableView,
+                                         viewFor: usernameColumn, row: rowIndex) as? NSTableCellView {
       guard let username = usernameView.textField?.stringValue else {
         return
       }

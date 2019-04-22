@@ -9,7 +9,7 @@
 import Foundation
 
 struct RedditAccount: RedditObject, Codable {
-  var id: String
+  var id: String //swiftlint:disable:this identifier_name
   var name: String
   var type: String = "t2"
   
@@ -17,7 +17,7 @@ struct RedditAccount: RedditObject, Codable {
   var noProfanity: Bool
   
   enum CodingKeys: String, CodingKey {
-    case id
+    case id //swiftlint:disable:this identifier_name
     case name
     case isEmployee = "is_employee"
     case noProfanity = "pref_no_profanity"

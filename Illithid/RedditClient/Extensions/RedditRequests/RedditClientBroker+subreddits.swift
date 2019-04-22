@@ -28,7 +28,8 @@ extension RedditClientBroker {
      - srDetail: Documentation unclear, [could only find this](https://www.reddit.com/r/redditdev/comments/3560mt/what_is_the_query_parameter_sr_detail_for_in/)
      - completion: Completion handler, is passed the listable as an argument
    */
-  func listSubreddits(sortBy subredditSort: SubredditSort = .popular, before: String = "", after: String = "", count: Int = 0,
+  func listSubreddits(sortBy subredditSort: SubredditSort = .popular,
+                      before: String = "", after: String = "", count: Int = 0,
                       includeCategories: Bool = false, limit: Int = 25, show: ShowAllPreference = .filtered,
                       srDetail: Bool = false, completion: @escaping (Listable<Subreddit>) -> Void) {
     let decoder = JSONDecoder()
@@ -53,13 +54,15 @@ extension RedditClientBroker {
             let list = try decoder.decode(Listable<Subreddit>.self, from: data)
             completion(list)
           } catch let error as DecodingError {
+            let json = try? JSON(data: data).rawString(options: [.sortedKeys, .prettyPrinted])
+            let response = json ?? String(data: data, encoding: .utf8) ?? "All decoding attempts failed"
             Log.error?.message("Error decoding subreddits list: \(error)")
-            let json = try! JSON(data: data)
-            Log.error?.message("JSON data response: \(json)")
-          }
-          catch {
+            Log.error?.message("JSON data response: \(response)")
+          } catch {
+            let json = try? JSON(data: data).rawString(options: [.sortedKeys, .prettyPrinted])
+            let response = json ?? String(data: data, encoding: .utf8) ?? "All decoding attempts failed"
             Log.error?.message("Unknown error decoding data: \(error)")
-            Log.error?.message("JSON data response: \(try! JSON(data: data))")
+            Log.error?.message("JSON data response: \(response)")
           }
         case let .failure(error):
           Log.error?.message("Failed to call subreddits API endpoint: \(error)")
@@ -67,12 +70,22 @@ extension RedditClientBroker {
       }
   }
 
-  func fetchSubredditHeaderImages(_ subreddits: [Subreddit], downloader: ImageDownloader,
+  func fetchSubredditHeaderImages(_ subreddit: Subreddit, downloader: ImageDownloader? = nil,
                                   completion: @escaping ImageDownloader.CompletionHandler) {
+    let imageDownloader = downloader ?? self.imageDownloader
+    guard let url = subreddit.headerImageURL else { return }
+    let request = URLRequest(url: url)
+    imageDownloader.download(request) { completion($0) }
+  }
+  
+  func fetchSubredditHeaderImages(_ subreddits: [Subreddit], downloader: ImageDownloader? = nil,
+                                  completion: @escaping ImageDownloader.CompletionHandler) {
+    let imageDownloader = downloader ?? self.imageDownloader
     let headerImageURLs: [URLRequest] = subreddits.compactMap { subreddit in
       guard let url = subreddit.headerImageURL else { return nil }
       return URLRequest(url: url)
     }
-    downloader.download(headerImageURLs) { completion($0) }
+    guard !headerImageURLs.isEmpty else { return }
+    imageDownloader.download(headerImageURLs) { completion($0) }
   }
 }

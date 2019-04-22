@@ -27,9 +27,9 @@ final class RedditClientBroker {
   static let redirectUri: URL = URL(string: "illithid://oauth2/callback")!
 
   /// The version of Illithid
-  static let VERSION: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.0.1"
+  static let VERSION = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.0.1"
   /// The author's Reddit username
-  static let REDDIT_AUTHOR: String = "Tyler1-66" //swiftlint:disable:this identifier_name
+  static let REDDIT_AUTHOR = "Tyler1-66" //swiftlint:disable:this identifier_name
 
   // MARK: OAuth2 parameters
 
@@ -46,7 +46,7 @@ final class RedditClientBroker {
   private let keychain = Keychain(server: RedditClientBroker.redditBaseUrl, protocolType: .https).synchronizable(true)
   private let defaults = UserDefaults.standard
   let session: SessionManager
-  let imageDownloader: ImageDownloader = ImageDownloader()
+  let imageDownloader = ImageDownloader(maximumActiveDownloads: 20)
 
   private var clients = [String: AccountTokenTuple]()
   private var currentAccount: RedditAccount?
@@ -166,8 +166,7 @@ final class RedditClientBroker {
     let oauth = OAuth2Swift(parameters: baseParameters)!
     oauth.accessTokenBasicAuthentification = true
 
-    let state = ((0 ... 11).map { _ in Int.random(in: (0 ... 9)) }).reduce("") {
-      (accumulator: String, next: Int) -> String in
+    let state = ((0 ... 11).map { _ in Int.random(in: (0 ... 9)) }).reduce("") { accumulator, next in
       accumulator + String(next)
     }
 
