@@ -75,6 +75,7 @@ extension RedditClientBroker {
     let imageDownloader = downloader ?? self.imageDownloader
     guard let url = subreddit.headerImageURL else { return }
     let request = URLRequest(url: url)
+    
     imageDownloader.download(request) { completion($0) }
   }
   

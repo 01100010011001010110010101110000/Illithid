@@ -14,7 +14,8 @@ import OAuthSwift
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
   func applicationWillFinishLaunching(_: Notification) {
-    Log.enable(configuration: XcodeLogConfiguration(minimumSeverity: .debug, debugMode: true))
+    Log.enable(configuration: ConsoleLogConfiguration(minimumSeverity: .debug, debugMode: true,
+                                                      formatters: [ReadableLogFormatter(severityStyle: .xcode)]))
     _ = RedditClientBroker.broker
   }
 

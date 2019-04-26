@@ -40,6 +40,7 @@ class SubredditsViewController: NSViewController {
         let subreddit = child.object
         RedditClientBroker.broker.fetchSubredditHeaderImages(subreddit) { [unowned self] response in
           subreddit.headerImage = response.result.value
+          Log.debug?.message("\(subreddit.displayName) header size: \(subreddit.headerImage!.size)")
           self.subredditsTableView.reloadData(forRowIndexes: IndexSet(integer: offset + preAppendSize),
                                               columnIndexes: IndexSet(integer: 0))
         }
@@ -69,7 +70,8 @@ extension SubredditsViewController: NSTableViewDataSource {
     if let cell = subredditsTableView.makeView(withIdentifier: identifier, owner: self) as? SubredditTableCellView {
       cell.title?.stringValue = subreddits[row].displayName
       cell.subredditDescription?.stringValue = subreddits[row].publicDescription
-      cell.preview.image = subreddits[row].headerImage
+      cell.preview.image = subreddits[row].headerImage?.resizeMaintainingAspectRatio(to: NSSize(width: 32.0,
+                                                                                                height: 54.0))
       return cell
     } else {
       Log.error?.message("Failed to create a cell")
