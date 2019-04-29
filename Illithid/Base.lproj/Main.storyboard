@@ -710,7 +710,7 @@
                         </connections>
                     </window>
                     <connections>
-                        <segue destination="XfG-lQ-9wD" kind="relationship" relationship="window.shadowedContentViewController" id="cq2-FE-JQM"/>
+                        <segue destination="Ywr-8Y-x4n" kind="relationship" relationship="window.shadowedContentViewController" id="xiS-OG-4BG"/>
                     </connections>
                 </windowController>
                 <customObject id="Oky-zY-oP4" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
@@ -735,7 +735,7 @@
                 </windowController>
                 <customObject id="EtH-NE-eSh" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="705" y="242"/>
+            <point key="canvasLocation" x="1067" y="447"/>
         </scene>
         <!--Preferences View Controller-->
         <scene sceneID="g1n-jv-wsQ">
@@ -761,7 +761,7 @@
                 </tabViewController>
                 <customObject id="rRX-55-Xu2" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="705" y="726"/>
+            <point key="canvasLocation" x="1355" y="916"/>
         </scene>
         <!--Window Controller-->
         <scene sceneID="eTv-14-BGd">
@@ -782,7 +782,7 @@
                 </windowController>
                 <customObject id="4uR-Lx-VqB" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1360" y="105"/>
+            <point key="canvasLocation" x="1413" y="61"/>
         </scene>
         <!--Api Debug Console View Controller-->
         <scene sceneID="uAe-yx-t6g">
@@ -864,7 +864,7 @@ DQ
                 </viewController>
                 <customObject id="15w-n8-lL1" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1421" y="531"/>
+            <point key="canvasLocation" x="1961" y="748"/>
         </scene>
         <!--Accounts Preferences View Controller-->
         <scene sceneID="KQc-fT-6kN">
@@ -991,30 +991,30 @@ DQ
                 </viewController>
                 <customObject id="V1c-BB-GDj" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1421" y="927"/>
+            <point key="canvasLocation" x="1961" y="1146"/>
         </scene>
         <!--Subreddits View Controller-->
         <scene sceneID="hIz-AP-VOD">
             <objects>
                 <viewController id="XfG-lQ-9wD" customClass="SubredditsViewController" customModule="Illithid" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" wantsLayer="YES" id="m2S-Jp-Qdl">
-                        <rect key="frame" x="0.0" y="0.0" width="578" height="332"/>
+                        <rect key="frame" x="0.0" y="0.0" width="450" height="302"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <scrollView autohidesScrollers="YES" horizontalLineScroll="96" horizontalPageScroll="10" verticalLineScroll="96" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wnF-3m-geM">
-                                <rect key="frame" x="0.0" y="0.0" width="578" height="332"/>
+                                <rect key="frame" x="0.0" y="0.0" width="450" height="302"/>
                                 <clipView key="contentView" id="FEy-k7-VQV">
-                                    <rect key="frame" x="1" y="1" width="576" height="330"/>
+                                    <rect key="frame" x="1" y="1" width="448" height="300"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowHeight="94" rowSizeStyle="automatic" usesAutomaticRowHeights="YES" viewBased="YES" id="3hO-GM-EKl">
-                                            <rect key="frame" x="0.0" y="0.0" width="576" height="330"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="448" height="300"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <size key="intercellSpacing" width="3" height="2"/>
                                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                             <tableColumns>
-                                                <tableColumn identifier="Post" width="573" minWidth="40" maxWidth="1000" id="gUR-7Q-7SY">
+                                                <tableColumn identifier="Subreddit" width="445" minWidth="40" maxWidth="1000" id="gUR-7Q-7SY">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
                                                         <font key="font" metaFont="smallSystem"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -1028,7 +1028,7 @@ DQ
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
                                                         <tableCellView identifier="Post" id="eK3-Nh-dwk" customClass="SubredditTableCellView" customModule="Illithid" customModuleProvider="target">
-                                                            <rect key="frame" x="1" y="1" width="573" height="94"/>
+                                                            <rect key="frame" x="1" y="1" width="445" height="94"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="dgw-X2-H7Y">
@@ -1036,19 +1036,19 @@ DQ
                                                                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="NSAdvanced" id="aEk-dF-IQI"/>
                                                                 </imageView>
                                                                 <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="19" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kvC-0v-Xli">
-                                                                    <rect key="frame" x="59" y="20" width="494" height="54"/>
+                                                                    <rect key="frame" x="59" y="20" width="366" height="54"/>
                                                                     <subviews>
-                                                                        <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lms-sK-nOy">
-                                                                            <rect key="frame" x="-2" y="36" width="478" height="18"/>
-                                                                            <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="rm1-zh-EFf">
+                                                                        <textField verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lms-sK-nOy">
+                                                                            <rect key="frame" x="-2" y="36" width="350" height="18"/>
+                                                                            <textFieldCell key="cell" title="Subreddit Title" id="rm1-zh-EFf">
                                                                                 <font key="font" metaFont="systemBold" size="14"/>
                                                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                             </textFieldCell>
                                                                         </textField>
-                                                                        <textField verticalHuggingPriority="750" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="VDy-lO-aSF">
-                                                                            <rect key="frame" x="-2" y="0.0" width="478" height="17"/>
-                                                                            <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="96K-zx-3Mf">
+                                                                        <textField verticalHuggingPriority="750" verticalCompressionResistancePriority="751" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VDy-lO-aSF">
+                                                                            <rect key="frame" x="-2" y="0.0" width="350" height="17"/>
+                                                                            <textFieldCell key="cell" title="Subreddit Description" id="96K-zx-3Mf">
                                                                                 <font key="font" metaFont="system"/>
                                                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1094,7 +1094,7 @@ DQ
                                     </subviews>
                                 </clipView>
                                 <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="aZ1-Ke-fTu">
-                                    <rect key="frame" x="1" y="253" width="478" height="16"/>
+                                    <rect key="frame" x="1" y="285" width="355" height="16"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="rBY-HZ-86a">
@@ -1117,7 +1117,45 @@ DQ
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-95" y="819"/>
+            <point key="canvasLocation" x="391" y="801"/>
+        </scene>
+        <!--Split View Controller-->
+        <scene sceneID="5Bs-Ry-udi">
+            <objects>
+                <splitViewController id="Ywr-8Y-x4n" sceneMemberID="viewController">
+                    <splitViewItems>
+                        <splitViewItem id="Mzs-JW-BwH"/>
+                        <splitViewItem id="VWl-aT-865"/>
+                    </splitViewItems>
+                    <splitView key="splitView" dividerStyle="thin" vertical="YES" id="f7w-No-90G">
+                        <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <connections>
+                            <outlet property="delegate" destination="Ywr-8Y-x4n" id="7Ns-jF-JOj"/>
+                        </connections>
+                    </splitView>
+                    <connections>
+                        <outlet property="splitView" destination="f7w-No-90G" id="b7r-Z5-NaH"/>
+                        <segue destination="XfG-lQ-9wD" kind="relationship" relationship="splitItems" id="sWT-Eb-hxN"/>
+                        <segue destination="bsJ-bM-tcv" kind="relationship" relationship="splitItems" id="N7U-ka-GVH"/>
+                    </connections>
+                </splitViewController>
+                <customObject id="hef-zN-h4v" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-257" y="947"/>
+        </scene>
+        <!--View Controller-->
+        <scene sceneID="w24-0V-2zq">
+            <objects>
+                <viewController id="bsJ-bM-tcv" sceneMemberID="viewController">
+                    <view key="view" id="evu-01-yhT">
+                        <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </view>
+                </viewController>
+                <customObject id="TMA-6f-3E1" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="391" y="1221"/>
         </scene>
     </scenes>
     <resources>

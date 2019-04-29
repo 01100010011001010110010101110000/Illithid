@@ -20,7 +20,7 @@ class SubredditsViewController: NSViewController {
   var before: String?
   var after: String?
   var count: Int = 0
-  
+
   var loadingSubreddits = false
 
   @IBOutlet var subredditsTableView: NSTableView!
@@ -29,22 +29,7 @@ class SubredditsViewController: NSViewController {
   override func viewWillAppear() {
     super.viewWillAppear()
     RedditClientBroker.broker.listSubreddits(sortBy: .default, includeCategories: true) { [unowned self] list in
-      self.count += list.metadata.dist
-      Log.debug?.message("Found first page\n\(list)")
-      self.before = list.metadata.before
-      self.after = list.metadata.after
-      let preAppendSize = self.subreddits.count
-      list.metadata.children.forEach { self.subreddits.append($0.object) }
-      self.subredditsTableView.reloadData()
-      list.metadata.children.enumerated().forEach { [unowned self] (offset, child) in
-        let subreddit = child.object
-        RedditClientBroker.broker.fetchSubredditHeaderImages(subreddit) { [unowned self] response in
-          subreddit.headerImage = response.result.value
-          Log.debug?.message("\(subreddit.displayName) header size: \(subreddit.headerImage!.size)")
-          self.subredditsTableView.reloadData(forRowIndexes: IndexSet(integer: offset + preAppendSize),
-                                              columnIndexes: IndexSet(integer: 0))
-        }
-      }
+      self.renderSubreddits(list: list)
     }
   }
 
@@ -87,33 +72,39 @@ extension SubredditsViewController {
     guard let scrollView = notification.object as? NSScrollView else { return }
     let currentPosition = Int(scrollView.contentView.bounds.maxY)
     let tableLength = Int(subredditsTableView.bounds.height)
-    if tableLength - currentPosition < 200 {
+    if tableLength - currentPosition < 500 {
       loadingSubreddits = true
       RedditClientBroker.broker.listSubreddits(sortBy: .popular, after: after ?? "",
                                                count: count) { [unowned self] list in
-        self.before = list.metadata.before
-        self.after = list.metadata.after
-        self.count += list.metadata.dist
-        let preAppendSize = self.subreddits.count
-                         
-        list.metadata.children.forEach { self.subreddits.append($0.object) }
-        let insertionIndex = IndexSet(integersIn: preAppendSize ..< self.subreddits.count)
-        self.subredditsTableView.beginUpdates()
-        self.subredditsTableView.insertRows(at: insertionIndex,
-                                            withAnimation: [.slideLeft, .effectGap])
-        self.subredditsTableView.endUpdates()
-                                                
-        Log.debug?.message("Found next page\n\(list)")
-        list.metadata.children.enumerated().forEach { [unowned self] (offset, child) in
-          let subreddit = child.object
-          RedditClientBroker.broker.fetchSubredditHeaderImages(subreddit) { [unowned self] response in
-            subreddit.headerImage = response.result.value
-            self.subredditsTableView.reloadData(forRowIndexes: IndexSet(integer: offset + preAppendSize),
-                                                columnIndexes: IndexSet(integer: 0))
-          }
-        }
-        self.loadingSubreddits = false
+        self.renderSubreddits(list: list)
       }
     }
+  }
+}
+
+extension SubredditsViewController {
+  func renderSubreddits(list: Listable<Subreddit>) {
+    before = list.metadata.before
+    after = list.metadata.after
+    count += list.metadata.dist
+    let preAppendSize = subreddits.count
+
+    list.metadata.children.forEach { self.subreddits.append($0.object) }
+    let insertionIndex = IndexSet(integersIn: preAppendSize ..< subreddits.count)
+    subredditsTableView.beginUpdates()
+    subredditsTableView.insertRows(at: insertionIndex,
+                                   withAnimation: [.slideLeft, .effectGap])
+    subredditsTableView.endUpdates()
+
+    Log.debug?.message("Found next page\n\(list)")
+    list.metadata.children.enumerated().forEach { [unowned self] offset, child in
+      let subreddit = child.object
+      RedditClientBroker.broker.fetchSubredditHeaderImages(subreddit) { [unowned self] response in
+        subreddit.headerImage = response.result.value
+        self.subredditsTableView.reloadData(forRowIndexes: IndexSet(integer: offset + preAppendSize),
+                                            columnIndexes: IndexSet(integer: 0))
+      }
+    }
+    loadingSubreddits = false
   }
 }
