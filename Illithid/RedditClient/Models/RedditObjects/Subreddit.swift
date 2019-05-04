@@ -14,6 +14,10 @@ enum SubredditSort {
 }
 
 class Subreddit: RedditObject {
+  static func == (lhs: Subreddit, rhs: Subreddit) -> Bool {
+    return lhs.name == rhs.name
+  }
+  
   let id: String  //swiftlint:disable:this identifier_name
   let name: String
   let type: String = "t5"

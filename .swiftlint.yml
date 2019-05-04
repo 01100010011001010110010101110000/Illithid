@@ -2,6 +2,7 @@ disabled_rules:
     - force_try
     - nesting
     - identifier_name
+    - line_length
 opt_in_rules: []
 included: [] 
 excluded: 

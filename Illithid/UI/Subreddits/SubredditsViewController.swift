@@ -11,6 +11,7 @@ import Foundation
 
 import AlamofireImage
 import CleanroomLogger
+import SwiftyJSON
 
 class SubredditsViewController: NSViewController {
   var subreddits: [Subreddit] = []
@@ -25,7 +26,7 @@ class SubredditsViewController: NSViewController {
 
   @IBOutlet var subredditsTableView: NSTableView!
   @IBOutlet var subredditsScrollView: NSScrollView!
-
+  
   override func viewWillAppear() {
     super.viewWillAppear()
     RedditClientBroker.broker.listSubreddits(sortBy: .default, includeCategories: true) { [unowned self] list in
@@ -46,6 +47,10 @@ class SubredditsViewController: NSViewController {
 extension SubredditsViewController: NSTableViewDelegate {
   func numberOfRows(in tableView: NSTableView) -> Int {
     return subreddits.count
+  }
+  func tableViewSelectionDidChange(_ notification: Notification) {
+    let subreddit = subreddits[subredditsTableView.selectedRow]
+    notificationCenter.post(name: .subredditChanged, object: subreddit)
   }
 }
 
@@ -106,5 +111,11 @@ extension SubredditsViewController {
       }
     }
     loadingSubreddits = false
+  }
+}
+
+extension Notification.Name {
+  static var subredditChanged: Notification.Name {
+    return .init("SubredditsViewController.subredditChanged")
   }
 }
