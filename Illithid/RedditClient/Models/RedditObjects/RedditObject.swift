@@ -125,6 +125,7 @@ struct ListingParams {
   let limit: Int = 25
   let show: ShowAllPreference = .filtered
   let sr_detail: Bool = false
+  let raw_json: Bool = true
   
   func toParameters() -> Parameters {
     var result: [String: Any] = [:]

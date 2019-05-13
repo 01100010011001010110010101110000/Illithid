@@ -43,7 +43,7 @@ extension RedditClientBroker {
       "show": show,
       "sr_detail": srDetail
     ]
-    let queryEncoding = URLEncoding(boolEncoding: .literal)
+    let queryEncoding = URLEncoding(boolEncoding: .numeric)
     let subredditsListUrl = URL(string: "https://oauth.reddit.com/subreddits/\(subredditSort)")!
 
     session.request(subredditsListUrl, method: .get, parameters: parameters, encoding: queryEncoding)

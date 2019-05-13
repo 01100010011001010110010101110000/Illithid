@@ -1,5 +1,5 @@
 //
-//  MediaEmbed.swift
+//  PostMedia.swift
 //  Illithid
 //
 //  Created by Tyler Gregory on 5/2/19.
@@ -8,9 +8,26 @@
 
 import Foundation
 
-struct MediaEmbed: Codable {
-  let type: String
-  let oembed: EmbeddingParameters
+struct PostMedia: Codable {
+  let type: String?
+  let oembed: EmbeddingParameters?
+  let reddit_video: RedditVideo?
+  
+  struct RedditVideo: Codable {
+    let dash_url: URL
+    let duration: Int
+    let fallback_url: URL
+    let height: Int
+    let hls_url: URL
+    let is_gif: Bool
+    let scrubber_media_url: URL
+    let transcoding_status: TranscodeStatus
+    let width: Int
+  }
+  
+  enum TranscodeStatus: String, Codable {
+    case completed
+  }
   
   struct EmbeddingParameters: Codable {
     let provider_url: URL

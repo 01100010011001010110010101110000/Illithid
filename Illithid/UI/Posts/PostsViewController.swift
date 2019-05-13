@@ -18,7 +18,7 @@ class PostsViewController: NSViewController {
   var posts: [Post] = []
 
   @IBOutlet var postsTableView: NSTableView!
-  
+
   override func viewDidLoad() {
     super.viewDidLoad()
     postsTableView.delegate = self
@@ -44,7 +44,7 @@ extension PostsViewController {
       self.renderPosts(list)
     }
   }
-  
+
   func renderPosts(_ posts: Listable<Post>) {
     postsTableView.reloadData()
   }
@@ -62,19 +62,46 @@ extension PostsViewController: NSTableViewDataSource {
     let videoIdentifier = NSUserInterfaceItemIdentifier(rawValue: "VideoPostCell")
     let imageIdentifier = NSUserInterfaceItemIdentifier(rawValue: "ImagePostCell")
     let textIdentifier = NSUserInterfaceItemIdentifier(rawValue: "TextPostCell")
-    if post.is_self {
-      return nil
-    } else if post.media?.type == "youtube.com" {
-      if let cell = postsTableView.makeView(withIdentifier: videoIdentifier, owner: self) as? VideoPostTableCellView {
-        cell.postTitle?.stringValue = post.title
-        cell.videoWebView.load(URLRequest(url: post.media!.oembed.html.iFrameSrc()!))
+
+    // Post type disambiguation
+    // The reddit API does not consistently return a post hint for self posts,
+    // and we wish to treat other cases with no hint (which may or may not exist) as a link type
+    let hint: PostHint = post.is_self ? .self : (post.post_hint ?? .link)
+    switch hint {
+    case .self:
+      if let cell = postsTableView.makeView(withIdentifier: textIdentifier, owner: self) as? TextPostTableCellView {
+        cell.postTitle.stringValue = post.title
+        let attributedText = try! NSMutableAttributedString(data: Data(post.selftext_html!.utf8),
+                                                            options: [.documentType: NSAttributedString.DocumentType.html],
+                                                            documentAttributes: nil)
+        // Default text color is black, which does not play nice with system themes
+        attributedText.addAttributes([.foregroundColor: NSColor.textColor, .font: NSFont.labelFont(ofSize: 18.0)],
+                                     range: NSRange(location: 0, length: attributedText.length - 1))
+        
+        let textView = cell.postTextView.documentView as? NSTextView
+        textView?.textStorage?.setAttributedString(attributedText)
         return cell
-      } else {
-        Log.error?.message("Failed to create a cell")
-        return nil
       }
-    } else {
+    case .image:
+      if let cell = postsTableView.makeView(withIdentifier: imageIdentifier, owner: nil) as? ImagePostTableCellView {
+        cell.postTitle.stringValue = post.title
+        cell.postImage.image = NSImage(named: "NSUser")
+        return cell
+      }
+    case .link:
+      // Load link
       return nil
+    case .richVideo, .hostedVideo:
+      if post.media?.type == "youtube.com" {
+        if let cell = postsTableView.makeView(withIdentifier: videoIdentifier, owner: self) as? VideoPostTableCellView {
+          cell.postTitle.stringValue = post.title
+          cell.videoWebView.load(URLRequest(url: post.media!.oembed!.html.iFrameSrc()!))
+          return cell
+        }
+      }
     }
+
+    Log.error?.message("We should never reach this")
+    return nil
   }
 }

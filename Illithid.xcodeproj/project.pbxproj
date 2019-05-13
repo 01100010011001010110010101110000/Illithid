@@ -34,6 +34,7 @@
 		6D4D0B75223C3C5C00B76B22 /* AlamofireImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D4D0B73223C3C5B00B76B22 /* AlamofireImage.framework */; };
 		6D4D0B76223C3C9100B76B22 /* AlamofireImage.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6D4D0B73223C3C5B00B76B22 /* AlamofireImage.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6D4D0B77223C3C9700B76B22 /* AlamofireImage.framework.dSYM in Copy Debug Symbols */ = {isa = PBXBuildFile; fileRef = 6D4D0B72223C3C5B00B76B22 /* AlamofireImage.framework.dSYM */; };
+		6D5F804122807B7F00AF6D7B /* TextPostTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D5F804022807B7F00AF6D7B /* TextPostTableCellView.swift */; };
 		6D67C7DE21A1353100A4AB93 /* Alamofire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D67C7DA21A1353000A4AB93 /* Alamofire.framework */; };
 		6D67C7DF21A1353100A4AB93 /* Alamofire.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6D67C7DA21A1353000A4AB93 /* Alamofire.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6D67C7E021A1353100A4AB93 /* CleanroomLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D67C7DB21A1353000A4AB93 /* CleanroomLogger.framework */; };
@@ -53,9 +54,10 @@
 		6DB742922277C95D00914C70 /* PostsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB742912277C95D00914C70 /* PostsViewController.swift */; };
 		6DB74294227901C800914C70 /* RedditClientBroker+posts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB74293227901C800914C70 /* RedditClientBroker+posts.swift */; };
 		6DB74296227902F300914C70 /* Post.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DB74295227902F300914C70 /* Post.swift */; };
+		6DBA74F32281299A00C0A94A /* PostMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBA74F22281299A00C0A94A /* PostMedia.swift */; };
+		6DBA74F522812CC900C0A94A /* ImagePostTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DBA74F422812CC900C0A94A /* ImagePostTableCellView.swift */; };
 		6DC12ADE21A46413002AB578 /* PreferencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC12ADD21A46413002AB578 /* PreferencesViewController.swift */; };
 		6DE1E9F522734C31002DCDCE /* NSImage+resize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE1E9F422734C31002DCDCE /* NSImage+resize.swift */; };
-		6DE5F395227BEA7B00706B54 /* MediaEmbed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE5F394227BEA7B00706B54 /* MediaEmbed.swift */; };
 		6DE5F397227BEDDA00706B54 /* Award.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DE5F396227BEDDA00706B54 /* Award.swift */; };
 /* End PBXBuildFile section */
 
@@ -146,6 +148,7 @@
 		6D4B6B4E21A130930064E471 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6D4D0B72223C3C5B00B76B22 /* AlamofireImage.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = AlamofireImage.framework.dSYM; path = Carthage/Build/Mac/AlamofireImage.framework.dSYM; sourceTree = "<group>"; };
 		6D4D0B73223C3C5B00B76B22 /* AlamofireImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AlamofireImage.framework; path = Carthage/Build/Mac/AlamofireImage.framework; sourceTree = "<group>"; };
+		6D5F804022807B7F00AF6D7B /* TextPostTableCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextPostTableCellView.swift; sourceTree = "<group>"; };
 		6D67C7DA21A1353000A4AB93 /* Alamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Alamofire.framework; path = Carthage/Build/Mac/Alamofire.framework; sourceTree = "<group>"; };
 		6D67C7DB21A1353000A4AB93 /* CleanroomLogger.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CleanroomLogger.framework; path = Carthage/Build/Mac/CleanroomLogger.framework; sourceTree = "<group>"; };
 		6D67C7DD21A1353100A4AB93 /* SwiftyJSON.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftyJSON.framework; path = Carthage/Build/Mac/SwiftyJSON.framework; sourceTree = "<group>"; };
@@ -162,9 +165,10 @@
 		6DB742912277C95D00914C70 /* PostsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostsViewController.swift; sourceTree = "<group>"; };
 		6DB74293227901C800914C70 /* RedditClientBroker+posts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RedditClientBroker+posts.swift"; sourceTree = "<group>"; };
 		6DB74295227902F300914C70 /* Post.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Post.swift; sourceTree = "<group>"; };
+		6DBA74F22281299A00C0A94A /* PostMedia.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostMedia.swift; sourceTree = "<group>"; };
+		6DBA74F422812CC900C0A94A /* ImagePostTableCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePostTableCellView.swift; sourceTree = "<group>"; };
 		6DC12ADD21A46413002AB578 /* PreferencesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesViewController.swift; sourceTree = "<group>"; };
 		6DE1E9F422734C31002DCDCE /* NSImage+resize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSImage+resize.swift"; sourceTree = "<group>"; };
-		6DE5F394227BEA7B00706B54 /* MediaEmbed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaEmbed.swift; sourceTree = "<group>"; };
 		6DE5F396227BEDDA00706B54 /* Award.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Award.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -377,6 +381,8 @@
 			children = (
 				6DB742912277C95D00914C70 /* PostsViewController.swift */,
 				6DABAE18227D088E00E00343 /* VideoPostTableCellView.swift */,
+				6D5F804022807B7F00AF6D7B /* TextPostTableCellView.swift */,
+				6DBA74F422812CC900C0A94A /* ImagePostTableCellView.swift */,
 			);
 			path = Posts;
 			sourceTree = "<group>";
@@ -392,8 +398,8 @@
 		6DE5F393227BEA5D00706B54 /* Post */ = {
 			isa = PBXGroup;
 			children = (
+				6DBA74F22281299A00C0A94A /* PostMedia.swift */,
 				6DB74295227902F300914C70 /* Post.swift */,
-				6DE5F394227BEA7B00706B54 /* MediaEmbed.swift */,
 				6DE5F396227BEDDA00706B54 /* Award.swift */,
 			);
 			path = Post;
@@ -579,16 +585,18 @@
 				6D47D033222C85BA008F2D21 /* RedditClientBroker+subreddits.swift in Sources */,
 				6DB742922277C95D00914C70 /* PostsViewController.swift in Sources */,
 				6D433AAC21F2752100C668B1 /* RedditObject.swift in Sources */,
+				6DBA74F32281299A00C0A94A /* PostMedia.swift in Sources */,
 				6D7D32622267C518001AAC76 /* StringInterpolation+Listable.swift in Sources */,
 				6D47D02F222C7A12008F2D21 /* SubredditsTableCellView.swift in Sources */,
 				6D4B6B2C21A130920064E471 /* AppDelegate.swift in Sources */,
 				6DB74294227901C800914C70 /* RedditClientBroker+posts.swift in Sources */,
 				6D0C89D021ACBA8500F40630 /* RedditAccount.swift in Sources */,
+				6D5F804122807B7F00AF6D7B /* TextPostTableCellView.swift in Sources */,
 				6D433AB021F27FD200C668B1 /* AccountFeatures.swift in Sources */,
+				6DBA74F522812CC900C0A94A /* ImagePostTableCellView.swift in Sources */,
 				6D4B6B3121A130920064E471 /* Illithid.xcdatamodeld in Sources */,
 				6D7C859621A4BE8C009A9C00 /* AccountsPreferencesViewController.swift in Sources */,
 				6DABAE1C227E2B6700E00343 /* String+parsing.swift in Sources */,
-				6DE5F395227BEA7B00706B54 /* MediaEmbed.swift in Sources */,
 				6D47D035222CC0A9008F2D21 /* Listable.swift in Sources */,
 				6D2F3C4D221D048100C0C876 /* SubredditsViewController.swift in Sources */,
 				6DABAE19227D088E00E00343 /* VideoPostTableCellView.swift in Sources */,

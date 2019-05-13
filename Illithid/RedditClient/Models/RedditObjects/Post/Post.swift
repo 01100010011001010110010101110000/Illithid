@@ -6,6 +6,7 @@
 //  Copyright © 2019 flayware. All rights reserved.
 //
 
+import Cocoa
 import Foundation
 
 enum PostSort: String, Codable {
@@ -16,6 +17,43 @@ enum PostSort: String, Codable {
   case rising
   case top
   case controversial
+  case confidence
+}
+
+enum PostHint: String, Codable {
+  case link
+  case `self`
+  case image
+  case richVideo
+  case hostedVideo
+  
+  enum CodingKeys: String, CodingKey {
+    case link
+    case `self`
+    case image
+    case richVideo = "rich:video"
+    case hostedVideo = "hosted:video"
+  }
+  
+  init(from decoder: Decoder) throws {
+    //TODO figure out if this is necessary, coding keys should handle this but it currently seems otherwise
+    let value = try decoder.singleValueContainer().decode(String.self)
+    switch value {
+    case "rich:video":
+      self = .richVideo
+    case "hosted:video":
+      self = .hostedVideo
+    default:
+      // Attempt to use string value; if we do not specifically support that type return the generic .link type
+      if let postType = PostHint(rawValue: value) {
+        self = postType
+      } else {
+        let context = EncodingError.Context(codingPath: decoder.codingPath,
+                                            debugDescription: "Unknown hint type: \(value)")
+        throw EncodingError.invalidValue(value, context)
+      }
+    }
+  }
 }
 
 struct Post: RedditObject {
@@ -32,8 +70,9 @@ struct Post: RedditObject {
   let subreddit_name_prefixed: String
   
   let selftext: String
-  let secure_media: MediaEmbed?
-  let media: MediaEmbed?
+  let selftext_html: String?
+  let secure_media: PostMedia?
+  let media: PostMedia?
   let domain: String
   
   let title: String
@@ -63,7 +102,7 @@ struct Post: RedditObject {
   let permalink: String
   let content_categories: [String]?
   let suggested_sort: PostSort?
-  let post_hint: String?
+  let post_hint: PostHint?
   let archived: Bool
   let no_follow: Bool
   let is_crosspostable: Bool
