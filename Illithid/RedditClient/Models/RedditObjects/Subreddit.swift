@@ -57,3 +57,11 @@ class Subreddit: RedditObject {
     case createdUTC = "created_utc"
   }
 }
+
+extension Subreddit {
+  func posts(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
+             params: ListingParams = .init(), completion: @escaping (Listing<Post>) -> Void) {
+    RedditClientBroker.broker.fetchPosts(for: self, sortBy: postSort, location: location, topInterval: topInterval,
+                                         params: params, completion: completion)
+  }
+}

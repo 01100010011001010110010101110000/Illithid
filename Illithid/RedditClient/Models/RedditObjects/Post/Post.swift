@@ -44,7 +44,7 @@ enum PostHint: String, Codable {
     case "hosted:video":
       self = .hostedVideo
     default:
-      // Attempt to use string value; if we do not specifically support that type return the generic .link type
+      // Attempt to use string value
       if let postType = PostHint(rawValue: value) {
         self = postType
       } else {

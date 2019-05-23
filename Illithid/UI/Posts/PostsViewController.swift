@@ -38,14 +38,13 @@ extension PostsViewController {
       Log.debug?.message("Switched to the same subreddit, doing nothing")
       return
     }
-    let params = ListingParams()
-    broker.fetchPosts(for: subreddit, sortBy: .hot, params: params) { list in
+    subreddit.posts(sortBy: .hot) { list in
       list.metadata.children.forEach { self.posts.append($0.object) }
       self.renderPosts(list)
     }
   }
 
-  func renderPosts(_ posts: Listable<Post>) {
+  func renderPosts(_ posts: Listing<Post>) {
     postsTableView.reloadData()
   }
 }
@@ -85,7 +84,14 @@ extension PostsViewController: NSTableViewDataSource {
     case .image:
       if let cell = postsTableView.makeView(withIdentifier: imageIdentifier, owner: nil) as? ImagePostTableCellView {
         cell.postTitle.stringValue = post.title
-        cell.postImage.image = NSImage(named: "NSUser")
+        if let image = broker.imageDownloader.imageCache?.image(for: URLRequest(url: post.url), withIdentifier: nil) {
+          cell.postImage.image = image
+        } else {
+          cell.postImage.image = NSImage(imageLiteralResourceName: "NSUser")
+          broker.fetchPostImage(for: post) { [unowned self, row] _ in
+            self.postsTableView.reloadData(forRowIndexes: IndexSet(integer: row), columnIndexes: IndexSet(integer: 0))
+          }
+        }
         return cell
       }
     case .link:

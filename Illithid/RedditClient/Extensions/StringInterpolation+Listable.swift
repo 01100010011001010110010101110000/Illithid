@@ -9,7 +9,7 @@
 import Foundation
 
 extension String.StringInterpolation {
-  mutating func appendInterpolation(_ value: Listable<Subreddit>) {
+  mutating func appendInterpolation(_ value: Listing<Subreddit>) {
     appendInterpolation("""
       dist: \(value.metadata.dist)
       before: \(value.metadata.before ?? "")

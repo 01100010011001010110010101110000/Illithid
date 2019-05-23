@@ -29,7 +29,7 @@ class SubredditsViewController: NSViewController {
   
   override func viewWillAppear() {
     super.viewWillAppear()
-    RedditClientBroker.broker.listSubreddits(sortBy: .default, includeCategories: true) { [unowned self] list in
+    RedditClientBroker.broker.subreddits(sortBy: .default) { [unowned self] list in
       self.renderSubreddits(list: list)
     }
   }
@@ -79,8 +79,7 @@ extension SubredditsViewController {
     let tableLength = Int(subredditsTableView.bounds.height)
     if tableLength - currentPosition < 500 {
       loadingSubreddits = true
-      RedditClientBroker.broker.listSubreddits(sortBy: .popular, after: after ?? "",
-                                               count: count) { [unowned self] list in
+      RedditClientBroker.broker.subreddits(sortBy: .popular) { [unowned self] list in
         self.renderSubreddits(list: list)
       }
     }
@@ -88,7 +87,7 @@ extension SubredditsViewController {
 }
 
 extension SubredditsViewController {
-  func renderSubreddits(list: Listable<Subreddit>) {
+  func renderSubreddits(list: Listing<Subreddit>) {
     before = list.metadata.before
     after = list.metadata.after
     count += list.metadata.dist

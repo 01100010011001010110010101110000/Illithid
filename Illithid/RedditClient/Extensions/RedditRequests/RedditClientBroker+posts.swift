@@ -9,13 +9,14 @@
 import Foundation
 
 import Alamofire
+import AlamofireImage
 import CleanroomLogger
 import SwiftyJSON
 
 extension RedditClientBroker {
   func fetchPosts(for subreddit: Subreddit, sortBy postSort: PostSort,
                   location: Location? = nil, topInterval: TopInterval? = nil,
-                  params: ListingParams, completion: @escaping (Listable<Post>) -> Void) {
+                  params: ListingParams = .init(), completion: @escaping (Listing<Post>) -> Void) {
     let decoder = JSONDecoder()
     decoder.dateDecodingStrategy = .secondsSince1970
     var parameters = params.toParameters()
@@ -37,7 +38,7 @@ extension RedditClientBroker {
         switch response.result {
         case let .success(data):
           do {
-            let list = try decoder.decode(Listable<Post>.self, from: data)
+            let list = try decoder.decode(Listing<Post>.self, from: data)
             completion(list)
           } catch let error as DecodingError {
             let json = try? JSON(data: data).rawString(options: [.sortedKeys, .prettyPrinted])
@@ -54,5 +55,13 @@ extension RedditClientBroker {
           Log.error?.message("Failed to call posts API endpoint: \(error)")
         }
     }
+  }
+  
+  func fetchPostImage(for post: Post, downloader: ImageDownloader? = nil,
+                      completion: @escaping ImageDownloader.CompletionHandler) {
+    let imageDownloader = downloader ?? self.imageDownloader
+    let request = URLRequest(url: post.url)
+    
+    imageDownloader.download(request) { completion($0) }
   }
 }

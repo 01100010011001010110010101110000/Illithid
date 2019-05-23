@@ -28,21 +28,11 @@ extension RedditClientBroker {
      - srDetail: Documentation unclear, [could only find this](https://www.reddit.com/r/redditdev/comments/3560mt/what_is_the_query_parameter_sr_detail_for_in/)
      - completion: Completion handler, is passed the listable as an argument
    */
-  func listSubreddits(sortBy subredditSort: SubredditSort = .popular,
-                      before: String = "", after: String = "", count: Int = 0,
-                      includeCategories: Bool = false, limit: Int = 25, show: ShowAllPreference = .filtered,
-                      srDetail: Bool = false, completion: @escaping (Listable<Subreddit>) -> Void) {
+  func subreddits(sortBy subredditSort: SubredditSort = .popular,
+                  params: ListingParams = .init(), completion: @escaping (Listing<Subreddit>) -> Void) {
     let decoder = JSONDecoder()
     decoder.dateDecodingStrategy = .secondsSince1970
-    let parameters: Parameters = [
-      "before": before,
-      "after": after,
-      "count": count,
-      "include_categories": includeCategories,
-      "limit": limit,
-      "show": show,
-      "sr_detail": srDetail
-    ]
+    let parameters = params.toParameters()
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
     let subredditsListUrl = URL(string: "https://oauth.reddit.com/subreddits/\(subredditSort)")!
 
@@ -51,7 +41,7 @@ extension RedditClientBroker {
         switch response.result {
         case let .success(data):
           do {
-            let list = try decoder.decode(Listable<Subreddit>.self, from: data)
+            let list = try decoder.decode(Listing<Subreddit>.self, from: data)
             completion(list)
           } catch let error as DecodingError {
             let json = try? JSON(data: data).rawString(options: [.sortedKeys, .prettyPrinted])

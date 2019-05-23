@@ -8,25 +8,25 @@
 
 import Foundation
 
-struct Listable<RedditType: RedditObject>: Codable {
+struct Listing<RedditType: RedditObject>: Codable {
   
   let kind: String
-  let metadata: ListableData
+  let metadata: ListData
   
   enum CodingKeys: String, CodingKey {
     case kind
     case metadata = "data"
   }
   
-  struct ListableData: Codable {
+  struct ListData: Codable {
     let modhash: String?
     let dist: Int
-    let children: [ListableChild]
+    let children: [ListChild]
     let after: String?
     let before: String?
   }
   
-  struct ListableChild: Codable {
+  struct ListChild: Codable {
     let kind: String
     let object: RedditType
     
