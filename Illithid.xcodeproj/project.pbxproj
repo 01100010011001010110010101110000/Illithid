@@ -12,6 +12,7 @@
 		6D0C89D021ACBA8500F40630 /* RedditAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D0C89CF21ACBA8500F40630 /* RedditAccount.swift */; };
 		6D21C22C21FE9FB900345B1A /* ApiDebugConsoleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D21C22A21FE9FB900345B1A /* ApiDebugConsoleViewController.swift */; };
 		6D21C22D21FE9FB900345B1A /* ApiDebugConsoleViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6D21C22B21FE9FB900345B1A /* ApiDebugConsoleViewController.xib */; };
+		6D22988822987FE400446218 /* LinkPostTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D22988722987FE400446218 /* LinkPostTableCellView.swift */; };
 		6D229B8321DAE832005DC34C /* OAuthSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6D229B8221DAE831005DC34C /* OAuthSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6D229B8521DAE843005DC34C /* OAuthSwift.framework.dSYM in Copy Debug Symbols */ = {isa = PBXBuildFile; fileRef = 6D229B8421DAE842005DC34C /* OAuthSwift.framework.dSYM */; };
 		6D2F3C4D221D048100C0C876 /* SubredditsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2F3C4C221D048100C0C876 /* SubredditsViewController.swift */; };
@@ -121,6 +122,7 @@
 		6D0C89CF21ACBA8500F40630 /* RedditAccount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RedditAccount.swift; sourceTree = "<group>"; };
 		6D21C22A21FE9FB900345B1A /* ApiDebugConsoleViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiDebugConsoleViewController.swift; sourceTree = "<group>"; };
 		6D21C22B21FE9FB900345B1A /* ApiDebugConsoleViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ApiDebugConsoleViewController.xib; sourceTree = "<group>"; };
+		6D22988722987FE400446218 /* LinkPostTableCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkPostTableCellView.swift; sourceTree = "<group>"; };
 		6D229B8221DAE831005DC34C /* OAuthSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OAuthSwift.framework; path = Carthage/Build/Mac/OAuthSwift.framework; sourceTree = "<group>"; };
 		6D229B8421DAE842005DC34C /* OAuthSwift.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = OAuthSwift.framework.dSYM; path = Carthage/Build/Mac/OAuthSwift.framework.dSYM; sourceTree = "<group>"; };
 		6D2F3C4C221D048100C0C876 /* SubredditsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubredditsViewController.swift; sourceTree = "<group>"; };
@@ -383,6 +385,7 @@
 				6DABAE18227D088E00E00343 /* VideoPostTableCellView.swift */,
 				6D5F804022807B7F00AF6D7B /* TextPostTableCellView.swift */,
 				6DBA74F422812CC900C0A94A /* ImagePostTableCellView.swift */,
+				6D22988722987FE400446218 /* LinkPostTableCellView.swift */,
 			);
 			path = Posts;
 			sourceTree = "<group>";
@@ -591,6 +594,7 @@
 				6D4B6B2C21A130920064E471 /* AppDelegate.swift in Sources */,
 				6DB74294227901C800914C70 /* RedditClientBroker+posts.swift in Sources */,
 				6D0C89D021ACBA8500F40630 /* RedditAccount.swift in Sources */,
+				6D22988822987FE400446218 /* LinkPostTableCellView.swift in Sources */,
 				6D5F804122807B7F00AF6D7B /* TextPostTableCellView.swift in Sources */,
 				6D433AB021F27FD200C668B1 /* AccountFeatures.swift in Sources */,
 				6DBA74F522812CC900C0A94A /* ImagePostTableCellView.swift in Sources */,

@@ -56,8 +56,9 @@ extension PostsViewController: NSTableViewDelegate {
 }
 
 extension PostsViewController: NSTableViewDataSource {
-  func tableView(_ tableView: NSTableView, viewFor _: NSTableColumn?, row: Int) -> NSView? {
+  func tableView(_ tableView: NSTableView, viewFor column: NSTableColumn?, row: Int) -> NSView? {
     let post = posts[row]
+    let linkIdentifier = NSUserInterfaceItemIdentifier(rawValue: "LinkPostCell")
     let videoIdentifier = NSUserInterfaceItemIdentifier(rawValue: "VideoPostCell")
     let imageIdentifier = NSUserInterfaceItemIdentifier(rawValue: "ImagePostCell")
     let textIdentifier = NSUserInterfaceItemIdentifier(rawValue: "TextPostCell")
@@ -79,6 +80,7 @@ extension PostsViewController: NSTableViewDataSource {
         
         let textView = cell.postTextView.documentView as? NSTextView
         textView?.textStorage?.setAttributedString(attributedText)
+        if column?.width ?? CGFloat.infinity < cell.fittingSize.width { column?.width = cell.fittingSize.width }
         return cell
       }
     case .image:
@@ -92,22 +94,30 @@ extension PostsViewController: NSTableViewDataSource {
             self.postsTableView.reloadData(forRowIndexes: IndexSet(integer: row), columnIndexes: IndexSet(integer: 0))
           }
         }
+        if column?.width ?? CGFloat.infinity < cell.fittingSize.width { column?.width = cell.fittingSize.width }
         return cell
       }
     case .link:
-      // Load link
-      return nil
+      if let cell = postsTableView.makeView(withIdentifier: linkIdentifier, owner: self) as? LinkPostTableCellView {
+        cell.postTitleTextField.stringValue = post.title
+        cell.linkWebView.load(URLRequest(url: post.url))
+        if column?.width ?? CGFloat.infinity < cell.fittingSize.width { column?.width = cell.fittingSize.width }
+        return cell
+      }
     case .richVideo, .hostedVideo:
       if post.media?.type == "youtube.com" {
         if let cell = postsTableView.makeView(withIdentifier: videoIdentifier, owner: self) as? VideoPostTableCellView {
           cell.postTitle.stringValue = post.title
           cell.videoWebView.load(URLRequest(url: post.media!.oembed!.html.iFrameSrc()!))
+          if column?.width ?? CGFloat.infinity < cell.fittingSize.width { column?.width = cell.fittingSize.width }
           return cell
         }
+      } else {
+        Log.error?.message("Unhandled media type: \(post.media?.type ?? "No media type")")
       }
     }
 
-    Log.error?.message("We should never reach this")
+    Log.error?.message("Switch statement is not exhaustive: \(hint)")
     return nil
   }
 }

@@ -55,13 +55,14 @@ extension SubredditsViewController: NSTableViewDelegate {
 }
 
 extension SubredditsViewController: NSTableViewDataSource {
-  func tableView(_ tableView: NSTableView, viewFor _: NSTableColumn?, row: Int) -> NSView? {
+  func tableView(_ tableView: NSTableView, viewFor column: NSTableColumn?, row: Int) -> NSView? {
     let identifier = NSUserInterfaceItemIdentifier(rawValue: "Post")
     if let cell = subredditsTableView.makeView(withIdentifier: identifier, owner: self) as? SubredditTableCellView {
       cell.title?.stringValue = subreddits[row].displayName
       cell.subredditDescription?.stringValue = subreddits[row].publicDescription
       cell.preview.image = subreddits[row].headerImage?.resizeMaintainingAspectRatio(to: NSSize(width: 32.0,
                                                                                                 height: 54.0))
+      if column?.width ?? CGFloat.infinity < cell.fittingSize.width { column?.width = cell.fittingSize.width }
       return cell
     } else {
       Log.error?.message("Failed to create a cell")

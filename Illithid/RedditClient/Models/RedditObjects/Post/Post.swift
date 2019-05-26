@@ -87,6 +87,7 @@ struct Post: RedditObject {
   
   let thumbnail_height: Int?
   let thumbnail_width: Int?
+  let thumbnail: URL?
   
   let gilded: Int
   let is_original_content: Bool
