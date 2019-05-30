@@ -151,7 +151,7 @@ extension PostsViewController {
     let superWidth = Int(superView.frame.width)
     
     for preview in post.previews().reversed() {
-      guard preview.width < superHeight else { continue }
+      guard preview.width < superWidth else { continue }
       if superHeight.distance(to: (3 * preview.height)) < 100 {
         return URLRequest(url: preview.url)
       }
