@@ -1183,19 +1183,16 @@ DQ
                                                             <rect key="frame" x="1" y="2" width="911" height="324"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="oC6-3a-P4z">
+                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="oC6-3a-P4z">
                                                                     <rect key="frame" x="18" y="287" width="875" height="17"/>
-                                                                    <textFieldCell key="cell" alignment="center" title="Post Title" id="vof-yl-uWQ">
-                                                                        <font key="font" usesAppearanceFont="YES"/>
+                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" alignment="center" title="Post Title" id="vof-yl-uWQ">
+                                                                        <font key="font" metaFont="titleBar"/>
                                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>
                                                                 </textField>
                                                                 <wkWebView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rc6-ep-SS5">
                                                                     <rect key="frame" x="20" y="20" width="871" height="247"/>
-                                                                    <constraints>
-                                                                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="200" id="PyQ-B8-5oa"/>
-                                                                    </constraints>
                                                                     <wkWebViewConfiguration key="configuration">
                                                                         <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" audio="YES" video="YES"/>
                                                                         <wkPreferences key="preferences" javaScriptCanOpenWindowsAutomatically="NO"/>
@@ -1204,10 +1201,10 @@ DQ
                                                             </subviews>
                                                             <constraints>
                                                                 <constraint firstItem="rc6-ep-SS5" firstAttribute="top" secondItem="oC6-3a-P4z" secondAttribute="bottom" constant="20" id="DKd-ad-ZtB"/>
+                                                                <constraint firstItem="rc6-ep-SS5" firstAttribute="centerX" secondItem="j1a-Or-Qsy" secondAttribute="centerX" id="R1Y-KK-vlQ"/>
                                                                 <constraint firstAttribute="trailing" secondItem="oC6-3a-P4z" secondAttribute="trailing" constant="20" symbolic="YES" id="cid-qa-har"/>
                                                                 <constraint firstItem="oC6-3a-P4z" firstAttribute="top" secondItem="j1a-Or-Qsy" secondAttribute="top" constant="20" symbolic="YES" id="hXO-I5-V93"/>
                                                                 <constraint firstAttribute="bottom" secondItem="rc6-ep-SS5" secondAttribute="bottom" constant="20" symbolic="YES" id="o9C-Ij-iOe"/>
-                                                                <constraint firstAttribute="trailing" secondItem="rc6-ep-SS5" secondAttribute="trailing" constant="20" symbolic="YES" id="okF-Ka-nN0"/>
                                                                 <constraint firstItem="rc6-ep-SS5" firstAttribute="leading" secondItem="j1a-Or-Qsy" secondAttribute="leading" constant="20" symbolic="YES" id="wPi-6E-xtb"/>
                                                                 <constraint firstItem="oC6-3a-P4z" firstAttribute="leading" secondItem="j1a-Or-Qsy" secondAttribute="leading" constant="20" symbolic="YES" id="zBH-xL-Ybr"/>
                                                             </constraints>
@@ -1220,48 +1217,44 @@ DQ
                                                             <rect key="frame" x="1" y="330" width="911" height="324"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TFY-X3-WVC">
+                                                                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="RIS-3m-Zpo">
+                                                                    <rect key="frame" x="20" y="20" width="871" height="257"/>
+                                                                    <constraints>
+                                                                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="32" id="Nuk-h8-C7v"/>
+                                                                    </constraints>
+                                                                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="NSAdvanced" id="2iG-yz-z3G"/>
+                                                                </imageView>
+                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4Mp-yd-ZOk">
                                                                     <rect key="frame" x="18" y="287" width="875" height="17"/>
-                                                                    <textFieldCell key="cell" alignment="center" title="Post Title" id="B8w-Ug-9Uc">
+                                                                    <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Label" id="FN3-Tp-lj8">
                                                                         <font key="font" metaFont="system"/>
                                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>
                                                                 </textField>
-                                                                <wkWebView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="csn-NO-Xrs" userLabel="Link Web View">
-                                                                    <rect key="frame" x="20" y="20" width="871" height="247"/>
-                                                                    <constraints>
-                                                                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="200" id="fjd-Cd-29n"/>
-                                                                    </constraints>
-                                                                    <wkWebViewConfiguration key="configuration">
-                                                                        <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
-                                                                        <wkPreferences key="preferences" javaScriptCanOpenWindowsAutomatically="NO"/>
-                                                                    </wkWebViewConfiguration>
-                                                                </wkWebView>
                                                             </subviews>
                                                             <constraints>
-                                                                <constraint firstItem="TFY-X3-WVC" firstAttribute="leading" secondItem="DwY-U6-PdK" secondAttribute="leading" constant="20" symbolic="YES" id="7Er-lV-WRW"/>
-                                                                <constraint firstItem="TFY-X3-WVC" firstAttribute="top" secondItem="DwY-U6-PdK" secondAttribute="top" constant="20" symbolic="YES" id="Pdy-cj-O8n"/>
-                                                                <constraint firstAttribute="trailing" secondItem="csn-NO-Xrs" secondAttribute="trailing" constant="20" symbolic="YES" id="WK4-kq-29m"/>
-                                                                <constraint firstAttribute="bottom" secondItem="csn-NO-Xrs" secondAttribute="bottom" constant="20" symbolic="YES" id="Z4n-ez-Wx8"/>
-                                                                <constraint firstItem="csn-NO-Xrs" firstAttribute="leading" secondItem="DwY-U6-PdK" secondAttribute="leading" constant="20" symbolic="YES" id="bHN-9i-Xos"/>
-                                                                <constraint firstItem="csn-NO-Xrs" firstAttribute="top" secondItem="TFY-X3-WVC" secondAttribute="bottom" constant="20" id="hHf-Ja-Rrk"/>
-                                                                <constraint firstItem="TFY-X3-WVC" firstAttribute="centerX" secondItem="DwY-U6-PdK" secondAttribute="centerX" id="x0W-bE-Ohl"/>
+                                                                <constraint firstItem="4Mp-yd-ZOk" firstAttribute="centerX" secondItem="DwY-U6-PdK" secondAttribute="centerX" id="4bf-yt-6cP"/>
+                                                                <constraint firstItem="RIS-3m-Zpo" firstAttribute="top" secondItem="4Mp-yd-ZOk" secondAttribute="bottom" constant="10" id="6nE-hB-BRA"/>
+                                                                <constraint firstItem="RIS-3m-Zpo" firstAttribute="centerX" secondItem="DwY-U6-PdK" secondAttribute="centerX" id="Duu-ON-bP3"/>
+                                                                <constraint firstItem="4Mp-yd-ZOk" firstAttribute="top" secondItem="DwY-U6-PdK" secondAttribute="top" constant="20" symbolic="YES" id="MHz-9w-6RM"/>
+                                                                <constraint firstItem="RIS-3m-Zpo" firstAttribute="leading" secondItem="DwY-U6-PdK" secondAttribute="leading" constant="20" symbolic="YES" id="Oxm-aW-XOd"/>
+                                                                <constraint firstAttribute="bottom" secondItem="RIS-3m-Zpo" secondAttribute="bottom" constant="20" symbolic="YES" id="Wul-zQ-yoK"/>
+                                                                <constraint firstItem="4Mp-yd-ZOk" firstAttribute="leading" secondItem="DwY-U6-PdK" secondAttribute="leading" constant="20" symbolic="YES" id="zgh-1Q-1ml"/>
                                                             </constraints>
                                                             <connections>
-                                                                <outlet property="linkWebView" destination="csn-NO-Xrs" id="b3L-IF-FOO"/>
-                                                                <outlet property="postTitleTextField" destination="TFY-X3-WVC" id="zhb-Mb-Ul7"/>
-                                                                <outlet property="videoWebView" destination="csn-NO-Xrs" id="iBS-Yq-foi"/>
+                                                                <outlet property="postTitle" destination="4Mp-yd-ZOk" id="pOL-EO-b1E"/>
+                                                                <outlet property="previewImage" destination="RIS-3m-Zpo" id="Tuq-OF-bL5"/>
                                                             </connections>
                                                         </tableCellView>
                                                         <tableCellView identifier="ImagePostCell" id="d4b-0k-5ZC" userLabel="Image Post Cell View" customClass="ImagePostTableCellView" customModule="Illithid" customModuleProvider="target">
                                                             <rect key="frame" x="1" y="658" width="911" height="217"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hGm-yp-C1O">
+                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="hGm-yp-C1O">
                                                                     <rect key="frame" x="18" y="180" width="875" height="17"/>
-                                                                    <textFieldCell key="cell" alignment="center" title="Post Title" id="5WV-bH-Yqh">
-                                                                        <font key="font" usesAppearanceFont="YES"/>
+                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" alignment="center" title="Post Title" id="5WV-bH-Yqh">
+                                                                        <font key="font" metaFont="titleBar"/>
                                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>
@@ -1293,10 +1286,10 @@ DQ
                                                             <rect key="frame" x="1" y="879" width="911" height="215"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Y6S-xD-PbZ">
+                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Y6S-xD-PbZ">
                                                                     <rect key="frame" x="18" y="178" width="875" height="17"/>
-                                                                    <textFieldCell key="cell" alignment="center" title="Post Title" id="6SN-X1-6yE">
-                                                                        <font key="font" usesAppearanceFont="YES"/>
+                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" alignment="center" title="Post Title" id="6SN-X1-6yE">
+                                                                        <font key="font" metaFont="titleBar"/>
                                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>

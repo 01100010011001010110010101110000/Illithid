@@ -19,9 +19,7 @@ class VideoPostTableCellView: NSTableCellView {
   ]
 
   override func draw(_ dirtyRect: NSRect) {
-    let configuration = WKWebViewConfiguration()
-    configuration.allowsAirPlayForMediaPlayback = true
-    videoWebView = WKWebView(frame: .zero, configuration: configuration)
+    videoWebView = WKWebView(frame: .zero)
     videoWebView.navigationDelegate = self
     super.draw(dirtyRect)
   }

@@ -10,11 +10,10 @@ import Cocoa
 import WebKit
 
 class LinkPostTableCellView: NSTableCellView {
-  @IBOutlet var postTitleTextField: NSTextField!
-  @IBOutlet var linkWebView: WKWebView!
+  @IBOutlet var postTitle: NSTextField!
+  @IBOutlet var previewImage: NSImageView!
   
-    override func draw(_ dirtyRect: NSRect) {
-        super.draw(dirtyRect)
-    }
-    
+  override func draw(_ dirtyRect: NSRect) {
+    super.draw(dirtyRect)
+  }
 }

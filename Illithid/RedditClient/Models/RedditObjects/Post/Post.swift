@@ -89,6 +89,8 @@ struct Post: RedditObject {
   let thumbnail_width: Int?
   let thumbnail: URL?
   
+  let preview: Preview?
+  
   let gilded: Int
   let is_original_content: Bool
   let is_meta: Bool
@@ -120,4 +122,18 @@ struct Post: RedditObject {
   let contest_mode: Bool
   let created_utc: Date
   let is_video: Bool
+}
+
+extension Post {
+  func previews() -> [ImagePreview.Image] {
+    var previews: [ImagePreview.Image] = []
+    guard self.thumbnail != nil, self.thumbnail?.scheme != nil else { return previews }
+    previews.reserveCapacity(self.preview?.images.first?.resolutions.count ?? 2)
+    previews.append(.init(url: self.thumbnail!, width: self.thumbnail_width!, height: self.thumbnail_height!))
+    if let preview = self.preview?.images.first {
+      previews.append(contentsOf: preview.resolutions)
+      previews.append(preview.source)
+    }
+    return previews
+  }
 }

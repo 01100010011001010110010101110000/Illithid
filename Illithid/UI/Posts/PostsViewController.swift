@@ -67,6 +67,7 @@ extension PostsViewController: NSTableViewDataSource {
     // The reddit API does not consistently return a post hint for self posts,
     // and we wish to treat other cases with no hint (which may or may not exist) as a link type
     let hint: PostHint = post.is_self ? .self : (post.post_hint ?? .link)
+    
     switch hint {
     case .self:
       if let cell = postsTableView.makeView(withIdentifier: textIdentifier, owner: self) as? TextPostTableCellView {
@@ -99,8 +100,27 @@ extension PostsViewController: NSTableViewDataSource {
       }
     case .link:
       if let cell = postsTableView.makeView(withIdentifier: linkIdentifier, owner: self) as? LinkPostTableCellView {
-        cell.postTitleTextField.stringValue = post.title
-        cell.linkWebView.load(URLRequest(url: post.url))
+        cell.postTitle.stringValue = post.title
+        guard let previewImageUrlRequest = selectPostPreview(post) else {
+          cell.previewImage.image = NSImage(imageLiteralResourceName: "NSUser")
+          return cell
+        }
+        
+        let previewImage = broker.imageDownloader.imageCache?.image(for: previewImageUrlRequest, withIdentifier: nil)
+        if let image = previewImage {
+          cell.previewImage.image = image
+        } else {
+          cell.previewImage.image = NSImage(imageLiteralResourceName: "NSUser")
+          broker.imageDownloader.download(previewImageUrlRequest) { [weak self, row] response in
+            switch response.result {
+            case .success:
+              self?.postsTableView.reloadData(forRowIndexes: IndexSet(integer: row),
+                                              columnIndexes: IndexSet(integer: 0))
+            case .failure(let error):
+              Log.error?.message("Failed to fetch preview thumbnail: \(error)")
+            }
+          }
+        }
         if column?.width ?? CGFloat.infinity < cell.fittingSize.width { column?.width = cell.fittingSize.width }
         return cell
       }
@@ -114,10 +134,29 @@ extension PostsViewController: NSTableViewDataSource {
         }
       } else {
         Log.error?.message("Unhandled media type: \(post.media?.type ?? "No media type")")
+        return nil
       }
     }
 
     Log.error?.message("Switch statement is not exhaustive: \(hint)")
+    return nil
+  }
+}
+
+extension PostsViewController {
+  
+  func selectPostPreview(_ post: Post) -> URLRequest? {
+    let superView = self.postsTableView.superview!
+    let superHeight = Int(superView.frame.height)
+    let superWidth = Int(superView.frame.width)
+    
+    for preview in post.previews().reversed() {
+      guard preview.width < superHeight else { continue }
+      if superHeight.distance(to: (3 * preview.height)) < 100 {
+        return URLRequest(url: preview.url)
+      }
+    }
+    
     return nil
   }
 }

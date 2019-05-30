@@ -31,11 +31,11 @@ struct PostMedia: Codable {
   
   struct EmbeddingParameters: Codable {
     let provider_url: URL
-    let title: String
+    let title: String?
     let type: String
     let html: String
-    let thumbnail_width: Int
-    let thumbnail_height: Int
+    let thumbnail_width: Int?
+    let thumbnail_height: Int?
     let height: Int
     let width: Int
     let version: String
