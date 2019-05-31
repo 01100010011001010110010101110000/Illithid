@@ -11,7 +11,17 @@ import WebKit
 
 class LinkPostTableCellView: NSTableCellView {
   @IBOutlet var postTitle: NSTextField!
+  
   @IBOutlet var previewImage: NSImageView!
+  
+  @IBOutlet var postAuthor: NSTextField!
+  
+  @IBOutlet var postAge: NSTextField!
+  @IBOutlet var subredditName: NSTextField!
+  
+  @IBOutlet var postDownvotes: NSTextField!
+  @IBOutlet var postUpvotes: NSTextField!
+  @IBOutlet var postCommentsCount: NSTextField!
   
   override func draw(_ dirtyRect: NSRect) {
     super.draw(dirtyRect)

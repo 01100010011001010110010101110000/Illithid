@@ -16,15 +16,19 @@ class PostsViewController: NSViewController {
   let broker = RedditClientBroker.broker
   var loadedSubreddit: Subreddit?
   var posts: [Post] = []
+  let intervalFormatter = DateComponentsFormatter()
 
-  @IBOutlet var postsTableView: NSTableView!
-
+  @IBOutlet var postsTableView: PostsTableView!
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     postsTableView.delegate = self
     postsTableView.dataSource = self
     notificationCenter.addObserver(self, selector: #selector(onSubredditChange(_:)),
                                    name: .subredditChanged, object: nil)
+    intervalFormatter.allowedUnits = [ .year,.month, .day, .hour, .minute, .second ]
+    intervalFormatter.maximumUnitCount = 1
+    intervalFormatter.unitsStyle = .abbreviated
   }
 }
 
@@ -100,7 +104,16 @@ extension PostsViewController: NSTableViewDataSource {
       }
     case .link:
       if let cell = postsTableView.makeView(withIdentifier: linkIdentifier, owner: self) as? LinkPostTableCellView {
+        
+        // Properties returned from the API directly
         cell.postTitle.stringValue = post.title
+        cell.postAuthor.stringValue = "u/\(post.author)"
+        cell.postUpvotes.stringValue = String(post.ups.postAbbreviation())
+        cell.postDownvotes.stringValue = String(post.downs.postAbbreviation())
+        cell.postCommentsCount.stringValue = String(post.num_comments.postAbbreviation())
+        cell.subredditName.stringValue = post.subreddit_name_prefixed
+        cell.postAge.stringValue = intervalFormatter.string(from: post.created_utc, to: .init()) ?? "Blade Runner"
+        
         guard let previewImageUrlRequest = selectPostPreview(post) else {
           cell.previewImage.image = NSImage(imageLiteralResourceName: "NSUser")
           return cell

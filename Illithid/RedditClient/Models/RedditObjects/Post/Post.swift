@@ -95,9 +95,11 @@ struct Post: RedditObject {
   let is_original_content: Bool
   let is_meta: Bool
   let is_self: Bool
+  // TODO: This has an inconsistent API response, handle it
 //  let edited: Date
   let ups: Int
   let downs: Int
+  let score: Int
   let clicked: Bool
   let created: Date
   let num_comments: Int
@@ -128,7 +130,7 @@ extension Post {
   func previews() -> [ImagePreview.Image] {
     var previews: [ImagePreview.Image] = []
     guard self.thumbnail != nil, self.thumbnail?.scheme != nil else { return previews }
-    previews.reserveCapacity(self.preview?.images.first?.resolutions.count ?? 2)
+    previews.reserveCapacity((self.preview?.images.first?.resolutions.count ?? 0) + 2)
     previews.append(.init(url: self.thumbnail!, width: self.thumbnail_width!, height: self.thumbnail_height!))
     if let preview = self.preview?.images.first {
       previews.append(contentsOf: preview.resolutions)
