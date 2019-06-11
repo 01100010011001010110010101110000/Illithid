@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension Int {
+public extension Int {
   func postAbbreviation(_ significantFigures: Int = 2) -> String {
     guard self >= 1000 else { return self.description }
     let float_self = Double(self)
