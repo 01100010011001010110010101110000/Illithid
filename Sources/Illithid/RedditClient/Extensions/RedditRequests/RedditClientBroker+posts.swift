@@ -21,7 +21,7 @@ public extension RedditClientBroker {
     decoder.dateDecodingStrategy = .secondsSince1970
     var parameters = params.toParameters()
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
-    let postsUrl = URL(string: "https://api.reddit.com/r/\(subreddit.displayName)/\(postSort)")!
+    let postsUrl = URL(string: "https://oauth.reddit.com/r/\(subreddit.displayName)/\(postSort)")!
     
     // Handle nonsense magic string parameters which apply to specific sorts
     switch postSort {

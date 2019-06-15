@@ -34,7 +34,7 @@ public extension RedditClientBroker {
     decoder.dateDecodingStrategy = .secondsSince1970
     let parameters = params.toParameters()
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
-    let subredditsListUrl = URL(string: "https://api.reddit.com/subreddits/\(subredditSort)")!
+    let subredditsListUrl = URL(string: "https://oauth.reddit.com/subreddits/\(subredditSort)")!
 
     session.request(subredditsListUrl, method: .get, parameters: parameters, encoding: queryEncoding)
       .validate().responseData { response in
