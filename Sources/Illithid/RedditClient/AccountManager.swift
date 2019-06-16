@@ -99,7 +99,7 @@ public final class AccountManager: BindableObject {
     }
   }
 
-  func persistAccounts() {
+  public func persistAccounts() {
     let encoder = JSONEncoder()
     accounts.forEach { account in
       do {
@@ -139,6 +139,10 @@ public final class AccountManager: BindableObject {
     }
 
     Publishers.MergeMany(accountPublishers)
+      .mapError { error -> Error in
+        self.logger.errorMessage { "Error while loading accounts: \(error)" }
+        return error
+      }
       .map { account in
         self.accounts.append(account)
         if lastSelectedAccount != nil, lastSelectedAccount == account.name {
@@ -152,45 +156,21 @@ public final class AccountManager: BindableObject {
         }
         completion()
       }
-
-//    for (idx, account) in savedAccounts.enumerated() {
-//      let credential: OAuthSwiftCredential = try! decoder.decode(
-//        OAuthSwiftCredential.self,
-//        from: keychain.getData(account)!
-//      )
-//      logger.debugMessage("Found refresh token: \(credential.oauthRefreshToken) for \(account)")
-//      let oauth = OAuth2Swift(parameters: configuration.oauthParameters)!
-//      oauth.accessTokenBasicAuthentification = true
-//      oauth.client = OAuthSwiftClient(credential: credential)
-//      session.adapter = oauth.requestAdapter
-//      session.retrier = oauth.requestAdapter
-//
-//      logger.debugMessage("...Loading \(account)")
-//
-//      session.request("https://oauth.reddit.com/api/v1/me", method: .get).validate().responseData { response in
-//        switch response.result {
-//        case let .success(data):
-//          self.logger.debugMessage("...Loaded \(account)")
-//          let accountObject = try! decoder.decode(RedditAccount.self, from: data)
-//          self.accounts.append(accountObject)
-//          self.credentials[accountObject.name] = oauth.client.credential
-//
-//          if let lastSelectedAccount = self.configuration.defaults.string(forKey: "SelectedAccount"),
-//            accountObject.name == lastSelectedAccount {
-//            self.logger.debugMessage("Setting \(lastSelectedAccount) as current account")
-//            self.setCurrentAccount(account: accountObject)
-//          }
-//        case let .failure(error):
-//          self.logger.errorMessage("Failed to retrieve account data: \(error)")
-//        }
-//      }
-//    }
   }
 
   public func removeAccount(indexSet: IndexSet) {
     for index in indexSet {
       removeAccount(toRemove: accounts[index])
     }
+  }
+
+  public func removeAll() {
+    let usernames = configuration.defaults.stringArray(forKey: "RedditUsernames") ?? []
+    usernames.forEach { (username) in
+      credentials.removeValue(forKey: username)
+    }
+    configuration.defaults.set([], forKey: "RedditUsernames")
+    accounts.removeAll()
   }
 
   public func removeAccount(toRemove account: RedditAccount) {
