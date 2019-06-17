@@ -132,8 +132,10 @@ public final class AccountManager: BindableObject {
         session.retrier = oauth.requestAdapter
       }
 
-      return oauth.client.requestPublisher(URL(string: "https://oauth.reddit.com/api/v1/me")!)
-        .map { $0.data }
+      return oauth.requestPublisher(URL(string: "https://oauth.reddit.com/api/v1/me")!, method: .GET, parameters: oauth.parameters)
+        .map { response in
+          response.data
+        }
         .decode(type: RedditAccount.self, decoder: decoder)
         .eraseToAnyPublisher()
     }
@@ -144,6 +146,7 @@ public final class AccountManager: BindableObject {
         return error
       }
       .map { account in
+        self.logger.debugMessage { "Appending \(account.name)" }
         self.accounts.append(account)
         if lastSelectedAccount != nil, lastSelectedAccount == account.name {
           self.setCurrentAccount(account: account)
