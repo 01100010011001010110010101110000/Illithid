@@ -143,7 +143,7 @@ public struct ListingParams {
 }
 
 /// The base class for all user-generated content on Reddit
-public protocol RedditObject: Codable, Equatable, Identifiable {
+public protocol RedditObject: Codable, Equatable, Identifiable, Hashable {
   /// The object's unique identifier
   var id: String { get } // swiftlint:disable:this identifier_name
 

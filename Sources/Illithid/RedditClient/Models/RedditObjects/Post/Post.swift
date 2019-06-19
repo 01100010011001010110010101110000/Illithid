@@ -60,7 +60,11 @@ public struct Post: RedditObject {
   public static func == (lhs: Post, rhs: Post) -> Bool {
     return lhs.name == rhs.name
   }
-  
+
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(name)
+  }
+
   public let id: String
   public let name: String
   public let type = "t3"
