@@ -35,4 +35,8 @@ public struct Listing<RedditType: RedditObject>: Codable {
       case object = "data"
     }
   }
+
+  lazy var children: [RedditType] = {
+    metadata.children.map { $0.object }
+  }()
 }
