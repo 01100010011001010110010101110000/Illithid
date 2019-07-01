@@ -102,8 +102,7 @@ public struct Post: RedditObject {
   public let is_original_content: Bool
   public let is_meta: Bool
   public let is_self: Bool
-  // TODO: This has an inconsistent API response, handle it
-//  let edited: Date
+  public let edited: Edited
   public let ups: Int
   public let downs: Int
   public let score: Int

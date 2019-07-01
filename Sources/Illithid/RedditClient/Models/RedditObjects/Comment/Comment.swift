@@ -1,73 +1,99 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Tyler Gregory on 6/19/19.
 //
 
 import Foundation
 
+public enum CommentsSort: String, Codable {
+  case confidence
+  case top
+  case new
+  case controversial
+  case old
+  case random
+  case qa
+  case live
+}
+
 public struct Comment: RedditObject {
-  let totalAwardsReceived: Int
-  let approvedAtUTC: Date
-  let ups: Int
-  let modReasonBy, bannedBy: String?
-  let authorFlairType: String
-  let removalReason: String?
-  let linkID: String
-  let authorFlairTemplateID: String?
-  let likes: String?
-  let noFollow: Bool
-  let replies: Replies
-  let userReports: [String]
-  let saved: Bool
-  let id: ID36
-  let bannedAtUTC: Date?
-  let modReasonTitle: String?
-  let gilded: Int
-  let archived: Bool
-  let reportReasons: String?
-  let author: String
-  let canModPost, sendReplies: Bool
+  public var type = "t1"
+
+  public static func == (lhs: Comment, rhs: Comment) -> Bool {
+    lhs.id == rhs.id
+  }
+
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(id)
+  }
+
+  public let totalAwardsReceived: Int
+  public let approvedAtUTC: Date?
+  public let ups: Int
+  public let modReasonBy: String?
+  public let bannedBy: String?
+  public let authorFlairType: String
+  public let removalReason: String?
   // This is actually a fullname
-  let parentID: String
-  let score: Int
-  let authorFullname: String
-  let approvedBy: String?
-  let allAwardings: [Award]
+  public let linkID: String
+  public let authorFlairTemplateID: String?
+  public let likes: String?
+  public let noFollow: Bool
+  public let replies: Replies?
+  public let userReports: [String]
+  public let saved: Bool
+  public let id: ID36
+  public let bannedAtUTC: Date?
+  public let modReasonTitle: String?
+  public let gilded: Int
+  public let archived: Bool
+  public let reportReasons: String?
+  public let author: String
+  public let canModPost, sendReplies: Bool
   // This is actually a fullname
-  let subredditID: String
-  let body: String
-  let edited: Bool
-  let authorFlairCSSClass: String?
-  let isSubmitter: Bool
-  let downs: Int
-  let authorFlairRichtext: [String]
-  let authorPatreonFlair: Bool
-  let collapsedReason: String?
-  let bodyHTML: String
-  let stickied: Bool
-  let subredditType: String
-  let canGild: Bool
-  let gildings: [Any: Any]
-  let authorFlairTextColor: String?
-  let scoreHidden: Bool
-  let permalink: String
-  let numReports: Int?
-  let locked: Bool
-  let name: String
-  let created: Date
-  let subreddit: String
-  let authorFlairText: String?
-  let collapsed: Bool
-  let createdUTC: Date
-  let subredditNamePrefixed: String
-  let controversiality: Int
-  let depth: Int
-  let authorFlairBackgroundColor: String?
-  let modReports: [String]
-  let modNote: String?
-  let distinguished: String?
+  public let parentID: String
+  public let score: Int
+  public let authorFullname: String
+  public let approvedBy: String?
+  public let allAwardings: [Award]
+  // This is actually a fullname
+  public let subredditID: String
+  public let body: String
+  public let edited: Edited
+  public let authorFlairCSSClass: String?
+  public let isSubmitter: Bool
+  public let downs: Int
+  public let authorFlairRichtext: [String]
+  public let authorPatreonFlair: Bool
+  public let collapsedReason: String?
+  public let bodyHTML: String
+  public let stickied: Bool
+  public let subredditType: String
+  public let canGild: Bool
+//  public let gildings: [Any: Any]
+  public let authorFlairTextColor: String?
+  public let scoreHidden: Bool
+  public let permalink: String
+  public let numReports: Int?
+  public let locked: Bool
+  public let name: String
+  public let created: Date
+  public let subreddit: String
+  public let authorFlairText: String?
+  public let collapsed: Bool
+  public let createdUTC: Date
+  public let subredditNamePrefixed: String
+  public let controversiality: Int
+  public let depth: Int
+  public let authorFlairBackgroundColor: String?
+  public let modReports: [String]
+  public let modNote: String?
+  public let distinguished: String?
+
+  public let previousVisits: [Date]?
+  public let contentCategories: [String]?
 
   enum CodingKeys: String, CodingKey {
     case totalAwardsReceived = "total_awards_received"
@@ -108,7 +134,7 @@ public struct Comment: RedditObject {
     case stickied
     case subredditType = "subreddit_type"
     case canGild = "can_gild"
-    case gildings
+//    case gildings
     case authorFlairTextColor = "author_flair_text_color"
     case scoreHidden = "score_hidden"
     case permalink
@@ -123,5 +149,21 @@ public struct Comment: RedditObject {
     case modReports = "mod_reports"
     case modNote = "mod_note"
     case distinguished
+    case previousVisits = "previous_visits"
+    case contentCategories = "content_categories"
+  }
+}
+
+public struct Replies: Codable {
+  public let collapsed: Listing<More>?
+  public let expanded: Listing<Comment>?
+
+  public init(from decoder: Decoder) throws {
+    var container = try decoder.singleValueContainer()
+    collapsed = try? container.decode(Listing<More>.self)
+    expanded = try? container.decode(Listing<Comment>.self)
+    if collapsed == nil, expanded == nil {
+      container.decodeNil()
+    }
   }
 }

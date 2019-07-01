@@ -16,14 +16,15 @@ import AlamofireImage
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public extension SessionManager {
-  func requestPublisher(urlRequest: URLRequestConvertible,
+  func requestPublisher(url: URLConvertible,
                         method: HTTPMethod = .get,
                         parameters: Parameters? = nil,
                         encoding: ParameterEncoding = URLEncoding.default,
                         headers: HTTPHeaders? = nil)
     -> AnyPublisher<DataResponse<Data>, Error> {
     return Publishers.Future { result in
-      self.request(urlRequest).validate().responseData { response in
+      self.request(url, method: method, parameters: parameters,
+                   encoding: encoding, headers: headers).validate().responseData { response in
         switch response.result {
         case .success:
           result(.success(response))
@@ -32,15 +33,6 @@ public extension SessionManager {
         }
       }
     }.eraseToAnyPublisher()
-  }
-
-  func requestPublisher(url: URLConvertible,
-                        method: HTTPMethod = .get,
-                        parameters: Parameters? = nil,
-                        encoding: ParameterEncoding = URLEncoding.default,
-                        headers: HTTPHeaders? = nil)
-    -> AnyPublisher<DataResponse<Data>, Error> {
-    return requestPublisher(urlRequest: URLRequest(url: try! url.asURL()))
   }
 }
 
@@ -57,9 +49,3 @@ public extension ImageDownloader {
     }.eraseToAnyPublisher()
   }
 }
-
-@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-extension JSONDecoder: TopLevelDecoder {}
-
-@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-extension JSONEncoder: TopLevelEncoder {}

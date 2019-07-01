@@ -142,9 +142,9 @@ public struct ListingParams {
   }
 }
 
-typealias ID36 = String
+public typealias ID36 = String
 /// The base class for all user-generated content on Reddit
-public protocol RedditObject: Codable, Equatable, Identifiable, Hashable {
+public protocol RedditObject: Codable, Identifiable, Hashable {
   /// The object's unique identifier
   var id: String { get } // swiftlint:disable:this identifier_name
 
