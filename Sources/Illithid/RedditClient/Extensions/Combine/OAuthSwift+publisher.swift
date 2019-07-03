@@ -15,13 +15,14 @@ import OAuthSwift
 public extension OAuthSwiftClient {
   func requestPublisher(_ url: URLConvertible) -> AnyPublisher<OAuthSwiftResponse, Error> {
     return Future { result in
-      _ = self.get(url,
-               success: { response in
-                 result(.success(response))
-               },
-               failure: { error in
-                 result(.failure(error))
-      })
+      _ = self.get(url) { innerResult in
+        switch innerResult {
+        case .success(let response):
+          result(.success(response))
+        case .failure(let error):
+          result(.failure(error))
+        }
+      }
     }.eraseToAnyPublisher()
   }
 }
@@ -33,12 +34,14 @@ public extension OAuth2Swift {
     -> AnyPublisher<OAuthSwiftResponse, OAuthSwiftError> {
     return Future { result in
       self.startAuthorizedRequest(url, method: method, parameters: parameters, headers: headers,
-                                  renewHeaders: renewHeaders, body: body, onTokenRenewal: onTokenRenewal,
-                                  success: { response in
-                                    result(.success(response))
-                                  }, failure: { error in
-                                    result(.failure(error))
-      })
+                                  renewHeaders: renewHeaders, body: body, onTokenRenewal: onTokenRenewal) { innerResult in
+        switch innerResult {
+        case .success(let response):
+          result(.success(response))
+        case .failure(let error):
+          result(.failure(error))
+        }
+      }
     }.eraseToAnyPublisher()
   }
 }

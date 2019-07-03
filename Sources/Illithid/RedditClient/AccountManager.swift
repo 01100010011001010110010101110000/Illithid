@@ -53,17 +53,17 @@ public final class AccountManager: BindableObject {
     oauth.authorize(
       withCallbackURL: configuration.redirectURI,
       scope: configuration.scope,
-      state: state, parameters: configuration.oauthParameters,
-      success: { _, _, parameters in
-        self.logger.debugMessage("Authorization successful")
-        self.logger.debugMessage("Returned parameters: \(parameters)")
-        self.logger.debugMessage("OAuth object parameters: \(oauth.parameters)")
-        self.fetchNewAccount(oauth: oauth, completion: completion)
-      },
-      failure: { error in
-        self.logger.errorMessage("Authorization failed: \(error)")
-      }
-    )
+      state: state, parameters: configuration.oauthParameters) { result in
+        switch result {
+        case .success(let (_, _, parameters)):
+          self.logger.debugMessage("Authorization successful")
+          self.logger.debugMessage("Returned parameters: \(parameters)")
+          self.logger.debugMessage("OAuth object parameters: \(oauth.parameters)")
+          self.fetchNewAccount(oauth: oauth, completion: completion)
+        case .failure(let error):
+          self.logger.errorMessage { "Authorization failed: \(error)" }
+        }
+    }
   }
 
   /**
