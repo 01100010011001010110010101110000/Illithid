@@ -14,8 +14,8 @@ import OAuthSwift
 
 public extension OAuthSwiftClient {
   func requestPublisher(_ url: URLConvertible) -> AnyPublisher<OAuthSwiftResponse, Error> {
-    return Publishers.Future { result in
-      self.get(url,
+    return Future { result in
+      _ = self.get(url,
                success: { response in
                  result(.success(response))
                },
@@ -31,7 +31,7 @@ public extension OAuth2Swift {
                         headers: OAuthSwift.Headers? = nil, renewHeaders: OAuthSwift.Headers? = nil,
                         body: Data? = nil, onTokenRenewal: TokenRenewedHandler? = nil)
     -> AnyPublisher<OAuthSwiftResponse, OAuthSwiftError> {
-    return Publishers.Future { result in
+    return Future { result in
       self.startAuthorizedRequest(url, method: method, parameters: parameters, headers: headers,
                                   renewHeaders: renewHeaders, body: body, onTokenRenewal: onTokenRenewal,
                                   success: { response in

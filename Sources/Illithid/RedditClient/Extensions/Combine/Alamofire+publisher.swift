@@ -22,7 +22,7 @@ public extension SessionManager {
                         encoding: ParameterEncoding = URLEncoding.default,
                         headers: HTTPHeaders? = nil)
     -> AnyPublisher<DataResponse<Data>, Error> {
-    return Publishers.Future { result in
+    return Future { result in
       self.request(url, method: method, parameters: parameters,
                    encoding: encoding, headers: headers).validate().responseData { response in
         switch response.result {
@@ -39,7 +39,7 @@ public extension SessionManager {
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public extension ImageDownloader {
   func imagePublisher(for url: URL) -> AnyPublisher<Image, Never> {
-    return Publishers.Future { result in
+    return Future { result in
       let urlRequest = URLRequest(url: url)
       self.download(urlRequest) { response in
         if let image = response.result.value {
