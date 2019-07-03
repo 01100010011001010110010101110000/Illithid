@@ -41,7 +41,7 @@ public struct Comment: RedditObject {
   public let authorFlairTemplateID: String?
   public let likes: String?
   public let noFollow: Bool
-  public let replies: Replies?
+  public let replies: GeneralListing?
   public let userReports: [String]
   public let saved: Bool
   public let id: ID36
@@ -152,18 +152,77 @@ public struct Comment: RedditObject {
     case previousVisits = "previous_visits"
     case contentCategories = "content_categories"
   }
-}
-
-public struct Replies: Codable {
-  public let collapsed: Listing<More>?
-  public let expanded: Listing<Comment>?
 
   public init(from decoder: Decoder) throws {
-    var container = try decoder.singleValueContainer()
-    collapsed = try? container.decode(Listing<More>.self)
-    expanded = try? container.decode(Listing<Comment>.self)
-    if collapsed == nil, expanded == nil {
-      container.decodeNil()
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+
+    if let emptyString = try? container.decode(String.self, forKey: .replies), emptyString.isEmpty {
+      replies = nil
+    } else {
+      replies = try container.decode(GeneralListing.self, forKey: .replies)
     }
+
+    totalAwardsReceived = try container.decode(Int.self, forKey: .totalAwardsReceived)
+    approvedAtUTC = try container.decodeIfPresent(Date.self, forKey: .approvedAtUTC)
+    ups = try container.decode(Int.self, forKey: .ups)
+    modReasonBy = try container.decodeIfPresent(String.self, forKey: .modReasonBy)
+    bannedBy = try container.decodeIfPresent(String.self, forKey: .bannedBy)
+    authorFlairType = try container.decode(String.self, forKey: .authorFlairType)
+    removalReason = try container.decodeIfPresent(String.self, forKey: .removalReason)
+    linkID = try container.decode(String.self, forKey: .linkID)
+    authorFlairTemplateID = try container.decodeIfPresent(String.self, forKey: .authorFlairType)
+    likes = try container.decodeIfPresent(String.self, forKey: .likes)
+    noFollow = try container.decode(Bool.self, forKey: .noFollow)
+    userReports = try container.decode([String].self, forKey: .userReports)
+    saved = try container.decode(Bool.self, forKey: .saved)
+    id = try container.decode(ID36.self, forKey: .id)
+    bannedAtUTC = try container.decodeIfPresent(Date.self, forKey: .bannedAtUTC)
+    modReasonTitle = try? container.decodeIfPresent(String.self, forKey: .modReasonTitle)
+    gilded = try container.decode(Int.self, forKey: .gilded)
+    archived = try container.decode(Bool.self, forKey: .archived)
+    reportReasons = try? container.decodeIfPresent(String.self, forKey: .reportReasons)
+    author = try container.decode(String.self, forKey: .author)
+    canModPost = try container.decode(Bool.self, forKey: .canModPost)
+    sendReplies = try container.decode(Bool.self, forKey: .sendReplies)
+    parentID = try container.decode(String.self, forKey: .parentID)
+    score = try container.decode(Int.self, forKey: .score)
+    authorFullname = try container.decode(String.self, forKey: .authorFullname)
+    approvedBy = try? container.decodeIfPresent(String.self, forKey: .approvedBy)
+    allAwardings = try container.decode([Award].self, forKey: .allAwardings)
+    subredditID = try container.decode(String.self, forKey: .subredditID)
+    body = try container.decode(String.self, forKey: .body)
+    edited = try container.decode(Edited.self, forKey: .edited)
+    authorFlairCSSClass = try? container.decodeIfPresent(String.self, forKey: .authorFlairCSSClass)
+    isSubmitter = try container.decode(Bool.self, forKey: .isSubmitter)
+    downs = try container.decode(Int.self, forKey: .downs)
+    authorFlairRichtext = try container.decode([String].self, forKey: .authorFlairRichtext)
+    authorPatreonFlair = try container.decode(Bool.self, forKey: .authorPatreonFlair)
+    collapsedReason = try? container.decodeIfPresent(String.self, forKey: .collapsedReason)
+    bodyHTML = try container.decode(String.self, forKey: .bodyHTML)
+    stickied = try container.decode(Bool.self, forKey: .stickied)
+    subredditType = try container.decode(String.self, forKey: .subredditType)
+    canGild = try container.decode(Bool.self, forKey: .canGild)
+//    let gildings = try? container.decode([Any = try? container.decode(Any]
+    authorFlairTextColor = try? container.decodeIfPresent(String.self, forKey: .authorFlairTextColor)
+    scoreHidden = try container.decode(Bool.self, forKey: .scoreHidden)
+    permalink = try container.decode(String.self, forKey: .permalink)
+    numReports = try? container.decodeIfPresent(Int.self, forKey: .numReports)
+    locked = try container.decode(Bool.self, forKey: .locked)
+    name = try container.decode(String.self, forKey: .name)
+    created = try container.decode(Date.self, forKey: .created)
+    subreddit = try container.decode(String.self, forKey: .subreddit)
+    authorFlairText = try? container.decodeIfPresent(String.self, forKey: .authorFlairText)
+    collapsed = try container.decode(Bool.self, forKey: .collapsed)
+    createdUTC = try container.decode(Date.self, forKey: .createdUTC)
+    subredditNamePrefixed = try container.decode(String.self, forKey: .subredditNamePrefixed)
+    controversiality = try container.decode(Int.self, forKey: .controversiality)
+    depth = try container.decode(Int.self, forKey: .depth)
+    authorFlairBackgroundColor = try? container.decodeIfPresent(String.self, forKey: .authorFlairBackgroundColor)
+    modReports = try container.decode([String].self, forKey: .modReports)
+    modNote = try? container.decode(String?.self, forKey: .modNote)
+    distinguished = try? container.decode(String?.self, forKey: .distinguished)
+
+    previousVisits = try? container.decodeIfPresent([Date].self, forKey: .previousVisits)
+    contentCategories = try? container.decodeIfPresent([String].self, forKey: .contentCategories)
   }
 }
