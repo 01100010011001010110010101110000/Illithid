@@ -29,6 +29,9 @@ public struct Subreddit: RedditObject {
   public let over18: Bool
   public let createdUTC: Date
 
+  /// The Reddit API sometimes returns the empty string for the `header_img` parameter, and also may return `nil`, so we handle the empty srtring, then
+  /// decode the actual URL if it is present
+  /// - Parameter decoder: A `Decoder` conforming object
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
     self.id = try container.decode(String.self, forKey: .id)
@@ -36,13 +39,13 @@ public struct Subreddit: RedditObject {
     self.publicDescription = try container.decode(String.self, forKey: .publicDescription)
     self.displayName = try container.decode(String.self, forKey: .displayName)
     self.wikiEnabled = try container.decodeIfPresent(Bool.self, forKey: .wikiEnabled)
-    let headerImageURLString = try container.decodeIfPresent(String.self, forKey: .headerImageURL)
     self.over18 = try container.decode(Bool.self, forKey: .over18)
     self.createdUTC = try container.decode(Date.self, forKey: .createdUTC)
-    if headerImageURLString != nil, !headerImageURLString!.isEmpty {
-      self.headerImageURL = try container.decode(URL.self, forKey: .headerImageURL)
+
+    if let emptyString = try? container.decode(String.self, forKey: .headerImageURL), emptyString.isEmpty {
+      headerImageURL = nil
     } else {
-      self.headerImageURL = nil
+      headerImageURL = try container.decodeIfPresent(URL.self, forKey: .headerImageURL)
     }
   }
 
