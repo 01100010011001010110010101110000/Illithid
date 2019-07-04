@@ -12,11 +12,10 @@ import SwiftUI
 import Alamofire
 
 public enum ShowAllPreference: CustomStringConvertible {
-  public
-  var description: String {
-      switch self {
-      case .all: return "all"
-      default: return ""
+  public var description: String {
+    switch self {
+    case .all: return "all"
+    default: return ""
     }
   }
 
@@ -135,6 +134,17 @@ public enum Location {
   case US_SD
 }
 
+/// The URL parameters which are applicable to all Listing endpoints in the Reddit API
+/// - Parameters:
+///     - after: The [`fullname`](https://www.reddit.com/dev/api#fullnames) of the Reddit Object to use as an anchor to fetch the next slice of the listing
+///     - before: The [`fullname`](https://www.reddit.com/dev/api#fullnames) of the Reddit Object to use as an anchor to fetch the previous slice of the listing
+///     - count: The number of items already seen in the listing. This is primarily used by the desktop site
+///     - include_categories: If `true`, include category information on the returned objects
+///     - limit: The number of objects to fetch from the listing
+///     - show: Whether to bypass filters such as hiding previously visited posts; defaults to filtered
+///     - sr_detail: Undocumented, unsure of its function
+///     - raw_json: If false, HTML escape `<`, `>`, and `&`. [This is forbackwards compatability](https://www.reddit.com/dev/api#response_body_encoding)
+/// - SeeAlso: [Reddit's Listing documentation](https://www.reddit.com/dev/api#listings)
 public struct ListingParams {
   public var after: String = ""
   public var before: String = ""

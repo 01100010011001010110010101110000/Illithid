@@ -34,18 +34,21 @@ public extension Listing {
       else { return nil }
     }
   }
+
   var accounts: [RedditAccount] {
     return data.children.compactMap { wrappedAccount in
       if case .account(let account) = wrappedAccount { return account }
       else { return nil }
     }
   }
+
   var posts: [Post] {
     return data.children.compactMap { wrappedPost in
       if case .post(let post) = wrappedPost { return post }
       else { return nil }
     }
   }
+
 //  var messages: [Message] {
 //    return data.children.compactMap { wrappedMessage in
 //      if case .message(let message) = wrappedMessage { return message }
@@ -58,6 +61,7 @@ public extension Listing {
       else { return nil }
     }
   }
+
   var awards: [Award] {
     return data.children.compactMap { wrappedAward in
       if case .award(let award) = wrappedAward { return award }
