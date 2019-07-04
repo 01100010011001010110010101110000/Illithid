@@ -41,7 +41,7 @@ public struct Comment: RedditObject {
   public let authorFlairTemplateID: String?
   public let likes: String?
   public let noFollow: Bool
-  public let replies: GeneralListing?
+  public let replies: Listing?
   public let userReports: [String]
   public let saved: Bool
   public let id: ID36
@@ -159,7 +159,7 @@ public struct Comment: RedditObject {
     if let emptyString = try? container.decode(String.self, forKey: .replies), emptyString.isEmpty {
       replies = nil
     } else {
-      replies = try container.decode(GeneralListing.self, forKey: .replies)
+      replies = try container.decode(Listing.self, forKey: .replies)
     }
 
     totalAwardsReceived = try container.decode(Int.self, forKey: .totalAwardsReceived)

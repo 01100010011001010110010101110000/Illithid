@@ -15,7 +15,7 @@ import Willow
 public extension RedditClientBroker {
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
   func getComments(for post: Post, parameters: ListingParams, focus: Comment? = nil, context: Int? = nil, depth: Int? = nil, showedits: Bool = true, showmore: Bool = true, sortBy: CommentsSort = .confidence, threaded: Bool = true, truncate: Int = 0)
-    -> AnyPublisher<GeneralListing, Error> {
+    -> AnyPublisher<Listing, Error> {
     let decoder = JSONDecoder()
     decoder.dateDecodingStrategy = .secondsSince1970
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
@@ -30,7 +30,7 @@ public extension RedditClientBroker {
         print(response.data!)
         return response.data!
       }
-      .decode(type: [GeneralListing].self, decoder: decoder)
+      .decode(type: [Listing].self, decoder: decoder)
       .mapError { (error) -> Error in
         self.logger.errorMessage { "Error fetching comments: \(error)" }
         return error

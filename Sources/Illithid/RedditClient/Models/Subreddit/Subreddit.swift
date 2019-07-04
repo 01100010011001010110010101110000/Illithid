@@ -63,7 +63,7 @@ public struct Subreddit: RedditObject {
 
 extension Subreddit {
   public func posts(_ broker: RedditClientBroker, sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
-                    params: ListingParams = .init(), completion: @escaping (Listing<Post>) -> Void) {
+                    params: ListingParams = .init(), completion: @escaping (Listing) -> Void) {
     broker.fetchPosts(for: self, sortBy: postSort, location: location, topInterval: topInterval,
                       params: params, completion: completion)
   }

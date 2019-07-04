@@ -8,59 +8,61 @@
 
 import Foundation
 
-public struct Listing<RedditType: RedditObject>: Codable {
-  public let kind: Kind
-  public let metadata: ListData
+public struct Listing: Codable {
+  public let kind: Kind = .listing
+  private let data: ListingData
 
-  private enum CodingKeys: String, CodingKey {
-    case kind
-    case metadata = "data"
+  fileprivate struct ListingData: Codable {
+    fileprivate let modhash: String?
+    fileprivate let dist: Int?
+    fileprivate let children: [Content]
+    fileprivate let after: String?
+    fileprivate let before: String?
   }
 
-  public struct ListData: Codable {
-    public let modhash: String?
-    public let dist: Int?
-    public let children: [ListChild]
-    public let after: String?
-    public let before: String?
-  }
+  public var after: String? { data.after }
+  public var before: String? { data.before }
+  public var dist: Int? { data.dist }
+  public var children: [Content] { data.children }
+  public var modhash: String? { data.modhash }
+}
 
-  public struct ListChild: Codable {
-    public let kind: Kind
-    public let object: RedditType
-
-    private enum CodingKeys: String, CodingKey {
-      case kind
-      case object = "data"
+public extension Listing {
+  var comments: [Comment] {
+    return data.children.compactMap { wrappedComment in
+      if case .comment(let comment) = wrappedComment { return comment }
+      else { return nil }
     }
   }
-
-  lazy var children: [RedditType] = {
-    metadata.children.map { $0.object }
-  }()
-}
-
-public enum Kind: String, Codable {
-  case comment = "t1" // Comment
-  case account = "t2" // Account
-  case post = "t3" // Link (Post)
-  case message = "t4" // Message
-  case subreddit = "t5" // Subreddit
-  case award = "t6" // Award
-  case more
-  case listing = "Listing"
-}
-
-public struct GeneralListing: Codable {
-  public let kind: Kind = .listing
-  public let data: ListingData
-
-  public struct ListingData: Codable {
-    public let modhash: String?
-    public let dist: Int?
-    public let children: [Content]
-    public let after: String?
-    public let before: String?
+  var accounts: [RedditAccount] {
+    return data.children.compactMap { wrappedAccount in
+      if case .account(let account) = wrappedAccount { return account }
+      else { return nil }
+    }
+  }
+  var posts: [Post] {
+    return data.children.compactMap { wrappedPost in
+      if case .post(let post) = wrappedPost { return post }
+      else { return nil }
+    }
+  }
+//  var messages: [Message] {
+//    return data.children.compactMap { wrappedMessage in
+//      if case .message(let message) = wrappedMessage { return message }
+//      else { return nil }
+//    }
+//  }
+  var subreddits: [Subreddit] {
+    return data.children.compactMap { wrappedSubreddit in
+      if case .subreddit(let subreddit) = wrappedSubreddit { return subreddit }
+      else { return nil }
+    }
+  }
+  var awards: [Award] {
+    return data.children.compactMap { wrappedAward in
+      if case .award(let award) = wrappedAward { return award }
+      else { return nil }
+    }
   }
 }
 
@@ -81,8 +83,8 @@ public enum Content: Codable {
       return .account
     case .post:
       return .post
-    //case .message:
-      //return .message
+    // case .message:
+    // return .message
     case .subreddit:
       return .subreddit
     case .award:
@@ -144,7 +146,7 @@ public enum Content: Codable {
     case .award(let award):
       try container.encode(award, forKey: .data)
     case .more(let more):
-      try container.encode(more, forKey: .data )
+      try container.encode(more, forKey: .data)
     }
   }
 }

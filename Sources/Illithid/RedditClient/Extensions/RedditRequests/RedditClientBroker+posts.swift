@@ -16,7 +16,7 @@ import SwiftyJSON
 public extension RedditClientBroker {
   func fetchPosts(for subreddit: Subreddit, sortBy postSort: PostSort,
                   location: Location? = nil, topInterval: TopInterval? = nil,
-                  params: ListingParams = .init(), completion: @escaping (Listing<Post>) -> Void) {
+                  params: ListingParams = .init(), completion: @escaping (Listing) -> Void) {
     let decoder = JSONDecoder()
     decoder.dateDecodingStrategy = .secondsSince1970
     var parameters = params.toParameters()
@@ -38,7 +38,7 @@ public extension RedditClientBroker {
         switch response.result {
         case let .success(data):
           do {
-            let list = try decoder.decode(Listing<Post>.self, from: data)
+            let list = try decoder.decode(Listing.self, from: data)
             completion(list)
           } catch let error as DecodingError {
             let json = try? JSON(data: data).rawString(options: [.sortedKeys, .prettyPrinted])

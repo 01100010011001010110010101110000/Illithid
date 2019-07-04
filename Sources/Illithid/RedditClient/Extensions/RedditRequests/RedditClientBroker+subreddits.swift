@@ -29,7 +29,7 @@ public extension RedditClientBroker {
      - completion: Completion handler, is passed the listable as an argument
    */
   func subreddits(sortBy subredditSort: SubredditSort = .popular,
-                  params: ListingParams = .init(), completion: @escaping (Listing<Subreddit>) -> Void) {
+                  params: ListingParams = .init(), completion: @escaping (Listing) -> Void) {
     let decoder = JSONDecoder()
     decoder.dateDecodingStrategy = .secondsSince1970
     let parameters = params.toParameters()
@@ -41,7 +41,7 @@ public extension RedditClientBroker {
         switch response.result {
         case let .success(data):
           do {
-            let list = try decoder.decode(Listing<Subreddit>.self, from: data)
+            let list = try decoder.decode(Listing.self, from: data)
             completion(list)
           } catch let error as DecodingError {
             let json = try? JSON(data: data).rawString(options: [.sortedKeys, .prettyPrinted])

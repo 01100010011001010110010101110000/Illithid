@@ -9,13 +9,4 @@
 import Foundation
 
 extension String.StringInterpolation {
-  mutating func appendInterpolation(_ value: Listing<Subreddit>) {
-    appendInterpolation("""
-      dist: \(value.metadata.dist ?? -1)
-      before: \(value.metadata.before ?? "")
-      after: \(value.metadata.after ?? "")
-      subreddits count: \(value.metadata.children.count)
-      subreddits: \(value.metadata.children.map { $0.object.displayName })
-    """)
-  }
 }

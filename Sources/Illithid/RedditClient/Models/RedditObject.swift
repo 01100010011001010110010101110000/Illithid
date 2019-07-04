@@ -24,6 +24,22 @@ public enum ShowAllPreference: CustomStringConvertible {
   case filtered
 }
 
+/// The `Kind` of Reddit object, with additional types which appear in the kind field in certain special cases
+/// - SeeAlso: [Reddit's type prefixes documentation](https://www.reddit.com/dev/api#fullnames)
+public enum Kind: String, Codable {
+  case comment = "t1"
+  case account = "t2"
+  case post = "t3"
+  case message = "t4"
+  case subreddit = "t5"
+  case award = "t6"
+  /// A special case of `Kind` used when the comments in a `Comment`'s `replies` field are collapsed
+  case more
+  /// The `Listing` container which wraps arrays of the other `Kind`s
+  case listing = "Listing"
+}
+
+/// The interval to use when sorting comments or posts by `top`
 public enum TopInterval {
   case hour
   case day
@@ -142,6 +158,8 @@ public struct ListingParams {
   }
 }
 
+/// The base36, non-kind qualified, ID of a Reddit object. IDs are guaranteed to be unique within a `Kind` type
+/// - SeeAlso: [Reddit's type fullnames documentation](https://www.reddit.com/dev/api#fullnames)
 public typealias ID36 = String
 /// The base class for all user-generated content on Reddit
 public protocol RedditObject: Codable, Identifiable, Hashable {
