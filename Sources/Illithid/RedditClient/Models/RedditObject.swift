@@ -138,31 +138,36 @@ public enum Location {
 /// - Parameters:
 ///     - after: The [`fullname`](https://www.reddit.com/dev/api#fullnames) of the Reddit Object to use as an anchor to fetch the next slice of the listing
 ///     - before: The [`fullname`](https://www.reddit.com/dev/api#fullnames) of the Reddit Object to use as an anchor to fetch the previous slice of the listing
-///     - count: The number of items already seen in the listing. This is primarily used by the desktop site
 ///     - include_categories: If `true`, include category information on the returned objects
 ///     - limit: The number of objects to fetch from the listing
 ///     - show: Whether to bypass filters such as hiding previously visited posts; defaults to filtered
-///     - sr_detail: Undocumented, unsure of its function
 ///     - raw_json: If false, HTML escape `<`, `>`, and `&`. [This is forbackwards compatability](https://www.reddit.com/dev/api#response_body_encoding)
 /// - SeeAlso: [Reddit's Listing documentation](https://www.reddit.com/dev/api#listings)
-public struct ListingParams {
-  public var after: String = ""
-  public var before: String = ""
-  public var count: Int = 0
-  public var include_categories: Bool = false
-  public var limit: Int = 25
-  public var show: ShowAllPreference = .filtered
-  public var sr_detail: Bool = false
-  public var raw_json: Bool = true
+public struct ListingParameters {
+  public var after: String
+  public var before: String
+  public var includeCategories: Bool
+  public var limit: Int
+  public var show: ShowAllPreference
+  public var rawJSON: Bool
 
-  public init() {}
+  public init(after: String = "", before: String = "", includeCategories: Bool = true,
+              limit: Int = 25, show: ShowAllPreference = .filtered, rawJSON: Bool = true) {
+    self.after = after
+    self.before = before
+    self.includeCategories = includeCategories
+    self.limit = limit
+    self.show = show
+    self.rawJSON = rawJSON
+  }
 
   public func toParameters() -> Parameters {
     var result: [String: Any] = [:]
     let mirror = Mirror(reflecting: self)
     for (property, value) in mirror.children {
       guard let property = property else { continue }
-      result[property] = value
+      let key = property.snakeCased() ?? property
+      result[key] = value
     }
     return result
   }
@@ -171,6 +176,9 @@ public struct ListingParams {
 /// The base36, non-kind qualified, ID of a Reddit object. IDs are guaranteed to be unique within a `Kind` type
 /// - SeeAlso: [Reddit's type fullnames documentation](https://www.reddit.com/dev/api#fullnames)
 public typealias ID36 = String
+/// The ID36 of an object fully qualifies by prepending it with its type, e.g. `t3_15bfi0`
+/// - SeeAlso: [Reddit's type fullnames documentation](https://www.reddit.com/dev/api#fullnames)
+public typealias Fullname = String
 /// The base class for all user-generated content on Reddit
 public protocol RedditObject: Codable, Identifiable, Hashable {
   /// The object's unique identifier

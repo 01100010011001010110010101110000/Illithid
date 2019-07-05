@@ -29,7 +29,7 @@ public extension RedditClientBroker {
      - completion: Completion handler, is passed the listable as an argument
    */
   func subreddits(sortBy subredditSort: SubredditSort = .popular,
-                  params: ListingParams = .init(), completion: @escaping (Listing) -> Void) {
+                  params: ListingParameters = .init(), completion: @escaping (Listing) -> Void) {
     let decoder = JSONDecoder()
     decoder.dateDecodingStrategy = .secondsSince1970
     let parameters = params.toParameters()

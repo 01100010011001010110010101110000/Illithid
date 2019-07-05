@@ -26,7 +26,7 @@ public enum PostHint: String, Codable {
   case image
   case richVideo
   case hostedVideo
-  
+
   private enum CodingKeys: String, CodingKey {
     case link
     case `self`
@@ -34,9 +34,9 @@ public enum PostHint: String, Codable {
     case richVideo = "rich:video"
     case hostedVideo = "hosted:video"
   }
-  
+
   public init(from decoder: Decoder) throws {
-    //TODO figure out if this is necessary, coding keys should handle this but it currently seems otherwise
+    // TODO: figure out if this is necessary, coding keys should handle this but it currently seems otherwise
     let value = try decoder.singleValueContainer().decode(String.self)
     switch value {
     case "rich:video":
@@ -62,7 +62,7 @@ public struct Post: RedditObject {
   }
 
   public func hash(into hasher: inout Hasher) {
-    hasher.combine(name)
+    hasher.combine(self.name)
   }
 
   public let id: String
@@ -83,8 +83,9 @@ public struct Post: RedditObject {
   public let author_fullname: String
   public let author: String
   public var authorPrefixed: String {
-    return "u/\(author)"
+    return "u/\(self.author)"
   }
+
   public let author_patreon_flair: Bool
   public let author_flair_text_color: String?
   public let author_flair_text: String?
