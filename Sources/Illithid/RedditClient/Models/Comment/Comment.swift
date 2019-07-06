@@ -5,7 +5,10 @@
 //  Created by Tyler Gregory on 6/19/19.
 //
 
+import Combine
 import Foundation
+
+import Alamofire
 
 public enum CommentsSort: String, Codable {
   case confidence
@@ -86,7 +89,8 @@ public struct Comment: RedditObject {
   public let createdUTC: Date
   public let subredditNamePrefixed: String
   public let controversiality: Int
-  public let depth: Int
+  /// Depth is present unless fetching a comment from `/api/info`
+  public let depth: Int?
   public let authorFlairBackgroundColor: String?
   public let modReports: [String]
   public let modNote: String?
@@ -216,7 +220,7 @@ public struct Comment: RedditObject {
     createdUTC = try container.decode(Date.self, forKey: .createdUTC)
     subredditNamePrefixed = try container.decode(String.self, forKey: .subredditNamePrefixed)
     controversiality = try container.decode(Int.self, forKey: .controversiality)
-    depth = try container.decode(Int.self, forKey: .depth)
+    depth = try container.decodeIfPresent(Int.self, forKey: .depth)
     authorFlairBackgroundColor = try container.decodeIfPresent(String.self, forKey: .authorFlairBackgroundColor)
     modReports = try container.decode([String].self, forKey: .modReports)
     modNote = try container.decode(String?.self, forKey: .modNote)
@@ -224,5 +228,17 @@ public struct Comment: RedditObject {
 
     previousVisits = try container.decodeIfPresent([Date].self, forKey: .previousVisits)
     contentCategories = try container.decodeIfPresent([String].self, forKey: .contentCategories)
+  }
+}
+
+public extension Comment {
+  static func fetch(name: Fullname, client: RedditClientBroker) -> AnyPublisher<Comment, Error> {
+    client.info(name: name)
+      .compactMap { listing in
+        return listing.comments.last
+    }.eraseToAnyPublisher()
+  }
+  static func fetch(name: Fullname, client: RedditClientBroker, completion: @escaping (Comment) -> Void) {
+
   }
 }
