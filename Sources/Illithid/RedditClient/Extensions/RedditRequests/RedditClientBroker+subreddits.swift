@@ -19,13 +19,7 @@ public extension RedditClientBroker {
 
    - Parameters:
      - subredditSort: Subreddit sort method
-     - before: Fetch subreddits before this subreddit ID
-     - after: Fetch subreddits after this subreddit ID
-     - count: Number of items already seen in the listing
-     - includeCategories: Documentation unclear
-     - limit: Number of subreddits to fetch (default: 25, max: 100)
-     - show: Ignores site wide filters (e.g. hide alreadt voted links) if "all" is passed, else no affect
-     - srDetail: Documentation unclear, [could only find this](https://www.reddit.com/r/redditdev/comments/3560mt/what_is_the_query_parameter_sr_detail_for_in/)
+     - params: Standard listing parameters object
      - completion: Completion handler, is passed the listable as an argument
    */
   func subreddits(sortBy subredditSort: SubredditSort = .popular,
@@ -34,7 +28,7 @@ public extension RedditClientBroker {
     decoder.dateDecodingStrategy = .secondsSince1970
     let parameters = params.toParameters()
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
-    let subredditsListUrl = URL(string: "https://oauth.reddit.com/subreddits/\(subredditSort)")!
+    let subredditsListUrl = URL(string: "/subreddits/\(subredditSort)", relativeTo: baseURL)!
 
     session.request(subredditsListUrl, method: .get, parameters: parameters, encoding: queryEncoding)
       .validate().responseData { response in

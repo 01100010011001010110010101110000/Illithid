@@ -21,7 +21,7 @@ public final class AccountManager: BindableObject {
   var configuration: ClientConfiguration
   let session: SessionManager
 
-  private let keychain = Keychain(server: RedditClientBroker.redditBaseUrl,
+  private let keychain = Keychain(server: RedditClientBroker.baseURL,
                                   protocolType: .https).synchronizable(true)
 
   init(logger: Logger, configuration: ClientConfiguration, session: SessionManager) {

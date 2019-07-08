@@ -13,10 +13,18 @@ import Willow
 
 /// Handles Reddit API meta-operations
 public final class RedditClientBroker {
+  private enum baseURLs: String, Codable {
+    case unauthenticated = "https://api.reddit.com/"
+    case authenticated = "https://oauth.reddit.com/"
+  }
+  public var baseURL: URL {
+    accounts.currentAccount != nil ? URL(string: baseURLs.authenticated.rawValue)! : URL(string: baseURLs.unauthenticated.rawValue)!
+  }
+  public static let authorizeEndpoint: URL = URL(string: "https://www.reddit.com/api/v1/authorize.compact")!
+  public static let tokenEndpoint: URL = URL(string: "https://www.reddit.com/api/v1/access_token")!
+
   /// Reddit API's base URL
-  static public let redditBaseUrl: URL = URL(string: "https://www.reddit.com/api/v1")!
-  /// Reddit's OAuth2 protected API endpoint
-  static public let redditOAuthBaseUrl: URL = URL(string: "https://oauth.reddit.com/api/v1")!
+  static public let baseURL: URL = URL(string: "https://www.reddit.com/api/v1")!
 
   public typealias AccountTokenTuple = (account: RedditAccount, credential: OAuthSwiftCredential)
 

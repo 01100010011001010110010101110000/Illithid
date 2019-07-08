@@ -38,13 +38,13 @@ public extension RedditClientBroker {
     let decoder = JSONDecoder()
     decoder.dateDecodingStrategy = .secondsSince1970
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
-    let commentsListingURL = URL(string: "https://oauth.reddit.com/r/\(post.subreddit)/comments/\(post.id)")!
+    let commentsListingURL = URL(string: "/r/\(post.subreddit)/comments/\(post.id)", relativeTo: baseURL)!
 
     var encodedParameters = parameters.toParameters()
     let commentsParameters: Parameters = [
       "comment": comment ?? "",
       "context": context ?? "",
-      "depth": depth ?? "",
+      "depth": depth,
       "showedits": showEdits,
       "showmore": showMore,
       "sort": sort.rawValue,

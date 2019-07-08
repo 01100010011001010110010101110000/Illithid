@@ -1,15 +1,16 @@
-import XCTest
 @testable import Illithid
+import XCTest
 
 final class IllithidTests: XCTestCase {
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct
-        // results.
-        XCTAssertEqual(Illithid().text, "Hello, World!")
-    }
+  let illithid = RedditClientBroker(configuration: TestableConfiguration())
 
-    static var allTests = [
-        ("testExample", testExample),
-    ]
+  func testCommentSingleton() {
+    Comment.fetch(name: "t1_ernlwui", client: illithid) { comment in
+      XCTAssertEqual(comment.author, "paulfknwalsh")
+    }
+  }
+
+  static var allTests = [
+    ("testCommentSingleton", testCommentSingleton),
+  ]
 }
