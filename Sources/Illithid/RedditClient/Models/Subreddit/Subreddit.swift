@@ -4,7 +4,10 @@
 //
 
 import Cocoa
+import Combine
 import Foundation
+
+import Alamofire
 
 public enum SubredditSort {
   case popular
@@ -66,5 +69,32 @@ extension Subreddit {
                     params: ListingParameters = .init(), completion: @escaping (Listing) -> Void) {
     broker.fetchPosts(for: self, sortBy: postSort, location: location, topInterval: topInterval,
                       params: params, completion: completion)
+  }
+}
+
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+public extension Subreddit {
+  static func fetch(name: Fullname, client: RedditClientBroker) -> AnyPublisher<Subreddit, Error> {
+    client.info(name: name)
+      .compactMap { listing in
+        return listing.subreddits.last
+    }.eraseToAnyPublisher()
+  }
+}
+
+public extension Post {
+  static func fetch(name: Fullname, client: RedditClientBroker, completion: @escaping (Result<Subreddit>) -> Void) {
+    client.info(name: name) { result in
+      switch result {
+      case .success(let listing):
+        guard let subreddit = listing.subreddits.last else {
+          completion(.failure(RedditClientBroker.NotFound(lookingFor: name)))
+          return
+        }
+        completion(.success(subreddit))
+      case .failure(let error):
+        completion(.failure(error))
+      }
+    }
   }
 }

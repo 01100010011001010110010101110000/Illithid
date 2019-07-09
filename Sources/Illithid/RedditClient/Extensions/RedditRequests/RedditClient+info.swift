@@ -29,9 +29,7 @@ public extension RedditClientBroker {
       .decode(type: Listing.self, decoder: decoder)
       .eraseToAnyPublisher()
   }
-  func info(name: Fullname) -> AnyPublisher<Listing, Error> {
-    return info(names: [name])
-  }
+  func info(name: Fullname) -> AnyPublisher<Listing, Error> { info(names: [name])}
 }
 
 public extension RedditClientBroker {

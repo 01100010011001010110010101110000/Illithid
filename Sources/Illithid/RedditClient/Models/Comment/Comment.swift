@@ -231,6 +231,7 @@ public struct Comment: RedditObject {
   }
 }
 
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public extension Comment {
   static func fetch(name: Fullname, client: RedditClientBroker) -> AnyPublisher<Comment, Error> {
     client.info(name: name)
@@ -238,7 +239,21 @@ public extension Comment {
         return listing.comments.last
     }.eraseToAnyPublisher()
   }
-  static func fetch(name: Fullname, client: RedditClientBroker, completion: @escaping (Comment) -> Void) {
+}
 
+public extension Comment {
+  static func fetch(name: Fullname, client: RedditClientBroker, completion: @escaping (Result<Comment>) -> Void) {
+    client.info(name: name) { result in
+      switch result {
+      case .success(let listing):
+        guard let comment = listing.comments.last else {
+          completion(.failure(RedditClientBroker.NotFound(lookingFor: name)))
+          return
+        }
+        completion(.success(comment))
+      case .failure(let error):
+        completion(.failure(error))
+      }
+    }
   }
 }

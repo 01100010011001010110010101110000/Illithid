@@ -27,27 +27,35 @@ public struct Listing: Codable {
   public var modhash: String? { data.modhash }
 }
 
+private extension Listing {
+  func items<T>(kind: Kind) -> [T] {
+    return data.children.compactMap { child in
+      if child.kind == kind {
+        switch child {
+        case .comment(let comment):
+          return comment as? T
+        case .account(let account):
+          return account as? T
+        case .post(let post):
+          return post as? T
+        case .subreddit(let subreddit):
+          return subreddit as? T
+        case .award(let award):
+          return award as? T
+        case .more(let more):
+          return more as? T
+        }
+      } else { return nil }
+    }
+  }
+}
+
 public extension Listing {
-  var comments: [Comment] {
-    return data.children.compactMap { wrappedComment in
-      if case .comment(let comment) = wrappedComment { return comment }
-      else { return nil }
-    }
-  }
+  var comments: [Comment] { items(kind: .comment) }
 
-  var accounts: [RedditAccount] {
-    return data.children.compactMap { wrappedAccount in
-      if case .account(let account) = wrappedAccount { return account }
-      else { return nil }
-    }
-  }
+  var accounts: [RedditAccount] { items(kind: .account) }
 
-  var posts: [Post] {
-    return data.children.compactMap { wrappedPost in
-      if case .post(let post) = wrappedPost { return post }
-      else { return nil }
-    }
-  }
+  var posts: [Post] { items(kind: .post) }
 
 //  var messages: [Message] {
 //    return data.children.compactMap { wrappedMessage in
@@ -55,19 +63,10 @@ public extension Listing {
 //      else { return nil }
 //    }
 //  }
-  var subreddits: [Subreddit] {
-    return data.children.compactMap { wrappedSubreddit in
-      if case .subreddit(let subreddit) = wrappedSubreddit { return subreddit }
-      else { return nil }
-    }
-  }
 
-  var awards: [Award] {
-    return data.children.compactMap { wrappedAward in
-      if case .award(let award) = wrappedAward { return award }
-      else { return nil }
-    }
-  }
+  var subreddits: [Subreddit] { items(kind: .subreddit) }
+
+  var awards: [Award] { items(kind: .award) }
 }
 
 public enum Content: Codable {
