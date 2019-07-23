@@ -15,7 +15,9 @@ import OAuthSwift
 import Willow
 
 public final class AccountManager: BindableObject {
-  public let didChange = PassthroughSubject<AccountManager, Never>()
+  public let willChange = PassthroughSubject<Void, Never>()
+
+  var cancellable: AnyCancellable!
 
   let logger: Logger
   var configuration: ClientConfiguration
@@ -32,14 +34,14 @@ public final class AccountManager: BindableObject {
 
   var credentials: [String: OAuthSwiftCredential] = [:]
   public var accounts: [RedditAccount] = [] {
-    didSet {
-      didChange.send(self)
+    willSet {
+      willChange.send()
     }
   }
 
   public var currentAccount: RedditAccount? {
-    didSet {
-      didChange.send(self)
+    willSet {
+      willChange.send()
     }
   }
 
@@ -53,16 +55,17 @@ public final class AccountManager: BindableObject {
     oauth.authorize(
       withCallbackURL: configuration.redirectURI,
       scope: configuration.scope,
-      state: state, parameters: configuration.oauthParameters) { result in
-        switch result {
-        case .success(let (_, _, parameters)):
-          self.logger.debugMessage("Authorization successful")
-          self.logger.debugMessage("Returned parameters: \(parameters)")
-          self.logger.debugMessage("OAuth object parameters: \(oauth.parameters)")
-          self.fetchNewAccount(oauth: oauth, completion: completion)
-        case .failure(let error):
-          self.logger.errorMessage { "Authorization failed: \(error)" }
-        }
+      state: state, parameters: configuration.oauthParameters
+    ) { result in
+      switch result {
+      case .success(let (_, _, parameters)):
+        self.logger.debugMessage("Authorization successful")
+        self.logger.debugMessage("Returned parameters: \(parameters)")
+        self.logger.debugMessage("OAuth object parameters: \(oauth.parameters)")
+        self.fetchNewAccount(oauth: oauth, completion: completion)
+      case let .failure(error):
+        self.logger.errorMessage { "Authorization failed: \(error)" }
+      }
     }
   }
 
@@ -140,11 +143,7 @@ public final class AccountManager: BindableObject {
         .eraseToAnyPublisher()
     }
 
-    Publishers.MergeMany(accountPublishers)
-      .mapError { error -> Error in
-        self.logger.errorMessage { "Error while loading accounts: \(error)" }
-        return error
-      }
+    cancellable = Publishers.MergeMany(accountPublishers)
       .map { account in
         self.logger.debugMessage { "Appending \(account.name)" }
         self.accounts.append(account)
@@ -153,7 +152,9 @@ public final class AccountManager: BindableObject {
         }
       }
       .collect()
-      .sink { _ in
+      .sink(receiveCompletion: { error in
+        self.logger.errorMessage { "Error while loading accounts: \(error)" }
+      }) { _ in
         if self.currentAccount == nil, !self.accounts.isEmpty {
           self.setCurrentAccount(account: self.accounts.first!)
         }
@@ -169,7 +170,7 @@ public final class AccountManager: BindableObject {
 
   public func removeAll() {
     let usernames = configuration.defaults.stringArray(forKey: "RedditUsernames") ?? []
-    usernames.forEach { (username) in
+    usernames.forEach { username in
       credentials.removeValue(forKey: username)
     }
     configuration.defaults.set([], forKey: "RedditUsernames")

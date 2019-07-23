@@ -5,8 +5,13 @@ final class IllithidTests: XCTestCase {
   let illithid = RedditClientBroker(configuration: TestableConfiguration())
 
   func testCommentSingleton() {
-    Comment.fetch(name: "t1_ernlwui", client: illithid) { comment in
-      XCTAssertEqual(comment.author, "paulfknwalsh")
+    Comment.fetch(name: "t1_ernlwui", client: illithid) { result in
+      switch result {
+      case .success(let comment):
+        XCTAssertEqual(comment.author, "paulfknwalsh")
+      case .failure(let error):
+        XCTFail(error.localizedDescription)
+      }
     }
   }
 
