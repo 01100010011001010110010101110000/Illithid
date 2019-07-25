@@ -37,7 +37,7 @@ public struct Comment: RedditObject {
   public let ups: Int
   public let modReasonBy: String?
   public let bannedBy: String?
-  public let authorFlairType: String
+  public let authorFlairType: String?
   public let removalReason: String?
   // This is actually a fullname
   public let linkID: String
@@ -171,7 +171,7 @@ public struct Comment: RedditObject {
     ups = try container.decode(Int.self, forKey: .ups)
     modReasonBy = try container.decodeIfPresent(String.self, forKey: .modReasonBy)
     bannedBy = try container.decodeIfPresent(String.self, forKey: .bannedBy)
-    authorFlairType = try container.decode(String.self, forKey: .authorFlairType)
+    authorFlairType = try container.decodeIfPresent(String.self, forKey: .authorFlairType)
     removalReason = try container.decodeIfPresent(String.self, forKey: .removalReason)
     linkID = try container.decode(String.self, forKey: .linkID)
     authorFlairTemplateID = try container.decodeIfPresent(String.self, forKey: .authorFlairType)
