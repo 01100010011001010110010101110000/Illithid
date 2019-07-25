@@ -5,6 +5,7 @@
 //  Created by Tyler Gregory on 6/12/19.
 //
 
+import AuthenticationServices
 import Combine
 import Foundation
 import SwiftUI
@@ -45,9 +46,10 @@ public final class AccountManager: BindableObject {
     }
   }
 
-  public func addAccount(completion: @escaping () -> Void) {
+  public func addAccount(anchor: ASWebAuthenticationPresentationContextProviding, completion: @escaping () -> Void) {
     let oauth = OAuth2Swift(parameters: configuration.oauthParameters)!
     oauth.accessTokenBasicAuthentification = true
+    oauth.authorizeURLHandler = IllithidWebAuthURLHandler(callbackURLScheme: "illithid://oauth2/callback", anchor: anchor)
 
     let state = ((0 ... 11).map { _ in Int.random(in: 0 ... 9) }).reduce("") { accumulator, next in
       accumulator + String(next)
