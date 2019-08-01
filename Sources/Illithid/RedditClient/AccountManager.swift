@@ -15,9 +15,7 @@ import KeychainAccess
 import OAuthSwift
 import Willow
 
-public final class AccountManager: BindableObject {
-  public let willChange = PassthroughSubject<Void, Never>()
-
+public final class AccountManager: ObservableObject {
   var cancellable: AnyCancellable!
 
   let logger: Logger
@@ -34,17 +32,9 @@ public final class AccountManager: BindableObject {
   }
 
   var credentials: [String: OAuthSwiftCredential] = [:]
-  public var accounts: [RedditAccount] = [] {
-    willSet {
-      willChange.send()
-    }
-  }
+  @Published public var accounts: [RedditAccount] = []
 
-  public var currentAccount: RedditAccount? {
-    willSet {
-      willChange.send()
-    }
-  }
+  @Published public var currentAccount: RedditAccount? = nil
 
   public func addAccount(anchor: ASWebAuthenticationPresentationContextProviding, completion: @escaping () -> Void) {
     let oauth = OAuth2Swift(parameters: configuration.oauthParameters)!
