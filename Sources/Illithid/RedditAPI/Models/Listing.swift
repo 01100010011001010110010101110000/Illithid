@@ -13,11 +13,23 @@ public struct Listing: Codable {
   private let data: ListingData
 
   fileprivate struct ListingData: Codable {
-    fileprivate let modhash: String?
-    fileprivate let dist: Int?
-    fileprivate let children: [Content]
-    fileprivate let after: String?
-    fileprivate let before: String?
+    let modhash: String?
+    let dist: Int?
+    let children: [Content]
+    let after: String?
+    let before: String?
+
+    init() {
+      modhash = nil
+      dist = nil
+      after = nil
+      before = nil
+      children = []
+    }
+  }
+
+  public init() {
+    data = ListingData()
   }
 
   public var after: String? { data.after }

@@ -36,7 +36,7 @@ public extension RedditClientBroker {
   func info(names: [Fullname], completion: @escaping (Result<Listing>) -> Void) {
     let decoder = JSONDecoder()
     decoder.dateDecodingStrategy = .secondsSince1970
-    let endpoint = URL(string: "https://oauth.reddit.com/api/info")!
+    let endpoint = URL(string: "/api/info", relativeTo: baseURL)!
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
     let infoParameters: Parameters = [
       "id": names.joined(separator: ","),
