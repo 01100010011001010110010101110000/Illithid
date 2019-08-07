@@ -230,30 +230,3 @@ public struct Comment: RedditObject {
     contentCategories = try container.decodeIfPresent([String].self, forKey: .contentCategories)
   }
 }
-
-@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-public extension Comment {
-  static func fetch(name: Fullname, client: RedditClientBroker) -> AnyPublisher<Comment, Error> {
-    client.info(name: name)
-      .compactMap { listing in
-        return listing.comments.last
-    }.eraseToAnyPublisher()
-  }
-}
-
-public extension Comment {
-  static func fetch(name: Fullname, client: RedditClientBroker, completion: @escaping (Result<Comment>) -> Void) {
-    client.info(name: name) { result in
-      switch result {
-      case .success(let listing):
-        guard let comment = listing.comments.last else {
-          completion(.failure(RedditClientBroker.NotFound(lookingFor: name)))
-          return
-        }
-        completion(.success(comment))
-      case .failure(let error):
-        completion(.failure(error))
-      }
-    }
-  }
-}

@@ -6,6 +6,9 @@
 //  Copyright © 2019 flayware. All rights reserved.
 //
 
+#if canImport(Combine)
+import Combine
+#endif
 import Foundation
 
 import Alamofire
@@ -65,3 +68,31 @@ public extension RedditClientBroker {
     imageDownloader.download(request) { completion($0) }
   }
 }
+
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+public extension Post {
+  static func fetch(name: Fullname, client: RedditClientBroker) -> AnyPublisher<Post, Error> {
+    client.info(name: name)
+      .compactMap { listing in
+        return listing.posts.last
+    }.eraseToAnyPublisher()
+  }
+}
+
+public extension Post {
+  static func fetch(name: Fullname, client: RedditClientBroker, completion: @escaping (Result<Post>) -> Void) {
+    client.info(name: name) { result in
+      switch result {
+      case .success(let listing):
+        guard let post = listing.posts.last else {
+          completion(.failure(RedditClientBroker.NotFound(lookingFor: name)))
+          return
+        }
+        completion(.success(post))
+      case .failure(let error):
+        completion(.failure(error))
+      }
+    }
+  }
+}
+
