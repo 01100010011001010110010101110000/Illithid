@@ -32,9 +32,9 @@ public final class AccountManager: ObservableObject {
   }
 
   var credentials: [String: OAuthSwiftCredential] = [:]
-  @Published public var accounts: [RedditAccount] = []
+  @Published public private(set) var accounts: OrderedSet<RedditAccount> = []
 
-  @Published public var currentAccount: RedditAccount? = nil
+  @Published public private(set) var currentAccount: RedditAccount? = nil
 
   public func addAccount(anchor: ASWebAuthenticationPresentationContextProviding, completion: @escaping () -> Void) {
     let oauth = OAuth2Swift(parameters: configuration.oauthParameters)!
@@ -79,13 +79,16 @@ public final class AccountManager: ObservableObject {
       case let .success(data):
         let account = try! decoder.decode(RedditAccount.self, from: data)
 
-        self.accounts.append(account)
-        self.credentials[account.name] = oauth.client.credential
-        self.setCurrentAccount(account: account)
-        var savedAccounts = self.configuration.defaults.stringArray(forKey: "RedditUsernames") ?? []
-        savedAccounts.append(account.name)
-        self.configuration.defaults.set(savedAccounts, forKey: "RedditUsernames")
-        self.persistAccounts()
+        // Only add the credentials and persist the username of new accounts
+        let didInsert = self.accounts.append(account)
+        if didInsert {
+          self.credentials[account.name] = oauth.client.credential
+          self.setCurrentAccount(account: account)
+          var savedAccounts = self.configuration.defaults.stringArray(forKey: "RedditUsernames") ?? []
+          savedAccounts.append(account.name)
+          self.configuration.defaults.set(savedAccounts, forKey: "RedditUsernames")
+          self.persistAccounts()
+        }
 
         completion()
       case let .failure(error):
@@ -154,7 +157,7 @@ public final class AccountManager: ObservableObject {
       }
   }
 
-  public func removeAccount(indexSet: IndexSet) {
+  public func removeAccounts(indexSet: IndexSet) {
     for index in indexSet {
       removeAccount(toRemove: accounts[index])
     }
@@ -171,7 +174,7 @@ public final class AccountManager: ObservableObject {
 
   public func removeAccount(toRemove account: RedditAccount) {
     /// Remove account from in memory accounts dictionary
-    accounts.removeAll { $0.name == account.name }
+    accounts.remove(account)
     credentials.removeValue(forKey: account.name)
 
     /// Remove username from saved account names
