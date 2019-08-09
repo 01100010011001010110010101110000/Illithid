@@ -6,6 +6,7 @@
  Created by Tyler Gregory on 8/8/19.
  */
 
+/// A data structure which guarantees unique membership and preserves lement ordering
 public struct OrderedSet<E: Hashable>: RandomAccessCollection, Equatable, Hashable {
   public typealias Element = E
   public typealias Index = Int
