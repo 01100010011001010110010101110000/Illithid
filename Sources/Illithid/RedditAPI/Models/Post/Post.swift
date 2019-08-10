@@ -133,10 +133,8 @@ public struct Post: RedditObject {
   public let contest_mode: Bool
   public let created_utc: Date
   public let is_video: Bool
-}
 
-public extension Post {
-  func previews() -> [ImagePreview.Image] {
+  public var previews: [ImagePreview.Image] {
     var previews: [ImagePreview.Image] = []
     guard self.thumbnail != nil, self.thumbnail?.scheme != nil else { return previews }
     previews.reserveCapacity((self.preview?.images.first?.resolutions.count ?? 0) + 2)
@@ -148,3 +146,4 @@ public extension Post {
     return previews
   }
 }
+

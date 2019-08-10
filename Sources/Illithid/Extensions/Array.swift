@@ -8,7 +8,7 @@
 import Foundation
 
 public extension Array {
-  func middle() -> Element {
+  var middle: Element {
     let middleIndex = self.isEmpty ? 0 : self.count / 2
     return self[middleIndex]
   }
