@@ -17,14 +17,16 @@ public final class RedditClientBroker {
     case unauthenticated = "https://api.reddit.com/"
     case authenticated = "https://oauth.reddit.com/"
   }
+
   public var baseURL: URL {
     accounts.currentAccount != nil ? URL(string: baseURLs.authenticated.rawValue)! : URL(string: baseURLs.unauthenticated.rawValue)!
   }
+
   public static let authorizeEndpoint: URL = URL(string: "https://www.reddit.com/api/v1/authorize.compact")!
   public static let tokenEndpoint: URL = URL(string: "https://www.reddit.com/api/v1/access_token")!
 
   /// Reddit API's base URL
-  static public let baseURL: URL = URL(string: "https://www.reddit.com/api/v1")!
+  public static let baseURL: URL = URL(string: "https://www.reddit.com/api/v1")!
 
   public typealias AccountTokenTuple = (account: RedditAccount, credential: OAuthSwiftCredential)
 
@@ -74,3 +76,6 @@ public final class RedditClientBroker {
     return SessionManager(configuration: alamoConfiguration)
   }
 }
+
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+extension RedditClientBroker: ObservableObject {}
