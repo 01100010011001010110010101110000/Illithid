@@ -33,45 +33,46 @@ public struct Comment: RedditObject {
   }
 
   public let totalAwardsReceived: Int
-  public let approvedAtUTC: Date?
+  public let approvedAtUtc: Date?
   public let ups: Int
   public let modReasonBy: String?
   public let bannedBy: String?
   public let authorFlairType: String?
   public let removalReason: String?
-  // This is actually a fullname
-  public let linkID: String
-  public let authorFlairTemplateID: String?
+  /// The `Fullname` of this comment's post
+  public let linkId: Fullname
+  public let authorFlairTemplateId: String?
   public let likes: String?
   public let noFollow: Bool
   public let replies: Listing?
   public let userReports: [String]
   public let saved: Bool
   public let id: ID36
-  public let bannedAtUTC: Date?
+  public let bannedAtUtc: Date?
   public let modReasonTitle: String?
   public let gilded: Int
   public let archived: Bool
   public let reportReasons: String?
   public let author: String
-  public let canModPost, sendReplies: Bool
-  // This is actually a fullname
-  public let parentID: String
+  public let canModPost: Bool
+  public let sendReplies: Bool
+  /// The `Fullname` of this comment's parent comment
+  public let parentId: Fullname
   public let score: Int
   public let authorFullname: String
   public let approvedBy: String?
   public let allAwardings: [Award]
-  // This is actually a fullname
-  public let subredditID: String
+  /// The `Fullname` of this comment's subreddit
+  public let subredditId: Fullname
   public let body: String
   public let edited: Edited
-  public let authorFlairCSSClass: String?
+  public let authorFlairCssClass: String?
   public let isSubmitter: Bool
   public let downs: Int
   public let authorFlairRichtext: [String]
   public let authorPatreonFlair: Bool
   public let collapsedReason: String?
-  public let bodyHTML: String
+  public let bodyHtml: String
   public let stickied: Bool
   public let subredditType: String
   public let canGild: Bool
@@ -86,10 +87,10 @@ public struct Comment: RedditObject {
   public let subreddit: String
   public let authorFlairText: String?
   public let collapsed: Bool
-  public let createdUTC: Date
+  public let createdUtc: Date
   public let subredditNamePrefixed: String
   public let controversiality: Int
-  /// Depth is present unless fetching a comment from `/api/info`
+  /// Depth is present unless fetching a comment from `/api/info` or `/search`
   public let depth: Int?
   public let authorFlairBackgroundColor: String?
   public let modReports: [String]
@@ -100,61 +101,68 @@ public struct Comment: RedditObject {
   public let contentCategories: [String]?
 
   enum CodingKeys: String, CodingKey {
-    case totalAwardsReceived = "total_awards_received"
-    case approvedAtUTC = "approved_at_utc"
+    case totalAwardsReceived
+    case approvedAtUtc
     case ups
-    case modReasonBy = "mod_reason_by"
-    case bannedBy = "banned_by"
-    case authorFlairType = "author_flair_type"
-    case removalReason = "removal_reason"
-    case linkID = "link_id"
-    case authorFlairTemplateID = "author_flair_template_id"
+    case modReasonBy
+    case bannedBy
+    case authorFlairType
+    case removalReason
+    case linkId
+    case authorFlairTemplateId
     case likes
-    case noFollow = "no_follow"
+    case noFollow
     case replies
-    case userReports = "user_reports"
-    case saved, id
-    case bannedAtUTC = "banned_at_utc"
-    case modReasonTitle = "mod_reason_title"
-    case gilded, archived
-    case reportReasons = "report_reasons"
+    case userReports
+    case saved
+    case id
+    case bannedAtUtc
+    case modReasonTitle
+    case gilded
+    case archived
+    case reportReasons
     case author
-    case canModPost = "can_mod_post"
-    case sendReplies = "send_replies"
-    case parentID = "parent_id"
+    case canModPost
+    case sendReplies
+    case parentId
     case score
-    case authorFullname = "author_fullname"
-    case approvedBy = "approved_by"
-    case allAwardings = "all_awardings"
-    case subredditID = "subreddit_id"
-    case body, edited
-    case authorFlairCSSClass = "author_flair_css_class"
-    case isSubmitter = "is_submitter"
+    case authorFullname
+    case approvedBy
+    case allAwardings
+    case subredditId
+    case body
+    case edited
+    case authorFlairCssClass
+    case isSubmitter
     case downs
-    case authorFlairRichtext = "author_flair_richtext"
-    case authorPatreonFlair = "author_patreon_flair"
-    case collapsedReason = "collapsed_reason"
-    case bodyHTML = "body_html"
+    case authorFlairRichtext
+    case authorPatreonFlair
+    case collapsedReason
+    case bodyHtml
     case stickied
-    case subredditType = "subreddit_type"
-    case canGild = "can_gild"
+    case subredditType
+    case canGild
 //    case gildings
-    case authorFlairTextColor = "author_flair_text_color"
-    case scoreHidden = "score_hidden"
+    case authorFlairTextColor
+    case scoreHidden
     case permalink
-    case numReports = "num_reports"
-    case locked, name, created, subreddit
-    case authorFlairText = "author_flair_text"
+    case numReports
+    case locked
+    case name
+    case created
+    case subreddit
+    case authorFlairText
     case collapsed
-    case createdUTC = "created_utc"
-    case subredditNamePrefixed = "subreddit_name_prefixed"
-    case controversiality, depth
-    case authorFlairBackgroundColor = "author_flair_background_color"
-    case modReports = "mod_reports"
-    case modNote = "mod_note"
+    case createdUtc
+    case subredditNamePrefixed
+    case controversiality
+    case depth
+    case authorFlairBackgroundColor
+    case modReports
+    case modNote
     case distinguished
-    case previousVisits = "previous_visits"
-    case contentCategories = "content_categories"
+    case previousVisits
+    case contentCategories
   }
 
   public init(from decoder: Decoder) throws {
@@ -167,20 +175,20 @@ public struct Comment: RedditObject {
     }
 
     totalAwardsReceived = try container.decode(Int.self, forKey: .totalAwardsReceived)
-    approvedAtUTC = try container.decodeIfPresent(Date.self, forKey: .approvedAtUTC)
+    approvedAtUtc = try container.decodeIfPresent(Date.self, forKey: .approvedAtUtc)
     ups = try container.decode(Int.self, forKey: .ups)
     modReasonBy = try container.decodeIfPresent(String.self, forKey: .modReasonBy)
     bannedBy = try container.decodeIfPresent(String.self, forKey: .bannedBy)
     authorFlairType = try container.decodeIfPresent(String.self, forKey: .authorFlairType)
     removalReason = try container.decodeIfPresent(String.self, forKey: .removalReason)
-    linkID = try container.decode(String.self, forKey: .linkID)
-    authorFlairTemplateID = try container.decodeIfPresent(String.self, forKey: .authorFlairType)
+    linkId = try container.decode(String.self, forKey: .linkId)
+    authorFlairTemplateId = try container.decodeIfPresent(String.self, forKey: .authorFlairTemplateId)
     likes = try container.decodeIfPresent(String.self, forKey: .likes)
     noFollow = try container.decode(Bool.self, forKey: .noFollow)
     userReports = try container.decode([String].self, forKey: .userReports)
     saved = try container.decode(Bool.self, forKey: .saved)
     id = try container.decode(ID36.self, forKey: .id)
-    bannedAtUTC = try container.decodeIfPresent(Date.self, forKey: .bannedAtUTC)
+    bannedAtUtc = try container.decodeIfPresent(Date.self, forKey: .bannedAtUtc)
     modReasonTitle = try container.decodeIfPresent(String.self, forKey: .modReasonTitle)
     gilded = try container.decode(Int.self, forKey: .gilded)
     archived = try container.decode(Bool.self, forKey: .archived)
@@ -188,21 +196,21 @@ public struct Comment: RedditObject {
     author = try container.decode(String.self, forKey: .author)
     canModPost = try container.decode(Bool.self, forKey: .canModPost)
     sendReplies = try container.decode(Bool.self, forKey: .sendReplies)
-    parentID = try container.decode(String.self, forKey: .parentID)
+    parentId = try container.decode(String.self, forKey: .parentId)
     score = try container.decode(Int.self, forKey: .score)
     authorFullname = try container.decode(String.self, forKey: .authorFullname)
     approvedBy = try container.decodeIfPresent(String.self, forKey: .approvedBy)
     allAwardings = try container.decode([Award].self, forKey: .allAwardings)
-    subredditID = try container.decode(String.self, forKey: .subredditID)
+    subredditId = try container.decode(String.self, forKey: .subredditId)
     body = try container.decode(String.self, forKey: .body)
     edited = try container.decode(Edited.self, forKey: .edited)
-    authorFlairCSSClass = try container.decodeIfPresent(String.self, forKey: .authorFlairCSSClass)
+    authorFlairCssClass = try container.decodeIfPresent(String.self, forKey: .authorFlairCssClass)
     isSubmitter = try container.decode(Bool.self, forKey: .isSubmitter)
     downs = try container.decode(Int.self, forKey: .downs)
     authorFlairRichtext = try container.decode([String].self, forKey: .authorFlairRichtext)
     authorPatreonFlair = try container.decode(Bool.self, forKey: .authorPatreonFlair)
     collapsedReason = try? container.decodeIfPresent(String.self, forKey: .collapsedReason)
-    bodyHTML = try container.decode(String.self, forKey: .bodyHTML)
+    bodyHtml = try container.decode(String.self, forKey: .bodyHtml)
     stickied = try container.decode(Bool.self, forKey: .stickied)
     subredditType = try container.decode(String.self, forKey: .subredditType)
     canGild = try container.decode(Bool.self, forKey: .canGild)
@@ -217,7 +225,7 @@ public struct Comment: RedditObject {
     subreddit = try container.decode(String.self, forKey: .subreddit)
     authorFlairText = try container.decodeIfPresent(String.self, forKey: .authorFlairText)
     collapsed = try container.decode(Bool.self, forKey: .collapsed)
-    createdUTC = try container.decode(Date.self, forKey: .createdUTC)
+    createdUtc = try container.decode(Date.self, forKey: .createdUtc)
     subredditNamePrefixed = try container.decode(String.self, forKey: .subredditNamePrefixed)
     controversiality = try container.decode(Int.self, forKey: .controversiality)
     depth = try container.decodeIfPresent(Int.self, forKey: .depth)

@@ -69,76 +69,75 @@ public struct Post: RedditObject {
 
   public let id: String
   public let name: String
-  public let type = "t3"
 
   public let subreddit: String
-  public let subreddit_id: String
-  public let subreddit_name_prefixed: String
+  public let subredditId: String
+  public let subredditNamePrefixed: String
 
   public let selftext: String
-  public let selftext_html: String?
-  public let secure_media: PostMedia?
+  public let selftextHtml: String?
+  public let secureMedia: PostMedia?
   public let media: PostMedia?
   public let domain: String
 
   public let title: String
-  public let author_fullname: String
+  public let authorFullname: String
   public let author: String
   public var authorPrefixed: String {
     return "u/\(self.author)"
   }
 
-  public let author_patreon_flair: Bool
-  public let author_flair_text_color: String?
-  public let author_flair_text: String?
+  public let authorPatreonFlair: Bool
+  public let authorFlairTextColor: String?
+  public let authorFlairText: String?
   public let url: URL
 
   public let saved: Bool
 
-  public let thumbnail_height: Int?
-  public let thumbnail_width: Int?
+  public let thumbnailHeight: Int?
+  public let thumbnailWidth: Int?
   public let thumbnail: URL?
 
   public let preview: Preview?
 
   public let gilded: Int
-  public let is_original_content: Bool
-  public let is_meta: Bool
-  public let is_self: Bool
+  public let isOriginalContent: Bool
+  public let isMeta: Bool
+  public let isSelf: Bool
   public let edited: Edited
   public let ups: Int
   public let downs: Int
   public let score: Int
   public let clicked: Bool
   public let created: Date
-  public let num_comments: Int
-  public let num_crossposts: Int
+  public let numComments: Int
+  public let numCrossposts: Int
   public let permalink: String
-  public let content_categories: [String]?
-  public let suggested_sort: PostSort?
-  public let post_hint: PostHint?
+  public let contentCategories: [String]?
+  public let suggestedSort: PostSort?
+  public let postHint: PostHint?
   public let archived: Bool
-  public let no_follow: Bool
-  public let is_crosspostable: Bool
+  public let noFollow: Bool
+  public let isCrosspostable: Bool
   public let pinned: Bool
-  public let all_awardings: [Award]
-  public let media_only: Bool
-  public let can_gild: Bool
+  public let allAwardings: [Award]
+  public let mediaOnly: Bool
+  public let canGild: Bool
   public let spoiler: Bool
   public let locked: Bool
   public let visited: Bool
-  public let num_reports: Int?
-  public let removal_reason: String?
-  public let send_replies: Bool
-  public let contest_mode: Bool
-  public let created_utc: Date
-  public let is_video: Bool
+  public let numReports: Int?
+  public let removalReason: String?
+  public let sendReplies: Bool
+  public let contestMode: Bool
+  public let createdUtc: Date
+  public let isVideo: Bool
 
   public var previews: [ImagePreview.Image] {
     var previews: [ImagePreview.Image] = []
     guard self.thumbnail != nil, self.thumbnail?.scheme != nil else { return previews }
     previews.reserveCapacity((self.preview?.images.first?.resolutions.count ?? 0) + 2)
-    previews.append(.init(url: self.thumbnail!, width: self.thumbnail_width!, height: self.thumbnail_height!))
+    previews.append(.init(url: self.thumbnail!, width: self.thumbnailWidth!, height: self.thumbnailHeight!))
     if let preview = self.preview?.images.first {
       previews.append(contentsOf: preview.resolutions)
       previews.append(preview.source)

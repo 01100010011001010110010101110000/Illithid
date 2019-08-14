@@ -39,8 +39,6 @@ public extension RedditClientBroker {
   func search(for query: String, subreddit: String? = nil, after: Fullname? = nil, before: Fullname? = nil,
               limit: UInt = 25, showAll: ShowAllPreference = .filtered, sort: SearchSort = .relevance,
               topInterval: TopInterval? = nil, resultTypes: Set<SearchType> = [.subreddit, .post, .user], completion: @escaping (Result<[Listing]>) -> ()) {
-    let decoder = JSONDecoder()
-    decoder.dateDecodingStrategy = .secondsSince1970
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
     var parameters: Parameters = [
       "q": query,
@@ -71,14 +69,14 @@ public extension RedditClientBroker {
           // The search API combines the user and subreddits results into a single listing
           // Therefore, we have a single listing when either we are searching for one term or both subreddits and users, and an array otherwise
           if resultTypes.count == 1 || resultTypes == [.subreddit, .user] {
-            let listing = try decoder.decode(Listing.self, from: data)
+            let listing = try self.decoder.decode(Listing.self, from: data)
             completion(.success([listing]))
           } else {
-            let listings = try decoder.decode([Listing].self, from: data)
+            let listings = try self.decoder.decode([Listing].self, from: data)
             completion(.success(listings))
           }
         } catch let error as DecodingError {
-          decoder.writeDecodingContext(decoding: data, error: error)
+          self.decoder.writeDecodingContext(decoding: data, error: error)
           completion(.failure(error))
         } catch {
           completion(.failure(error))

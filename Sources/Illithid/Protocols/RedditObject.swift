@@ -185,8 +185,4 @@ public protocol RedditObject: Codable, Identifiable, Hashable {
 
   /// The object's full name
   var name: String { get }
-
-  /// The object's type as defined by the Reddit API
-  /// e.g. "t5"
-  var type: String { get }
 }

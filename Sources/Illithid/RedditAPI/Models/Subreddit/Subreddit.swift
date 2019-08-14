@@ -23,14 +23,12 @@ public struct Subreddit: RedditObject {
 
   public let id: String // swiftlint:disable:this identifier_name
   public let name: String
-  public let type: String = "t5"
   public let publicDescription: String
   public let displayName: String
   public let wikiEnabled: Bool?
-  public let headerImageURL: URL?
-  public var headerImage: NSImage?
+  public let headerImg: URL?
   public let over18: Bool
-  public let createdUTC: Date
+  public let createdUtc: Date
 
   /// The Reddit API sometimes returns the empty string for the `header_img` parameter, and also may return `nil`, so we handle the empty srtring, then
   /// decode the actual URL if it is present
@@ -43,24 +41,24 @@ public struct Subreddit: RedditObject {
     self.displayName = try container.decode(String.self, forKey: .displayName)
     self.wikiEnabled = try container.decodeIfPresent(Bool.self, forKey: .wikiEnabled)
     self.over18 = try container.decode(Bool.self, forKey: .over18)
-    self.createdUTC = try container.decode(Date.self, forKey: .createdUTC)
+    self.createdUtc = try container.decode(Date.self, forKey: .createdUtc)
 
-    if let emptyString = try? container.decode(String.self, forKey: .headerImageURL), emptyString.isEmpty {
-      headerImageURL = nil
+    if let emptyString = try? container.decode(String.self, forKey: .headerImg), emptyString.isEmpty {
+      headerImg = nil
     } else {
-      headerImageURL = try container.decodeIfPresent(URL.self, forKey: .headerImageURL)
+      headerImg = try container.decodeIfPresent(URL.self, forKey: .headerImg)
     }
   }
 
   private enum CodingKeys: String, CodingKey {
     case id // swiftlint:disable:this identifier_name
     case name
-    case publicDescription = "public_description"
-    case displayName = "display_name"
-    case wikiEnabled = "wiki_enabled"
-    case headerImageURL = "header_img"
+    case publicDescription
+    case displayName
+    case wikiEnabled
+    case headerImg
     case over18
-    case createdUTC = "created_utc"
+    case createdUtc
   }
 }
 

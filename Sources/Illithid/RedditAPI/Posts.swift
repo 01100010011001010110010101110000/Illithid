@@ -20,8 +20,6 @@ public extension RedditClientBroker {
   func fetchPosts(for subreddit: Subreddit, sortBy postSort: PostSort,
                   location: Location? = nil, topInterval: TopInterval? = nil,
                   params: ListingParameters = .init(), completion: @escaping (Listing) -> Void) {
-    let decoder = JSONDecoder()
-    decoder.dateDecodingStrategy = .secondsSince1970
     var parameters = params.toParameters()
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
     let postsUrl = URL(string: "/r/\(subreddit.displayName)/\(postSort)", relativeTo: baseURL)!
@@ -41,7 +39,7 @@ public extension RedditClientBroker {
         switch response.result {
         case let .success(data):
           do {
-            let list = try decoder.decode(Listing.self, from: data)
+            let list = try self.decoder.decode(Listing.self, from: data)
             completion(list)
           } catch let error as DecodingError {
             let json = try? JSON(data: data).rawString(options: [.sortedKeys, .prettyPrinted])

@@ -37,8 +37,6 @@ public extension RedditClientBroker {
                 by sort: CommentsSort = .confidence, focusOn comment: Comment? = nil, context: Int? = nil,
                 depth: Int = 0, showEdits: Bool = true, showMore: Bool = true,
                 threaded: Bool = true, truncate: Int = 0) -> AnyPublisher<Listing, Error> {
-    let decoder = JSONDecoder()
-    decoder.dateDecodingStrategy = .secondsSince1970
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
     let commentsListingURL = URL(string: "/r/\(post.subreddit)/comments/\(post.id)", relativeTo: baseURL)!
 

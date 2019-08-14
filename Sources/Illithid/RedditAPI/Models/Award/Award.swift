@@ -9,29 +9,29 @@
 import Foundation
 
 public struct Award: Codable {
-  public let is_enabled: Bool
+  public let isEnabled: Bool
   public let count: Int
-  public let subreddit_id: String?
+  public let subredditId: String?
   public let description: String?
-  public let coin_reward: Int
-  public let icon_width: Int
-  public let icon_height: Int
-  public let icon_url: URL
-  public let days_of_premium: Int
-  public let days_of_drip_extension: Int
-  public let award_type: String
-  public let coin_price: Int
+  public let coinReward: Int
+  public let iconWidth: Int
+  public let iconHeight: Int
+  public let iconUrl: URL
+  public let daysOfPremium: Int
+  public let daysOfDripExtension: Int
+  public let awardType: String
+  public let coinPrice: Int
 
   // TODO Reddit has (recently?) implemented "community" awards, which have GUID IDs and can have any name;
   // decide whether to leave this unhandled as strings or special case it via custom coding
   public let id: String
   public let name: String
-  public let resized_icons: [AwardIcons]
+  public let resizedIcons: [AwardIcons]
   
   public enum AwardID: String, Codable {
-    case gid_1
-    case gid_2
-    case gid_3
+    case gid1
+    case gid2
+    case gid3
   }
   public enum AwardName: String, Codable {
     case Silver

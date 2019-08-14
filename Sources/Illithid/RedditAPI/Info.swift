@@ -15,8 +15,6 @@ import Alamofire
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public extension RedditClientBroker {
   func info(names: [Fullname]) -> AnyPublisher<Listing, Error> {
-    let decoder = JSONDecoder()
-    decoder.dateDecodingStrategy = .secondsSince1970
     let endpoint = URL(string: "/api/info", relativeTo: baseURL)!
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
     let infoParameters: Parameters = [
@@ -34,8 +32,6 @@ public extension RedditClientBroker {
 
 public extension RedditClientBroker {
   func info(names: [Fullname], completion: @escaping (Result<Listing>) -> Void) {
-    let decoder = JSONDecoder()
-    decoder.dateDecodingStrategy = .secondsSince1970
     let endpoint = URL(string: "/api/info", relativeTo: baseURL)!
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
     let infoParameters: Parameters = [
@@ -47,7 +43,7 @@ public extension RedditClientBroker {
       switch response.result {
       case .success(let data):
         do {
-          let listing = try decoder.decode(Listing.self, from: data)
+          let listing = try self.decoder.decode(Listing.self, from: data)
           completion(.success(listing))
         } catch {
           completion(.failure(error))

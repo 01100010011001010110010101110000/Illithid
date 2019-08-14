@@ -39,6 +39,8 @@ public final class RedditClientBroker {
 
   public var configuration: ClientConfiguration
 
+  let decoder: JSONDecoder = .init()
+
   public init(
     sharedLogger: Logger = Logger(
       logLevels: [.all],
@@ -56,6 +58,9 @@ public final class RedditClientBroker {
 
     session = Self.makeSessionManager(configuration)
     accounts = AccountManager(logger: logger, configuration: self.configuration, session: session)
+
+    decoder.dateDecodingStrategy = .secondsSince1970
+    decoder.keyDecodingStrategy = .convertFromSnakeCase
   }
 
   static func makeSessionManager(_ configuration: ClientConfiguration) -> SessionManager {

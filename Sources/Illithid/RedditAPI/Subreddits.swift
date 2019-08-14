@@ -27,8 +27,6 @@ public extension RedditClientBroker {
    */
   func subreddits(sortBy subredditSort: SubredditSort = .popular,
                   params: ListingParameters = .init(), completion: @escaping (Listing) -> Void) {
-    let decoder = JSONDecoder()
-    decoder.dateDecodingStrategy = .secondsSince1970
     let parameters = params.toParameters()
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
     let subredditsListUrl = URL(string: "/subreddits/\(subredditSort)", relativeTo: baseURL)!
@@ -38,7 +36,7 @@ public extension RedditClientBroker {
         switch response.result {
         case let .success(data):
           do {
-            let list = try decoder.decode(Listing.self, from: data)
+            let list = try self.decoder.decode(Listing.self, from: data)
             completion(list)
           } catch let error as DecodingError {
             let json = try? JSON(data: data).rawString(options: [.sortedKeys, .prettyPrinted])
@@ -60,7 +58,7 @@ public extension RedditClientBroker {
   func fetchSubredditHeaderImages(_ subreddit: Subreddit, downloader: ImageDownloader? = nil,
                                   completion: @escaping ImageDownloader.CompletionHandler) {
     let imageDownloader = downloader ?? self.imageDownloader
-    guard let url = subreddit.headerImageURL else { return }
+    guard let url = subreddit.headerImg else { return }
     let request = URLRequest(url: url)
     
     imageDownloader.download(request) { completion($0) }
@@ -70,7 +68,7 @@ public extension RedditClientBroker {
                                   completion: @escaping ImageDownloader.CompletionHandler) {
     let imageDownloader = downloader ?? self.imageDownloader
     let headerImageURLs: [URLRequest] = subreddits.compactMap { subreddit in
-      guard let url = subreddit.headerImageURL else { return nil }
+      guard let url = subreddit.headerImg else { return nil }
       return URLRequest(url: url)
     }
     guard !headerImageURLs.isEmpty else { return }

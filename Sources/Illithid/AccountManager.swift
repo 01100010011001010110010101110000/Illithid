@@ -25,10 +25,15 @@ public final class AccountManager: ObservableObject {
   private let keychain = Keychain(server: RedditClientBroker.baseURL,
                                   protocolType: .https).synchronizable(true)
 
+  private let decoder: JSONDecoder = .init()
+
   init(logger: Logger, configuration: ClientConfiguration, session: SessionManager) {
     self.logger = logger
     self.configuration = configuration
     self.session = session
+
+    decoder.dateDecodingStrategy = .secondsSince1970
+    decoder.keyDecodingStrategy = .convertFromSnakeCase
   }
 
   var credentials: [String: OAuthSwiftCredential] = [:]
@@ -71,13 +76,12 @@ public final class AccountManager: ObservableObject {
 
    */
   private func fetchNewAccount(oauth: OAuth2Swift, completion: @escaping () -> Void) {
-    let decoder = JSONDecoder()
     session.adapter = oauth.requestAdapter
     session.retrier = oauth.requestAdapter
     session.request("https://oauth.reddit.com/api/v1/me", method: .get).validate().responseData { response in
       switch response.result {
       case let .success(data):
-        let account = try! decoder.decode(RedditAccount.self, from: data)
+        let account = try! self.decoder.decode(RedditAccount.self, from: data)
 
         // Only add the credentials and persist the username of new accounts
         let didInsert = self.accounts.append(account)
@@ -109,7 +113,6 @@ public final class AccountManager: ObservableObject {
   }
 
   public func loadSavedAccounts(completion: @escaping () -> Void = {}) {
-    let decoder = JSONDecoder()
     let savedAccounts = configuration.defaults.stringArray(forKey: "RedditUsernames") ?? []
     let lastSelectedAccount = configuration.defaults.string(forKey: "SelectedAccount")
 
