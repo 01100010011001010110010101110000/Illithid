@@ -36,7 +36,7 @@ public struct PostMedia: Codable {
     public let html: String
     public let thumbnail_width: Int?
     public let thumbnail_height: Int?
-    public let height: Int
+    public let height: Int?
     public let width: Int
     public let version: String
     public let author_name: String?

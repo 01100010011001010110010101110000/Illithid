@@ -18,7 +18,7 @@ public struct RedditAccount: RedditObject, Codable {
   public var type: String = "t2"
   
   public var isEmployee: Bool
-  public var noProfanity: Bool
+  public var noProfanity: Bool?
   
   private enum CodingKeys: String, CodingKey {
     case id //swiftlint:disable:this identifier_name
