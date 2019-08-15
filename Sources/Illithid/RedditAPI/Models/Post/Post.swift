@@ -90,7 +90,19 @@ public struct Post: RedditObject {
   public let authorPatreonFlair: Bool
   public let authorFlairTextColor: String?
   public let authorFlairText: String?
-  public let url: URL
+
+  /// The string value returned by the Reddit API for the URL attribute
+  private let url: String
+  /// The computed `URL`, derived from `self.url`
+  public var contentUrl: URL {
+    if let unwrapped = URL(string: url) {
+      return unwrapped
+    } else {
+      // This is ugly, but I will keep it for the time being under the assumption that non-encoded URLs are the only
+      // pathological case for this property
+      return URL(string: url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)!
+    }
+  }
 
   public let saved: Bool
 
@@ -145,4 +157,3 @@ public struct Post: RedditObject {
     return previews
   }
 }
-

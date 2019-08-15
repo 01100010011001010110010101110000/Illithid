@@ -61,7 +61,7 @@ public extension RedditClientBroker {
   func fetchPostImage(for post: Post, downloader: ImageDownloader? = nil,
                       completion: @escaping ImageDownloader.CompletionHandler) {
     let imageDownloader = downloader ?? self.imageDownloader
-    let request = URLRequest(url: post.url)
+    let request = URLRequest(url: post.contentUrl)
     
     imageDownloader.download(request) { completion($0) }
   }
