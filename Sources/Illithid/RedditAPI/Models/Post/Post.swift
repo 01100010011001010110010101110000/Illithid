@@ -13,13 +13,12 @@ import Alamofire
 
 public enum PostSort: String, Codable {
   case hot
-  case qa
+  case best
   case new
-  case random
+  case random // This is in the API docs but seems to return a 404
   case rising
   case top
   case controversial
-  case confidence
 }
 
 public enum PostHint: String, Codable {
@@ -126,7 +125,8 @@ public struct Post: RedditObject {
   public let numCrossposts: Int
   public let permalink: String
   public let contentCategories: [String]?
-  public let suggestedSort: PostSort?
+  /// The suggested sort method for the Post's comments
+  public let suggestedSort: CommentsSort?
   public let postHint: PostHint?
   public let archived: Bool
   public let noFollow: Bool
