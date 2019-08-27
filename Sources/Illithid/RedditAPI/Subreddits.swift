@@ -54,26 +54,6 @@ public extension RedditClientBroker {
         }
       }
   }
-
-  func fetchSubredditHeaderImages(_ subreddit: Subreddit, downloader: ImageDownloader? = nil,
-                                  completion: @escaping ImageDownloader.CompletionHandler) {
-    let imageDownloader = downloader ?? self.imageDownloader
-    guard let url = subreddit.headerImg else { return }
-    let request = URLRequest(url: url)
-    
-    imageDownloader.download(request) { completion($0) }
-  }
-  
-  func fetchSubredditHeaderImages(_ subreddits: [Subreddit], downloader: ImageDownloader? = nil,
-                                  completion: @escaping ImageDownloader.CompletionHandler) {
-    let imageDownloader = downloader ?? self.imageDownloader
-    let headerImageURLs: [URLRequest] = subreddits.compactMap { subreddit in
-      guard let url = subreddit.headerImg else { return nil }
-      return URLRequest(url: url)
-    }
-    guard !headerImageURLs.isEmpty else { return }
-    imageDownloader.download(headerImageURLs) { completion($0) }
-  }
 }
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
