@@ -41,12 +41,16 @@ open class RedditClientBroker {
   internal let session: SessionManager
 
   private init(configuration: ClientConfiguration) {
-    self.logger = .debugLogger
+    #if DEBUG
+    self.logger = .debugLogger()
+    #else
+    self.logger = .releaseLogger(subsystem: "com.illithid.illithid")
+    #endif
     self.imageDownloader = ImageDownloader(maximumActiveDownloads: 20)
     self.configuration = configuration
 
-    session = Self.makeSessionManager(configuration: configuration)
-    accounts = AccountManager(logger: logger, configuration: self.configuration, session: session)
+    self.session = Self.makeSessionManager(configuration: configuration)
+    self.accounts = AccountManager(logger: logger, configuration: self.configuration, session: session)
 
     decoder.dateDecodingStrategy = .secondsSince1970
     decoder.keyDecodingStrategy = .convertFromSnakeCase

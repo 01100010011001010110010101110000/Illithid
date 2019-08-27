@@ -10,23 +10,23 @@ import Foundation
 import Willow
 
 extension Logger {
-  public static let debugLogger: Logger = {
+  public static func debugLogger() -> Logger {
     let consoleWriter = ConsoleWriter(modifiers: [EmojiModifier(), TimestampModifier()])
     return Logger(logLevels: [.all], writers: [consoleWriter],
                   executionMethod: .synchronous(lock: NSRecursiveLock()))
-  }()
+  }
 }
 
 extension Logger {
-  public static let releaseLogger: Logger = {
-    let writer = OSLogWriter(subsystem: "com.illithid.illithid",
+  public static func releaseLogger(subsystem: String, logLevels: LogLevel = .event) -> Logger {
+    let writer = OSLogWriter(subsystem: subsystem,
                              category: "release", modifiers: [LevelLabelModifier(), TimestampModifier()])
-    return Logger(logLevels: [.event], writers: [writer],
-                  executionMethod: .asynchronous(queue: DispatchQueue(label: "com.illithis.illithid.log", qos: .utility)))
-  }()
+    return Logger(logLevels: logLevels, writers: [writer],
+                  executionMethod: .asynchronous(queue: DispatchQueue(label: "\(subsystem).log", qos: .utility)))
+  }
 }
 
-struct EmojiModifier: LogModifier {
+public struct EmojiModifier: LogModifier {
   /**
    Prepends the `message` with an emoji depending on `logLevel` at the start of the line.
 
@@ -34,7 +34,7 @@ struct EmojiModifier: LogModifier {
    - parameter logLevel: The severity of `message`
    - returns: The modified `message`
    */
-  func modifyMessage(_ message: String, with logLevel: LogLevel) -> String {
+  public func modifyMessage(_ message: String, with logLevel: LogLevel) -> String {
     switch logLevel {
     case .debug:
       return "🔬🔬🔬 => \(message)"
@@ -52,7 +52,7 @@ struct EmojiModifier: LogModifier {
   }
 }
 
-struct LevelLabelModifier: LogModifier {
+public struct LevelLabelModifier: LogModifier {
   /**
    Prepends `message` with a text label denoting the severity of `logLevel`
 
@@ -60,7 +60,7 @@ struct LevelLabelModifier: LogModifier {
    - parameter logLevel: The severity of `message`
    - returns: The modified `message`
    */
-  func modifyMessage(_ message: String, with logLevel: LogLevel) -> String {
+  public func modifyMessage(_ message: String, with logLevel: LogLevel) -> String {
     return "[\(logLevel.description.uppercased())] => \(message)"
   }
 }
