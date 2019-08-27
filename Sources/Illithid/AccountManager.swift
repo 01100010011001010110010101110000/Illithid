@@ -16,11 +16,13 @@ import OAuthSwift
 import Willow
 
 public final class AccountManager: ObservableObject {
-  var cancellable: AnyCancellable!
+  private var cancellable: AnyCancellable!
 
-  let logger: Logger
-  var configuration: ClientConfiguration
-  let session: SessionManager
+  private let logger: Logger
+  private var configuration: ClientConfiguration
+  private let defaults: UserDefaults = .standard
+
+  private let session: SessionManager
 
   private let keychain = Keychain(server: "www.reddit.com",
                                   protocolType: .https).synchronizable(true)
@@ -88,9 +90,9 @@ public final class AccountManager: ObservableObject {
         if didInsert {
           self.credentials[account.name] = oauth.client.credential
           self.setCurrentAccount(account: account)
-          var savedAccounts = self.configuration.defaults.stringArray(forKey: "RedditUsernames") ?? []
+          var savedAccounts = self.defaults.stringArray(forKey: "RedditUsernames") ?? []
           savedAccounts.append(account.name)
-          self.configuration.defaults.set(savedAccounts, forKey: "RedditUsernames")
+          self.defaults.set(savedAccounts, forKey: "RedditUsernames")
           self.persistAccounts()
         }
 
@@ -113,8 +115,8 @@ public final class AccountManager: ObservableObject {
   }
 
   public func loadSavedAccounts(completion: @escaping () -> Void = {}) {
-    let savedAccounts = configuration.defaults.stringArray(forKey: "RedditUsernames") ?? []
-    let lastSelectedAccount = configuration.defaults.string(forKey: "SelectedAccount")
+    let savedAccounts = defaults.stringArray(forKey: "RedditUsernames") ?? []
+    let lastSelectedAccount = defaults.string(forKey: "SelectedAccount")
 
     let accountPublishers = savedAccounts.map { account -> AnyPublisher<RedditAccount, Error> in
       let credential: OAuthSwiftCredential = try! decoder.decode(
@@ -167,11 +169,11 @@ public final class AccountManager: ObservableObject {
   }
 
   public func removeAll() {
-    let usernames = configuration.defaults.stringArray(forKey: "RedditUsernames") ?? []
+    let usernames = defaults.stringArray(forKey: "RedditUsernames") ?? []
     usernames.forEach { username in
       credentials.removeValue(forKey: username)
     }
-    configuration.defaults.set([], forKey: "RedditUsernames")
+    defaults.set([], forKey: "RedditUsernames")
     accounts.removeAll()
   }
 
@@ -181,9 +183,9 @@ public final class AccountManager: ObservableObject {
     credentials.removeValue(forKey: account.name)
 
     /// Remove username from saved account names
-    let accounts = configuration.defaults.stringArray(forKey: "RedditUsernames") ?? []
+    let accounts = defaults.stringArray(forKey: "RedditUsernames") ?? []
     let filteredAccounts = accounts.filter { account.name != $0 }
-    configuration.defaults.set(filteredAccounts, forKey: "RedditUsernames")
+    defaults.set(filteredAccounts, forKey: "RedditUsernames")
 
     /// Remove user credentials from the keychain
     do {
@@ -195,7 +197,7 @@ public final class AccountManager: ObservableObject {
 
   public func setCurrentAccount(account: RedditAccount) {
     currentAccount = account
-    configuration.defaults.set(account.name, forKey: "SelectedAccount")
+    defaults.set(account.name, forKey: "SelectedAccount")
     let oauth = OAuth2Swift(parameters: configuration.oauthParameters)!
     oauth.accessTokenBasicAuthentification = true
     oauth.client = OAuthSwiftClient(credential: credentials[account.name]!)

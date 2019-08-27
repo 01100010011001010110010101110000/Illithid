@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Tyler Gregory on 6/13/19.
 //
@@ -28,8 +28,18 @@ public protocol ClientConfiguration {
   var duration: Duration { get }
   var author: String { get }
   var version: String { get }
+}
 
-  var defaults: UserDefaults { get }
-
-  var oauthParameters: OAuthSwift.ConfigParameters { mutating get }
+extension ClientConfiguration {
+  var oauthParameters: OAuthSwift.ConfigParameters {
+    [
+      "consumerKey": consumerKey,
+      "consumerSecret": consumerSecret,
+      "duration": duration.rawValue,
+      "authorizeUrl": RedditClientBroker.authorizeEndpoint.absoluteString,
+      "accessTokenUrl": RedditClientBroker.tokenEndpoint.absoluteString,
+      "responseType": responseType.rawValue,
+      "scope": scope
+    ]
+  }
 }
