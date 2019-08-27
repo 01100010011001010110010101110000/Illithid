@@ -36,7 +36,7 @@ open class RedditClientBroker {
 
   internal let decoder: JSONDecoder = .init()
 
-  internal let session: SessionManager
+  internal var session: SessionManager
 
   private init(configuration: ClientConfiguration) {
     #if DEBUG
@@ -55,6 +55,7 @@ open class RedditClientBroker {
 
   public func configure(configuration: ClientConfiguration) {
     self.configuration = configuration
+    self.session = Self.makeSessionManager(configuration: configuration)
   }
 
   private static func makeSessionManager(configuration: ClientConfiguration) -> SessionManager {
