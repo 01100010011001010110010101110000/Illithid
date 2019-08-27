@@ -27,8 +27,6 @@ open class RedditClientBroker {
   public static let authorizeEndpoint: URL = URL(string: "https://www.reddit.com/api/v1/authorize.compact")!
   public static let tokenEndpoint: URL = URL(string: "https://www.reddit.com/api/v1/access_token")!
 
-  open var imageDownloader: ImageDownloader
-
   open var logger: Logger
 
   // TODO: Make this private
@@ -46,7 +44,6 @@ open class RedditClientBroker {
     #else
     self.logger = .releaseLogger(subsystem: "com.illithid.illithid")
     #endif
-    self.imageDownloader = ImageDownloader(maximumActiveDownloads: 20)
     self.configuration = configuration
 
     self.session = Self.makeSessionManager(configuration: configuration)

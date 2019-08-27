@@ -57,14 +57,6 @@ public extension RedditClientBroker {
         }
     }
   }
-  
-  func fetchPostImage(for post: Post, downloader: ImageDownloader? = nil,
-                      completion: @escaping ImageDownloader.CompletionHandler) {
-    let imageDownloader = downloader ?? self.imageDownloader
-    let request = URLRequest(url: post.contentUrl)
-    
-    imageDownloader.download(request) { completion($0) }
-  }
 }
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
