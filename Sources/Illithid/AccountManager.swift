@@ -22,7 +22,7 @@ public final class AccountManager: ObservableObject {
   var configuration: ClientConfiguration
   let session: SessionManager
 
-  private let keychain = Keychain(server: RedditClientBroker.baseURL,
+  private let keychain = Keychain(server: "www.reddit.com",
                                   protocolType: .https).synchronizable(true)
 
   private let decoder: JSONDecoder = .init()

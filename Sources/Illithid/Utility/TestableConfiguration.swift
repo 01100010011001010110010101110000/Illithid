@@ -16,8 +16,8 @@ struct TestableConfiguration: ClientConfiguration {
       "consumerKey": consumerKey,
       "consumerSecret": consumerSecret,
       "duration": duration.rawValue,
-      "authorizeUrl": "\(RedditClientBroker.baseURL)/authorize.compact",
-      "accessTokenUrl": "\(RedditClientBroker.baseURL)/access_token",
+      "authorizeUrl": RedditClientBroker.authorizeEndpoint.absoluteString,
+      "accessTokenUrl": RedditClientBroker.tokenEndpoint.absoluteString,
       "responseType": responseType.rawValue,
       "scope": scope
     ]

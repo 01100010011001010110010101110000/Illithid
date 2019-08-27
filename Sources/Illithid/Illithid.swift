@@ -12,7 +12,9 @@ import OAuthSwift
 import Willow
 
 /// Handles Reddit API meta-operations
-public final class RedditClientBroker {
+open class RedditClientBroker {
+  public static var shared: RedditClientBroker = .init(configuration: TestableConfiguration())
+
   private enum baseURLs: String, Codable {
     case unauthenticated = "https://api.reddit.com/"
     case authenticated = "https://oauth.reddit.com/"
@@ -25,45 +27,36 @@ public final class RedditClientBroker {
   public static let authorizeEndpoint: URL = URL(string: "https://www.reddit.com/api/v1/authorize.compact")!
   public static let tokenEndpoint: URL = URL(string: "https://www.reddit.com/api/v1/access_token")!
 
-  /// Reddit API's base URL
-  public static let baseURL: URL = URL(string: "https://www.reddit.com/api/v1")!
+  open var imageDownloader: ImageDownloader
 
-  public typealias AccountTokenTuple = (account: RedditAccount, credential: OAuthSwiftCredential)
+  open var logger: Logger
 
-  let session: SessionManager
-  public let imageDownloader: ImageDownloader
-
-  let logger: Logger
-
+  // TODO: Make this private
   public let accounts: AccountManager
 
   public var configuration: ClientConfiguration
 
-  let decoder: JSONDecoder = .init()
+  internal let decoder: JSONDecoder = .init()
 
-  public init(
-    sharedLogger: Logger = Logger(
-      logLevels: [.all],
-      writers: [ConsoleWriter()],
-      executionMethod: .asynchronous(
-        queue: DispatchQueue(label: "log.queue", qos: .utility)
-      )
-    ),
-    sharedImageDownloader: ImageDownloader = ImageDownloader(maximumActiveDownloads: 20),
-    configuration: ClientConfiguration
-  ) {
-    logger = sharedLogger
-    imageDownloader = sharedImageDownloader
+  internal let session: SessionManager
+
+  private init(configuration: ClientConfiguration) {
+    self.logger = .debugLogger
+    self.imageDownloader = ImageDownloader(maximumActiveDownloads: 20)
     self.configuration = configuration
 
-    session = Self.makeSessionManager(configuration)
+    session = Self.makeSessionManager(configuration: configuration)
     accounts = AccountManager(logger: logger, configuration: self.configuration, session: session)
 
     decoder.dateDecodingStrategy = .secondsSince1970
     decoder.keyDecodingStrategy = .convertFromSnakeCase
   }
 
-  static func makeSessionManager(_ configuration: ClientConfiguration) -> SessionManager {
+  public func configure(configuration: ClientConfiguration) {
+    self.configuration = configuration
+  }
+
+  private static func makeSessionManager(configuration: ClientConfiguration) -> SessionManager {
     let alamoConfiguration = URLSessionConfiguration.default
     let osVersion = ProcessInfo().operatingSystemVersion
     let userAgentComponents = [
@@ -71,11 +64,10 @@ public final class RedditClientBroker {
       "\(configuration.consumerKey)",
       "\(configuration.version) (by \(configuration.author))"
     ]
-    let headers = [
+    let headers = SessionManager.defaultHTTPHeaders.merging([
       "User-Agent": userAgentComponents.joined(separator: ":"),
-      "Accept": "application/json",
-      "Content-Type": "application/json"
-    ]
+      "Accept": "application/json"
+    ]) { _, new in new }
     alamoConfiguration.httpAdditionalHeaders = headers
 
     return SessionManager(configuration: alamoConfiguration)
