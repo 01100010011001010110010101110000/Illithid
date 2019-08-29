@@ -15,6 +15,7 @@ import KeychainAccess
 import OAuthSwift
 import Willow
 
+/// `AccountManager` is the class responsible for Reddit account management, including adding, deleting, and switching accounts
 public final class AccountManager: ObservableObject {
   private var cancellable: AnyCancellable!
 
@@ -52,6 +53,8 @@ public final class AccountManager: ObservableObject {
       defaults.set(newAccounts, forKey: "RedditUsernames")
     }
   }
+
+  // MARK: Account login
 
   /// Used to login a new user to Reddit
   /// - Parameter anchor: The `NSWindow` or `UIWindow` to use as an anchor for presenting the authentication dialog
@@ -112,47 +115,23 @@ public final class AccountManager: ObservableObject {
     }
   }
 
-  public func persistAccounts() {
-    accounts.forEach { account in
-      do {
-        try keychain
-          .label("www.reddit.com (\(account.name))")
-          .set(encoder.encode(credentials[account.name]!), key: account.name)
-      } catch {
-        logger.errorMessage("ERROR persisting \(account.name) - \(error)")
-      }
-    }
-  }
-
   public func loadSavedAccounts(completion: @escaping () -> Void = {}) {
     let lastSelectedAccount = defaults.string(forKey: "SelectedAccount")
 
     let accountPublishers = savedAccounts.compactMap { accountName -> AnyPublisher<RedditAccount, Error>? in
-      do {
-        guard let credentialData = try keychain.getData(accountName) else {
-          logger.warnMessage("WARN No data in keychain for key \(accountName)")
-          return nil
+      guard let credential = token(for: accountName) else { return nil }
+      credentials[accountName] = credential
+
+      let oauth = OAuth2Swift(parameters: configuration.oauthParameters)!
+      oauth.accessTokenBasicAuthentification = true
+      oauth.client = OAuthSwiftClient(credential: credential)
+
+      return oauth.requestPublisher(URL(string: "https://oauth.reddit.com/api/v1/me")!, method: .GET, parameters: oauth.parameters)
+        .map { response in
+          response.data
         }
-        let credential = try decoder.decode(OAuthSwiftCredential.self, from: credentialData)
-        credentials[accountName] = credential
-
-        let oauth = OAuth2Swift(parameters: configuration.oauthParameters)!
-        oauth.accessTokenBasicAuthentification = true
-        oauth.client = OAuthSwiftClient(credential: credential)
-
-        return oauth.requestPublisher(URL(string: "https://oauth.reddit.com/api/v1/me")!, method: .GET, parameters: oauth.parameters)
-          .map { response in
-            response.data
-          }
-          .decode(type: RedditAccount.self, decoder: decoder)
-          .eraseToAnyPublisher()
-      } catch let error as DecodingError {
-        logger.errorMessage("ERROR decoding OAuth2 credential: \(error)")
-        return nil
-      } catch {
-        logger.errorMessage("ERROR fetching OAuth2 credential from Keychain: \(error)")
-        return nil
-      }
+        .decode(type: RedditAccount.self, decoder: decoder)
+        .eraseToAnyPublisher()
     }
 
     cancellable = Publishers.MergeMany(accountPublishers)
@@ -173,6 +152,18 @@ public final class AccountManager: ObservableObject {
         completion()
       }
   }
+
+  public func setCurrentAccount(account: RedditAccount) {
+    currentAccount = account
+    defaults.set(account.name, forKey: "SelectedAccount")
+    let oauth = OAuth2Swift(parameters: configuration.oauthParameters)!
+    oauth.accessTokenBasicAuthentification = true
+    oauth.client = OAuthSwiftClient(credential: credentials[account.name]!)
+    session.adapter = oauth.requestAdapter
+    session.retrier = oauth.requestAdapter
+  }
+
+  // MARK: Account removal
 
   public func removeAccounts(indexSet: IndexSet) {
     for index in indexSet {
@@ -201,17 +192,45 @@ public final class AccountManager: ObservableObject {
     do {
       try keychain.remove(account.name)
     } catch {
-      logger.errorMessage("Error removing key for: \(account.name) - \(error)")
+      logger.errorMessage("Error removing key for: \(account.name): \(error)")
     }
   }
 
-  public func setCurrentAccount(account: RedditAccount) {
-    currentAccount = account
-    defaults.set(account.name, forKey: "SelectedAccount")
-    let oauth = OAuth2Swift(parameters: configuration.oauthParameters)!
-    oauth.accessTokenBasicAuthentification = true
-    oauth.client = OAuthSwiftClient(credential: credentials[account.name]!)
-    session.adapter = oauth.requestAdapter
-    session.retrier = oauth.requestAdapter
+  // MARK: OAuth token management
+
+  private func token(for accountName: String) -> OAuthSwiftCredential? {
+    do {
+      guard let credentialData = try keychain.getData(accountName) else {
+        logger.warnMessage("WARN No data in keychain for key \(accountName)")
+        return nil
+      }
+      return try decoder.decode(OAuthSwiftCredential.self, from: credentialData)
+    } catch let error {
+      logger.errorMessage("ERROR fetching credential for \(accountName): \(error)")
+      return nil
+    }
+  }
+
+  private func token(for account: RedditAccount) -> OAuthSwiftCredential? {
+    return token(for: account.name)
+  }
+
+  private func write(token: OAuthSwiftCredential, for account: RedditAccount) throws {
+    do {
+      let encodedCredential = try encoder.encode(token)
+      try keychain
+        .label("www.reddit.com (\(account.name))")
+        .set(encodedCredential, key: account.name)
+    } catch let error {
+      logger.errorMessage("ERROR persisting \(account.name): \(error)")
+    }
+  }
+
+  public func persistAccounts() {
+    accounts.forEach { account in
+      if let credential = credentials[account.name] {
+        try? write(token: credential, for: account)
+      }
+    }
   }
 }
