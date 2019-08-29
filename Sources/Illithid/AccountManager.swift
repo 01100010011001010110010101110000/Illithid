@@ -24,10 +24,12 @@ public final class AccountManager: ObservableObject {
 
   private let session: SessionManager
 
-  private let keychain = Keychain(server: "www.reddit.com",
-                                  protocolType: .https).synchronizable(true)
+  private let keychain = Keychain(service: Bundle.main.bundleIdentifier!)
+    .synchronizable(true)
+    .comment("Reddit OAuth2 credential")
 
   private let decoder: JSONDecoder = .init()
+  private let encoder: JSONEncoder = .init()
 
   init(logger: Logger, configuration: ClientConfiguration, session: SessionManager) {
     self.logger = logger
@@ -38,10 +40,18 @@ public final class AccountManager: ObservableObject {
     decoder.keyDecodingStrategy = .convertFromSnakeCase
   }
 
-  var credentials: [String: OAuthSwiftCredential] = [:]
+  private var credentials: [String: OAuthSwiftCredential] = [:]
   @Published public private(set) var accounts: OrderedSet<RedditAccount> = []
-
   @Published public private(set) var currentAccount: RedditAccount? = nil
+
+  public private(set) var savedAccounts: [String] {
+    get {
+      defaults.stringArray(forKey: "RedditUsernames") ?? []
+    }
+    set(newAccounts) {
+      defaults.set(newAccounts, forKey: "RedditUsernames")
+    }
+  }
 
   public func addAccount(anchor: ASWebAuthenticationPresentationContextProviding, completion: @escaping () -> Void) {
     let oauth = OAuth2Swift(parameters: configuration.oauthParameters)!
@@ -63,7 +73,7 @@ public final class AccountManager: ObservableObject {
         self.logger.debugMessage("OAuth object parameters: \(oauth.parameters)")
         self.fetchNewAccount(oauth: oauth, completion: completion)
       case let .failure(error):
-        self.logger.errorMessage { "Authorization failed: \(error)" }
+        self.logger.errorMessage("Authorization failed: \(error)")
       }
     }
   }
@@ -90,9 +100,7 @@ public final class AccountManager: ObservableObject {
         if didInsert {
           self.credentials[account.name] = oauth.client.credential
           self.setCurrentAccount(account: account)
-          var savedAccounts = self.defaults.stringArray(forKey: "RedditUsernames") ?? []
-          savedAccounts.append(account.name)
-          self.defaults.set(savedAccounts, forKey: "RedditUsernames")
+          self.savedAccounts.append(account.name)
           self.persistAccounts()
         }
 
@@ -104,56 +112,63 @@ public final class AccountManager: ObservableObject {
   }
 
   public func persistAccounts() {
-    let encoder = JSONEncoder()
     accounts.forEach { account in
       do {
-        try keychain.set(encoder.encode(credentials[account.name]!), key: account.name)
+        try keychain
+          .label("www.reddit.com (\(account.name))")
+          .set(encoder.encode(credentials[account.name]!), key: account.name)
       } catch {
-        logger.errorMessage("Error persisting \(account.name) - \(error)")
+        logger.errorMessage("ERROR persisting \(account.name) - \(error)")
       }
     }
   }
 
   public func loadSavedAccounts(completion: @escaping () -> Void = {}) {
-    let savedAccounts = defaults.stringArray(forKey: "RedditUsernames") ?? []
     let lastSelectedAccount = defaults.string(forKey: "SelectedAccount")
 
-    let accountPublishers = savedAccounts.map { account -> AnyPublisher<RedditAccount, Error> in
-      let credential: OAuthSwiftCredential = try! decoder.decode(
-        OAuthSwiftCredential.self,
-        from: keychain.getData(account)!
-      )
-      credentials[account] = credential
-      logger.debugMessage("Found refresh token: \(credential.oauthRefreshToken) for \(account)")
-      let oauth = OAuth2Swift(parameters: configuration.oauthParameters)!
-      oauth.accessTokenBasicAuthentification = true
-      oauth.client = OAuthSwiftClient(credential: credential)
-
-      // Allow initial reddit requests to succeed if a prior account exists
-      if lastSelectedAccount != nil, lastSelectedAccount == account {
-        session.adapter = oauth.requestAdapter
-        session.retrier = oauth.requestAdapter
-      }
-
-      return oauth.requestPublisher(URL(string: "https://oauth.reddit.com/api/v1/me")!, method: .GET, parameters: oauth.parameters)
-        .map { response in
-          response.data
+    let accountPublishers = savedAccounts.compactMap { accountName -> AnyPublisher<RedditAccount, Error>? in
+      do {
+        guard let credentialData = try keychain.getData(accountName) else {
+          return nil
         }
-        .decode(type: RedditAccount.self, decoder: decoder)
-        .eraseToAnyPublisher()
+        let credential = try decoder.decode(OAuthSwiftCredential.self, from: credentialData)
+        credentials[accountName] = credential
+
+        let oauth = OAuth2Swift(parameters: configuration.oauthParameters)!
+        oauth.accessTokenBasicAuthentification = true
+        oauth.client = OAuthSwiftClient(credential: credential)
+
+        if lastSelectedAccount == accountName {
+          session.adapter = oauth.requestAdapter
+          session.retrier = oauth.requestAdapter
+        }
+
+        return oauth.requestPublisher(URL(string: "https://oauth.reddit.com/api/v1/me")!, method: .GET, parameters: oauth.parameters)
+          .map { response in
+            response.data
+          }
+          .decode(type: RedditAccount.self, decoder: decoder)
+          .eraseToAnyPublisher()
+      } catch let error as DecodingError {
+        logger.errorMessage("ERROR decoding OAuth2 credential: \(error)")
+        return nil
+      } catch {
+        logger.errorMessage("ERROR fetching OAuth2 credential from Keychain: \(error)")
+        return nil
+      }
     }
 
     cancellable = Publishers.MergeMany(accountPublishers)
       .map { account in
-        self.logger.debugMessage { "Appending \(account.name)" }
+        self.logger.debugMessage("Appending \(account.name)")
         self.accounts.append(account)
-        if lastSelectedAccount != nil, lastSelectedAccount == account.name {
+        if lastSelectedAccount == account.name {
           self.setCurrentAccount(account: account)
         }
       }
       .collect()
       .sink(receiveCompletion: { error in
-        self.logger.errorMessage { "Error while loading accounts: \(error)" }
+        self.logger.errorMessage("Error while loading accounts: \(error)")
       }) { _ in
         if self.currentAccount == nil, !self.accounts.isEmpty {
           self.setCurrentAccount(account: self.accounts.first!)
@@ -169,11 +184,11 @@ public final class AccountManager: ObservableObject {
   }
 
   public func removeAll() {
-    let usernames = defaults.stringArray(forKey: "RedditUsernames") ?? []
-    usernames.forEach { username in
-      credentials.removeValue(forKey: username)
+    savedAccounts.forEach { username in
+      try? keychain.remove(username)
     }
-    defaults.set([], forKey: "RedditUsernames")
+    savedAccounts.removeAll()
+    credentials.removeAll()
     accounts.removeAll()
   }
 
@@ -183,9 +198,7 @@ public final class AccountManager: ObservableObject {
     credentials.removeValue(forKey: account.name)
 
     /// Remove username from saved account names
-    let accounts = defaults.stringArray(forKey: "RedditUsernames") ?? []
-    let filteredAccounts = accounts.filter { account.name != $0 }
-    defaults.set(filteredAccounts, forKey: "RedditUsernames")
+    savedAccounts.removeAll { $0 == account.name }
 
     /// Remove user credentials from the keychain
     do {
