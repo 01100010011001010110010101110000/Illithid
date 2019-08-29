@@ -21,7 +21,7 @@ open class RedditClientBroker {
   }
 
   public var baseURL: URL {
-    accounts.currentAccount != nil ? URL(string: baseURLs.authenticated.rawValue)! : URL(string: baseURLs.unauthenticated.rawValue)!
+    accountManager.currentAccount != nil ? URL(string: baseURLs.authenticated.rawValue)! : URL(string: baseURLs.unauthenticated.rawValue)!
   }
 
   public static let authorizeEndpoint: URL = URL(string: "https://www.reddit.com/api/v1/authorize.compact")!
@@ -30,7 +30,7 @@ open class RedditClientBroker {
   open var logger: Logger
 
   // TODO: Make this private
-  public let accounts: AccountManager
+  public let accountManager: AccountManager
 
   public var configuration: ClientConfiguration
 
@@ -47,7 +47,7 @@ open class RedditClientBroker {
     self.configuration = configuration
 
     self.session = Self.makeSessionManager(configuration: configuration)
-    self.accounts = AccountManager(logger: logger, configuration: self.configuration, session: session)
+    self.accountManager = AccountManager(logger: logger, configuration: self.configuration, session: session)
 
     decoder.dateDecodingStrategy = .secondsSince1970
     decoder.keyDecodingStrategy = .convertFromSnakeCase
