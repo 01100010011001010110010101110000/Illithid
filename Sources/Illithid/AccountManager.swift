@@ -53,10 +53,14 @@ public final class AccountManager: ObservableObject {
     }
   }
 
-  public func addAccount(anchor: ASWebAuthenticationPresentationContextProviding, completion: @escaping () -> Void) {
+  /// Used to login a new user to Reddit
+  /// - Parameter anchor: The `NSWindow` or `UIWindow` to use as an anchor for presenting the authentication dialog
+  /// - Parameter completion: The method to call when authentication has completed
+  public func loginUser(anchor: ASWebAuthenticationPresentationContextProviding, completion: @escaping () -> Void) {
     let oauth = OAuth2Swift(parameters: configuration.oauthParameters)!
     oauth.accessTokenBasicAuthentification = true
-    oauth.authorizeURLHandler = IllithidWebAuthURLHandler(callbackURLScheme: configuration.redirectURI, anchor: anchor)
+    oauth.authorizeURLHandler = IllithidWebAuthURLHandler(callbackURLScheme: configuration.redirectURI.absoluteString,
+                                                          anchor: anchor)
 
     // Generate random state value to protect from CSRF
     let state = ((0 ... 11).map { _ in Int.random(in: 0 ... 9) }).reduce("") { accumulator, next in
@@ -89,25 +93,21 @@ public final class AccountManager: ObservableObject {
 
    */
   private func fetchNewAccount(oauth: OAuth2Swift, completion: @escaping () -> Void) {
-    session.adapter = oauth.requestAdapter
-    session.retrier = oauth.requestAdapter
-    session.request("https://oauth.reddit.com/api/v1/me", method: .get).validate().responseData { response in
-      switch response.result {
-      case let .success(data):
-        let account = try! self.decoder.decode(RedditAccount.self, from: data)
-
-        // Only add the credentials and persist the username of new accounts
-        let didInsert = self.accounts.append(account)
-        if didInsert {
-          self.credentials[account.name] = oauth.client.credential
-          self.setCurrentAccount(account: account)
-          self.savedAccounts.append(account.name)
-          self.persistAccounts()
+    oauth.startAuthorizedRequest("https://oauth.reddit.com/api/v1/me", method: .GET, parameters: oauth.parameters) { result in
+      switch result {
+      case .success(let response):
+        do {
+          let account = try self.decoder.decode(RedditAccount.self, from: response.data)
+          if self.accounts.append(account) {
+            self.credentials[account.name] = oauth.client.credential
+            self.savedAccounts.append(account.name)
+            self.setCurrentAccount(account: account)
+          }
+        } catch let error {
+          self.logger.errorMessage("ERROR decoding new account: \(error)")
         }
-
-        completion()
-      case let .failure(error):
-        self.logger.errorMessage("User profile fetch failed: \(error)")
+      case .failure(let error):
+        self.logger.errorMessage("ERROR fetching account data: \(error)")
       }
     }
   }
