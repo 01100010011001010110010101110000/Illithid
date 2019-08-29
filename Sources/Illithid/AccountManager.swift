@@ -130,6 +130,7 @@ public final class AccountManager: ObservableObject {
     let accountPublishers = savedAccounts.compactMap { accountName -> AnyPublisher<RedditAccount, Error>? in
       do {
         guard let credentialData = try keychain.getData(accountName) else {
+          logger.warnMessage("WARN No data in keychain for key \(accountName)")
           return nil
         }
         let credential = try decoder.decode(OAuthSwiftCredential.self, from: credentialData)
@@ -138,11 +139,6 @@ public final class AccountManager: ObservableObject {
         let oauth = OAuth2Swift(parameters: configuration.oauthParameters)!
         oauth.accessTokenBasicAuthentification = true
         oauth.client = OAuthSwiftClient(credential: credential)
-
-        if lastSelectedAccount == accountName {
-          session.adapter = oauth.requestAdapter
-          session.retrier = oauth.requestAdapter
-        }
 
         return oauth.requestPublisher(URL(string: "https://oauth.reddit.com/api/v1/me")!, method: .GET, parameters: oauth.parameters)
           .map { response in
