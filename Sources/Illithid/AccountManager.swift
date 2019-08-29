@@ -56,8 +56,9 @@ public final class AccountManager: ObservableObject {
   public func addAccount(anchor: ASWebAuthenticationPresentationContextProviding, completion: @escaping () -> Void) {
     let oauth = OAuth2Swift(parameters: configuration.oauthParameters)!
     oauth.accessTokenBasicAuthentification = true
-    oauth.authorizeURLHandler = IllithidWebAuthURLHandler(callbackURLScheme: "illithid://oauth2/callback", anchor: anchor)
+    oauth.authorizeURLHandler = IllithidWebAuthURLHandler(callbackURLScheme: configuration.redirectURI, anchor: anchor)
 
+    // Generate random state value to protect from CSRF
     let state = ((0 ... 11).map { _ in Int.random(in: 0 ... 9) }).reduce("") { accumulator, next in
       accumulator + String(next)
     }
