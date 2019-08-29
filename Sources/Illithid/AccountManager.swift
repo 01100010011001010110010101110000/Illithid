@@ -41,7 +41,6 @@ public final class AccountManager: ObservableObject {
     decoder.keyDecodingStrategy = .convertFromSnakeCase
   }
 
-  private var credentials: [String: OAuthSwiftCredential] = [:]
   @Published public private(set) var accounts: OrderedSet<RedditAccount> = []
   @Published public private(set) var currentAccount: RedditAccount? = nil
 
@@ -102,7 +101,7 @@ public final class AccountManager: ObservableObject {
         do {
           let account = try self.decoder.decode(RedditAccount.self, from: response.data)
           if self.accounts.append(account) {
-            self.credentials[account.name] = oauth.client.credential
+            try? self.write(token: oauth.client.credential, for: account)
             self.savedAccounts.append(account.name)
             self.setCurrentAccount(account: account)
           }
@@ -120,7 +119,6 @@ public final class AccountManager: ObservableObject {
 
     let accountPublishers = savedAccounts.compactMap { accountName -> AnyPublisher<RedditAccount, Error>? in
       guard let credential = token(for: accountName) else { return nil }
-      credentials[accountName] = credential
 
       let oauth = OAuth2Swift(parameters: configuration.oauthParameters)!
       oauth.accessTokenBasicAuthentification = true
@@ -154,11 +152,14 @@ public final class AccountManager: ObservableObject {
   }
 
   public func setCurrentAccount(account: RedditAccount) {
+    guard accounts.contains(account) else { return }
     currentAccount = account
     defaults.set(account.name, forKey: "SelectedAccount")
+
     let oauth = OAuth2Swift(parameters: configuration.oauthParameters)!
     oauth.accessTokenBasicAuthentification = true
-    oauth.client = OAuthSwiftClient(credential: credentials[account.name]!)
+    oauth.client = OAuthSwiftClient(credential: token(for: account)!)
+
     session.adapter = oauth.requestAdapter
     session.retrier = oauth.requestAdapter
   }
@@ -176,19 +177,15 @@ public final class AccountManager: ObservableObject {
       try? keychain.remove(username)
     }
     savedAccounts.removeAll()
-    credentials.removeAll()
     accounts.removeAll()
   }
 
   public func removeAccount(toRemove account: RedditAccount) {
-    /// Remove account from in memory accounts dictionary
+    // Remove account from in memory logged in accounts and from the savedAccounts entry in UserDefaults
     accounts.remove(account)
-    credentials.removeValue(forKey: account.name)
-
-    /// Remove username from saved account names
     savedAccounts.removeAll { $0 == account.name }
 
-    /// Remove user credentials from the keychain
+    // Remove credentials from the keychain
     do {
       try keychain.remove(account.name)
     } catch {
@@ -222,15 +219,7 @@ public final class AccountManager: ObservableObject {
         .label("www.reddit.com (\(account.name))")
         .set(encodedCredential, key: account.name)
     } catch let error {
-      logger.errorMessage("ERROR persisting \(account.name): \(error)")
-    }
-  }
-
-  public func persistAccounts() {
-    accounts.forEach { account in
-      if let credential = credentials[account.name] {
-        try? write(token: credential, for: account)
-      }
+      logger.errorMessage("ERROR writing \(account.name): \(error)")
     }
   }
 }
