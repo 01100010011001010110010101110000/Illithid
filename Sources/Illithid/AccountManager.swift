@@ -39,17 +39,30 @@ public final class AccountManager: ObservableObject {
 
     decoder.dateDecodingStrategy = .secondsSince1970
     decoder.keyDecodingStrategy = .convertFromSnakeCase
+
+    accounts = .init(loadAccounts())
+    currentAccount = loadSelectedAccount()
   }
 
-  @Published public private(set) var accounts: OrderedSet<RedditAccount> = []
-  @Published public private(set) var currentAccount: RedditAccount? = nil
+  // MARK: Published attributes
 
-  public private(set) var savedAccounts: [String] {
-    get {
-      defaults.stringArray(forKey: "RedditUsernames") ?? []
+  @Published public private(set) var accounts: OrderedSet<RedditAccount> = [] {
+    didSet {
+      guard let data = try? encoder.encode(self.accounts.contents) else { return }
+      defaults.set(data, forKey: "RedditAccounts")
     }
-    set(newAccounts) {
-      defaults.set(newAccounts, forKey: "RedditUsernames")
+  }
+
+  @Published public var currentAccount: RedditAccount? = nil {
+    didSet {
+      // If we are set to an account which doees not exist, keep the old value
+      guard currentAccount != nil, oldValue != currentAccount else { return }
+      guard accounts.contains(currentAccount!) else {
+        currentAccount = oldValue
+        return
+      }
+      // FIXME: Handle the case when `currentAccount` is set to nil, e.g. when deleting all accounts
+      setCurrentAccount(account: currentAccount!)
     }
   }
 
@@ -76,10 +89,8 @@ public final class AccountManager: ObservableObject {
       switch result {
       case .success(let (_, _, parameters)):
         self.logger.debugMessage("Authorization successful")
-        self.logger.debugMessage("Returned parameters: \(parameters)")
-        self.logger.debugMessage("OAuth object parameters: \(oauth.parameters)")
         self.fetchNewAccount(oauth: oauth, completion: completion)
-      case let .failure(error):
+      case .failure(let error):
         self.logger.errorMessage("Authorization failed: \(error)")
       }
     }
@@ -102,10 +113,9 @@ public final class AccountManager: ObservableObject {
           let account = try self.decoder.decode(RedditAccount.self, from: response.data)
           if self.accounts.append(account) {
             try? self.write(token: oauth.client.credential, for: account)
-            self.savedAccounts.append(account.name)
             self.setCurrentAccount(account: account)
           }
-        } catch let error {
+        } catch {
           self.logger.errorMessage("ERROR decoding new account: \(error)")
         }
       case .failure(let error):
@@ -114,46 +124,7 @@ public final class AccountManager: ObservableObject {
     }
   }
 
-  public func loadSavedAccounts(completion: @escaping () -> Void = {}) {
-    let lastSelectedAccount = defaults.string(forKey: "SelectedAccount")
-
-    let accountPublishers = savedAccounts.compactMap { accountName -> AnyPublisher<RedditAccount, Error>? in
-      guard let credential = token(for: accountName) else { return nil }
-
-      let oauth = OAuth2Swift(parameters: configuration.oauthParameters)!
-      oauth.accessTokenBasicAuthentification = true
-      oauth.client = OAuthSwiftClient(credential: credential)
-
-      return oauth.requestPublisher(URL(string: "https://oauth.reddit.com/api/v1/me")!, method: .GET, parameters: oauth.parameters)
-        .map { response in
-          response.data
-        }
-        .decode(type: RedditAccount.self, decoder: decoder)
-        .eraseToAnyPublisher()
-    }
-
-    cancellable = Publishers.MergeMany(accountPublishers)
-      .map { account in
-        self.logger.debugMessage("Appending \(account.name)")
-        self.accounts.append(account)
-        if lastSelectedAccount == account.name {
-          self.setCurrentAccount(account: account)
-        }
-      }
-      .collect()
-      .sink(receiveCompletion: { error in
-        self.logger.errorMessage("Error while loading accounts: \(error)")
-      }) { _ in
-        if self.currentAccount == nil, !self.accounts.isEmpty {
-          self.setCurrentAccount(account: self.accounts.first!)
-        }
-        completion()
-      }
-  }
-
-  public func setCurrentAccount(account: RedditAccount) {
-    guard accounts.contains(account) else { return }
-    currentAccount = account
+  private func setCurrentAccount(account: RedditAccount) {
     defaults.set(account.name, forKey: "SelectedAccount")
 
     let oauth = OAuth2Swift(parameters: configuration.oauthParameters)!
@@ -162,6 +133,23 @@ public final class AccountManager: ObservableObject {
 
     session.adapter = oauth.requestAdapter
     session.retrier = oauth.requestAdapter
+  }
+
+  // MARK: Saved Account Loading
+
+  private func loadSelectedAccount() -> RedditAccount? {
+    if let selectedAccountData = defaults.data(forKey: "SelectedAccount") {
+      guard let account = try? decoder.decode(RedditAccount.self, from: selectedAccountData) else { return nil }
+      return account
+    } else {
+      return nil
+    }
+  }
+
+  private func loadAccounts() -> [RedditAccount] {
+    guard let accountData = defaults.data(forKey: "RedditAccounts") else { return [] }
+    guard let accounts = try? decoder.decode([RedditAccount].self, from: accountData) else { return [] }
+    return accounts
   }
 
   // MARK: Account removal
@@ -173,24 +161,20 @@ public final class AccountManager: ObservableObject {
   }
 
   public func removeAll() {
-    savedAccounts.forEach { username in
-      try? keychain.remove(username)
+    do {
+      try keychain.removeAll()
+    } catch {
+      logger.errorMessage("ERROR Removing all keys: \(error)")
     }
-    savedAccounts.removeAll()
     accounts.removeAll()
   }
 
   public func removeAccount(toRemove account: RedditAccount) {
     // Remove account from in memory logged in accounts and from the savedAccounts entry in UserDefaults
     accounts.remove(account)
-    savedAccounts.removeAll { $0 == account.name }
 
     // Remove credentials from the keychain
-    do {
-      try keychain.remove(account.name)
-    } catch {
-      logger.errorMessage("Error removing key for: \(account.name): \(error)")
-    }
+    removeToken(for: account)
   }
 
   // MARK: OAuth token management
@@ -202,7 +186,7 @@ public final class AccountManager: ObservableObject {
         return nil
       }
       return try decoder.decode(OAuthSwiftCredential.self, from: credentialData)
-    } catch let error {
+    } catch {
       logger.errorMessage("ERROR fetching credential for \(accountName): \(error)")
       return nil
     }
@@ -218,8 +202,16 @@ public final class AccountManager: ObservableObject {
       try keychain
         .label("www.reddit.com (\(account.name))")
         .set(encodedCredential, key: account.name)
-    } catch let error {
+    } catch {
       logger.errorMessage("ERROR writing \(account.name): \(error)")
+    }
+  }
+
+  private func removeToken(for account: RedditAccount) {
+    do {
+      try keychain.remove(account.name)
+    } catch {
+      logger.errorMessage("ERROR Removing token for \(account.name): \(error)")
     }
   }
 }
