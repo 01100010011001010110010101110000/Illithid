@@ -53,6 +53,10 @@ public final class AccountManager: ObservableObject {
     }
   }
 
+  /*
+   This is easier to use, but it may be a good idea to make `setCurrentAccount` public and make this setter private.
+   If there are any errors here, they will be silently swallowed.
+   */
   @Published public var currentAccount: RedditAccount? = nil {
     didSet {
       // If we are set to an account which doees not exist, keep the old value
