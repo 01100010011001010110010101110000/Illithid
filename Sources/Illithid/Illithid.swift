@@ -8,13 +8,12 @@ import Cocoa
 import Foundation
 
 import Alamofire
-import AlamofireImage
 import OAuthSwift
 import Willow
 
 /// Handles Reddit API meta-operations
 open class RedditClientBroker: ObservableObject {
-  public static var shared: RedditClientBroker = .init(configuration: TestableConfiguration())
+  public static var shared: RedditClientBroker = .init()
 
   private enum baseURLs: String, Codable {
     case unauthenticated = "https://api.reddit.com/"
@@ -33,22 +32,18 @@ open class RedditClientBroker: ObservableObject {
   // TODO: Make this private
   public let accountManager: AccountManager
 
-  public private(set) var configuration: ClientConfiguration 
-
   internal let decoder: JSONDecoder = .init()
 
   internal var session: SessionManager
 
-  private init(configuration: ClientConfiguration) {
+  private init() {
     #if DEBUG
     self.logger = .debugLogger()
     #else
     self.logger = .releaseLogger(subsystem: "com.illithid.illithid")
     #endif
-    self.configuration = configuration
 
-    self.accountManager = AccountManager(logger: logger,
-                                         configuration: self.configuration)
+    self.accountManager = AccountManager(logger: logger)
     self.session = accountManager.makeSession(for: accountManager.currentAccount)
 
     decoder.dateDecodingStrategy = .secondsSince1970
@@ -56,7 +51,6 @@ open class RedditClientBroker: ObservableObject {
   }
 
   public func configure(configuration: ClientConfiguration) {
-    self.configuration = configuration
     accountManager.configuration = configuration
     session.session.invalidateAndCancel()
     session = accountManager.makeSession(for: accountManager.currentAccount)

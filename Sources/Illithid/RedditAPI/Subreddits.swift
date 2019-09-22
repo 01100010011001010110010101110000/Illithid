@@ -12,8 +12,6 @@ import Combine
 import Foundation
 
 import Alamofire
-import AlamofireImage
-import Willow
 import SwiftyJSON
 
 public extension RedditClientBroker {

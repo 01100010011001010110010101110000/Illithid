@@ -17,7 +17,7 @@ import Willow
 
 /// `AccountManager` is the class responsible for Reddit account management, including adding, deleting, and switching accounts
 public final class AccountManager: ObservableObject {
-  var configuration: ClientConfiguration
+  var configuration: ClientConfiguration = TestableConfiguration()
 
   private let logger: Logger
   private let defaults: UserDefaults = .standard
@@ -29,9 +29,8 @@ public final class AccountManager: ObservableObject {
   private let decoder: JSONDecoder = .init()
   private let encoder: JSONEncoder = .init()
 
-  init(logger: Logger, configuration: ClientConfiguration) {
+  init(logger: Logger) {
     self.logger = logger
-    self.configuration = configuration
 
     decoder.dateDecodingStrategy = .secondsSince1970
     decoder.keyDecodingStrategy = .convertFromSnakeCase
