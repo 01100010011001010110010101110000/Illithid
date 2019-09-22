@@ -13,7 +13,7 @@ import Foundation
 import Alamofire
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-public extension RedditClientBroker {
+public extension Illithid {
   func info(names: [Fullname]) -> AnyPublisher<Listing, Error> {
     let endpoint = URL(string: "/api/info", relativeTo: baseURL)!
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
@@ -30,7 +30,7 @@ public extension RedditClientBroker {
   func info(name: Fullname) -> AnyPublisher<Listing, Error> { info(names: [name])}
 }
 
-public extension RedditClientBroker {
+public extension Illithid {
   func info(names: [Fullname], completion: @escaping (Result<Listing>) -> Void) {
     let endpoint = URL(string: "/api/info", relativeTo: baseURL)!
     let queryEncoding = URLEncoding(boolEncoding: .numeric)

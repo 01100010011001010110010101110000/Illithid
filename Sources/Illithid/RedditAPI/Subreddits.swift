@@ -14,7 +14,7 @@ import Foundation
 import Alamofire
 import SwiftyJSON
 
-public extension RedditClientBroker {
+public extension Illithid {
   /**
    Loads subreddits from the Reddit API
 
@@ -56,7 +56,7 @@ public extension RedditClientBroker {
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public extension Subreddit {
-  static func fetch(name: Fullname, client: RedditClientBroker) -> AnyPublisher<Subreddit, Error> {
+  static func fetch(name: Fullname, client: Illithid) -> AnyPublisher<Subreddit, Error> {
     client.info(name: name)
       .compactMap { listing in
         return listing.subreddits.last
@@ -65,12 +65,12 @@ public extension Subreddit {
 }
 
 public extension Post {
-  static func fetch(name: Fullname, client: RedditClientBroker, completion: @escaping (Result<Subreddit>) -> Void) {
+  static func fetch(name: Fullname, client: Illithid, completion: @escaping (Result<Subreddit>) -> Void) {
     client.info(name: name) { result in
       switch result {
       case .success(let listing):
         guard let subreddit = listing.subreddits.last else {
-          completion(.failure(RedditClientBroker.NotFound(lookingFor: name)))
+          completion(.failure(Illithid.NotFound(lookingFor: name)))
           return
         }
         completion(.success(subreddit))

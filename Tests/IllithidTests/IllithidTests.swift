@@ -2,7 +2,7 @@
 import XCTest
 
 final class IllithidTests: XCTestCase {
-  let illithid = RedditClientBroker(configuration: TestableConfiguration())
+  let illithid = Illithid(configuration: TestableConfiguration())
 
   func testCommentSingleton() {
     Comment.fetch(name: "t1_ernlwui", client: illithid) { result in

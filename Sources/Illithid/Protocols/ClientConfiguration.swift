@@ -36,8 +36,8 @@ extension ClientConfiguration {
       "consumerKey": consumerKey,
       "consumerSecret": consumerSecret,
       "duration": duration.rawValue,
-      "authorizeUrl": RedditClientBroker.authorizeEndpoint.absoluteString,
-      "accessTokenUrl": RedditClientBroker.tokenEndpoint.absoluteString,
+      "authorizeUrl": Illithid.authorizeEndpoint.absoluteString,
+      "accessTokenUrl": Illithid.tokenEndpoint.absoluteString,
       "responseType": responseType.rawValue,
       "scope": scope
     ]

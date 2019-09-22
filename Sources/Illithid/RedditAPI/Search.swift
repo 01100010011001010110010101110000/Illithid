@@ -23,7 +23,7 @@ public enum SearchSort: String, Codable {
   case comments
 }
 
-public extension RedditClientBroker {
+public extension Illithid {
   /// Queries the Reddit search API and returns matching subreddits, users, or posts
   /// - Parameter query: The search term
   /// - Parameter subreddit: If supplied, will restrict the search results to a specific subreddit

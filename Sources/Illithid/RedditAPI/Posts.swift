@@ -16,7 +16,7 @@ import AlamofireImage
 import Willow
 import SwiftyJSON
 
-public extension RedditClientBroker {
+public extension Illithid {
   func fetchPosts(for subreddit: Subreddit, sortBy postSort: PostSort,
                   location: Location? = nil, topInterval: TopInterval? = nil,
                   params: ListingParameters = .init(), completion: @escaping (Listing) -> Void) {
@@ -61,7 +61,7 @@ public extension RedditClientBroker {
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public extension Post {
-  static func fetch(name: Fullname, client: RedditClientBroker) -> AnyPublisher<Post, Error> {
+  static func fetch(name: Fullname, client: Illithid) -> AnyPublisher<Post, Error> {
     client.info(name: name)
       .compactMap { listing in
         return listing.posts.last
@@ -70,12 +70,12 @@ public extension Post {
 }
 
 public extension Post {
-  static func fetch(name: Fullname, client: RedditClientBroker, completion: @escaping (Result<Post>) -> Void) {
+  static func fetch(name: Fullname, client: Illithid, completion: @escaping (Result<Post>) -> Void) {
     client.info(name: name) { result in
       switch result {
       case .success(let listing):
         guard let post = listing.posts.last else {
-          completion(.failure(RedditClientBroker.NotFound(lookingFor: name)))
+          completion(.failure(Illithid.NotFound(lookingFor: name)))
           return
         }
         completion(.success(post))

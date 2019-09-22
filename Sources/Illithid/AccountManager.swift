@@ -116,12 +116,12 @@ public final class AccountManager: ObservableObject {
       let data = try! encoder.encode(currentAccount)
       defaults.set(data, forKey: "SelectedAccount")
 
-      RedditClientBroker.shared.session.session.invalidateAndCancel()
-      RedditClientBroker.shared.session = makeSession(for: currentAccount)
+      Illithid.shared.session.session.invalidateAndCancel()
+      Illithid.shared.session = makeSession(for: currentAccount)
     } else {
       defaults.removeObject(forKey: "SelectedAccount")
-      RedditClientBroker.shared.session.session.invalidateAndCancel()
-      RedditClientBroker.shared.session = makeSession()
+      Illithid.shared.session.session.invalidateAndCancel()
+      Illithid.shared.session = makeSession()
     }
   }
 

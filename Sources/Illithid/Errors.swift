@@ -9,7 +9,7 @@ import Foundation
 
 import SwiftyJSON
 
-public extension RedditClientBroker {
+public extension Illithid {
   struct NotFound: LocalizedError {
     let lookingFor: String
   }
