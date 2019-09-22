@@ -33,11 +33,7 @@ open class RedditClientBroker: ObservableObject {
   // TODO: Make this private
   public let accountManager: AccountManager
 
-  public var configuration: ClientConfiguration {
-    didSet {
-      configure(configuration: configuration)
-    }
-  }
+  public private(set) var configuration: ClientConfiguration 
 
   internal let decoder: JSONDecoder = .init()
 
@@ -53,7 +49,7 @@ open class RedditClientBroker: ObservableObject {
 
     self.accountManager = AccountManager(logger: logger,
                                          configuration: self.configuration)
-    self.session = accountManager.makeSession()
+    self.session = accountManager.makeSession(for: accountManager.currentAccount)
 
     decoder.dateDecodingStrategy = .secondsSince1970
     decoder.keyDecodingStrategy = .convertFromSnakeCase
@@ -61,7 +57,8 @@ open class RedditClientBroker: ObservableObject {
 
   public func configure(configuration: ClientConfiguration) {
     self.configuration = configuration
-    session = accountManager.makeSession(for: accountManager.currentAccount)
     accountManager.configuration = configuration
+    session.session.invalidateAndCancel()
+    session = accountManager.makeSession(for: accountManager.currentAccount)
   }
 }

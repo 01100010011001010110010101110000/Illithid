@@ -44,30 +44,12 @@ public final class AccountManager: ObservableObject {
 
   @Published public private(set) var accounts: OrderedSet<RedditAccount> = [] {
     didSet {
-      let data = try! encoder.encode(self.accounts.contents)
+      let data = try! encoder.encode(accounts.contents)
       defaults.set(data, forKey: "RedditAccounts")
     }
   }
 
-  /*
-   This is easier to use, but it may be a good idea to make a `setCurrentAccount` func and make this setter private.
-   */
-  @Published public var currentAccount: RedditAccount? = nil {
-    didSet {
-      // If we are set to an account which doees not exist, keep the old value
-      guard currentAccount != nil, oldValue != currentAccount else { return }
-      guard accounts.contains(currentAccount!) else {
-        currentAccount = oldValue
-        return
-      }
-      // FIXME: Handle the case when `currentAccount` is set to nil, e.g. when deleting all accounts
-      let data = try! encoder.encode(currentAccount)
-      defaults.set(data, forKey: "SelectedAccount")
-
-      RedditClientBroker.shared.session.session.invalidateAndCancel()
-      RedditClientBroker.shared.session = self.makeSession(for: currentAccount)
-    }
-  }
+  @Published public private(set) var currentAccount: RedditAccount? = nil
 
   // MARK: Account login
 
@@ -128,6 +110,22 @@ public final class AccountManager: ObservableObject {
     }
   }
 
+  public func setAccount(_ account: RedditAccount?) {
+    if let toSet = account {
+      // If we are set to an account which doees not exist, do nothing
+      guard toSet != currentAccount, accounts.contains(toSet) else { return }
+      let data = try! encoder.encode(currentAccount)
+      defaults.set(data, forKey: "SelectedAccount")
+
+      RedditClientBroker.shared.session.session.invalidateAndCancel()
+      RedditClientBroker.shared.session = makeSession(for: currentAccount)
+    } else {
+      defaults.removeObject(forKey: "SelectedAccount")
+      RedditClientBroker.shared.session.session.invalidateAndCancel()
+      RedditClientBroker.shared.session = makeSession()
+    }
+  }
+
   internal func makeSession(for account: RedditAccount? = nil) -> SessionManager {
     let alamoConfiguration = URLSessionConfiguration.default
     let osVersion = ProcessInfo().operatingSystemVersion
@@ -185,11 +183,13 @@ public final class AccountManager: ObservableObject {
       logger.errorMessage("ERROR Removing all keys: \(error)")
     }
     accounts.removeAll()
+    setAccount(nil)
   }
 
   public func removeAccount(toRemove account: RedditAccount) {
     // Remove account from in memory logged in accounts and from the savedAccounts entry in UserDefaults
     accounts.remove(account)
+    if account == currentAccount { setAccount(nil) }
 
     // Remove credentials from the keychain
     removeToken(for: account)
