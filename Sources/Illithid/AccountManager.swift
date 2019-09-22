@@ -140,10 +140,12 @@ public final class AccountManager: ObservableObject {
     alamoConfiguration.httpAdditionalHeaders = headers
     let session = SessionManager(configuration: alamoConfiguration)
 
-    guard let toUse = account else { return session }
+    guard let redditAccount = account else { return session }
+    // FIXME: This should return an error to the caller instead of silently returning the anonymous session
+    guard let credential = token(for: redditAccount) else { return session }
     let oauth = OAuth2Swift(parameters: configuration.oauthParameters)!
     oauth.accessTokenBasicAuthentification = true
-    oauth.client = OAuthSwiftClient(credential: token(for: toUse)!)
+    oauth.client = OAuthSwiftClient(credential: credential)
 
     session.adapter = oauth.requestAdapter
     session.retrier = oauth.requestAdapter
@@ -195,6 +197,10 @@ public final class AccountManager: ObservableObject {
   }
 
   // MARK: OAuth token management
+
+  public func isAuthenticated(_ account: RedditAccount) -> Bool {
+    return token(for: account) != nil
+  }
 
   private func token(for accountName: String) -> OAuthSwiftCredential? {
     do {
