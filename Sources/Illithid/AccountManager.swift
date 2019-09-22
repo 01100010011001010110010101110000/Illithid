@@ -17,13 +17,10 @@ import Willow
 
 /// `AccountManager` is the class responsible for Reddit account management, including adding, deleting, and switching accounts
 public final class AccountManager: ObservableObject {
-  private var cancellable: AnyCancellable!
+  var configuration: ClientConfiguration
 
   private let logger: Logger
-  private var configuration: ClientConfiguration
   private let defaults: UserDefaults = .standard
-
-  private let session: SessionManager
 
   private let keychain = Keychain(service: Bundle.main.bundleIdentifier!)
     .synchronizable(true)
@@ -32,10 +29,9 @@ public final class AccountManager: ObservableObject {
   private let decoder: JSONDecoder = .init()
   private let encoder: JSONEncoder = .init()
 
-  init(logger: Logger, configuration: ClientConfiguration, session: SessionManager) {
+  init(logger: Logger, configuration: ClientConfiguration) {
     self.logger = logger
     self.configuration = configuration
-    self.session = session
 
     decoder.dateDecodingStrategy = .secondsSince1970
     decoder.keyDecodingStrategy = .convertFromSnakeCase
@@ -48,14 +44,13 @@ public final class AccountManager: ObservableObject {
 
   @Published public private(set) var accounts: OrderedSet<RedditAccount> = [] {
     didSet {
-      guard let data = try? encoder.encode(self.accounts.contents) else { return }
+      let data = try! encoder.encode(self.accounts.contents)
       defaults.set(data, forKey: "RedditAccounts")
     }
   }
 
   /*
-   This is easier to use, but it may be a good idea to make `setCurrentAccount` public and make this setter private.
-   If there are any errors here, they will be silently swallowed.
+   This is easier to use, but it may be a good idea to make a `setCurrentAccount` func and make this setter private.
    */
   @Published public var currentAccount: RedditAccount? = nil {
     didSet {
@@ -66,7 +61,11 @@ public final class AccountManager: ObservableObject {
         return
       }
       // FIXME: Handle the case when `currentAccount` is set to nil, e.g. when deleting all accounts
-      setCurrentAccount(account: currentAccount!)
+      let data = try! encoder.encode(currentAccount)
+      defaults.set(data, forKey: "SelectedAccount")
+
+      RedditClientBroker.shared.session.session.invalidateAndCancel()
+      RedditClientBroker.shared.session = self.makeSession(for: currentAccount)
     }
   }
 
@@ -75,7 +74,8 @@ public final class AccountManager: ObservableObject {
   /// Used to login a new user to Reddit
   /// - Parameter anchor: The `NSWindow` or `UIWindow` to use as an anchor for presenting the authentication dialog
   /// - Parameter completion: The method to call when authentication has completed
-  public func loginUser(anchor: ASWebAuthenticationPresentationContextProviding, completion: @escaping () -> Void) {
+  public func addAccount(anchor: ASWebAuthenticationPresentationContextProviding,
+                         completion: @escaping (_ account: RedditAccount) -> Void = { _ in }) {
     let oauth = OAuth2Swift(parameters: configuration.oauthParameters)!
     oauth.accessTokenBasicAuthentification = true
     oauth.authorizeURLHandler = IllithidWebAuthURLHandler(callbackURLScheme: configuration.redirectURI.absoluteString,
@@ -91,7 +91,7 @@ public final class AccountManager: ObservableObject {
       state: state, parameters: configuration.oauthParameters
     ) { result in
       switch result {
-      case .success(let (_, _, parameters)):
+      case .success:
         self.logger.debugMessage("Authorization successful")
         self.fetchNewAccount(oauth: oauth, completion: completion)
       case .failure(let error):
@@ -109,16 +109,16 @@ public final class AccountManager: ObservableObject {
    - Precondition: The `authorize` method must have returned successfully on `oauth` prior to invocation
 
    */
-  private func fetchNewAccount(oauth: OAuth2Swift, completion: @escaping () -> Void) {
+  private func fetchNewAccount(oauth: OAuth2Swift, completion: @escaping (_ account: RedditAccount) -> Void) {
     oauth.startAuthorizedRequest("https://oauth.reddit.com/api/v1/me", method: .GET, parameters: oauth.parameters) { result in
       switch result {
       case .success(let response):
         do {
           let account = try self.decoder.decode(RedditAccount.self, from: response.data)
-          if self.accounts.append(account) {
-            try? self.write(token: oauth.client.credential, for: account)
-            self.setCurrentAccount(account: account)
-          }
+          self.accounts.append(account)
+          try self.write(token: oauth.client.credential, for: account)
+          self.currentAccount = account
+          completion(account)
         } catch {
           self.logger.errorMessage("ERROR decoding new account: \(error)")
         }
@@ -128,15 +128,29 @@ public final class AccountManager: ObservableObject {
     }
   }
 
-  private func setCurrentAccount(account: RedditAccount) {
-    defaults.set(account.name, forKey: "SelectedAccount")
+  internal func makeSession(for account: RedditAccount? = nil) -> SessionManager {
+    let alamoConfiguration = URLSessionConfiguration.default
+    let osVersion = ProcessInfo().operatingSystemVersion
+    let userAgentComponents = [
+      "macOS \(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion)",
+      "\(configuration.consumerKey)",
+      "\(configuration.version) (by \(configuration.author))"
+    ]
+    let headers = SessionManager.defaultHTTPHeaders.merging([
+      "User-Agent": userAgentComponents.joined(separator: ":"),
+      "Accept": "application/json"
+    ]) { _, new in new }
+    alamoConfiguration.httpAdditionalHeaders = headers
+    let session = SessionManager(configuration: alamoConfiguration)
 
+    guard let toUse = account else { return session }
     let oauth = OAuth2Swift(parameters: configuration.oauthParameters)!
     oauth.accessTokenBasicAuthentification = true
-    oauth.client = OAuthSwiftClient(credential: token(for: account)!)
+    oauth.client = OAuthSwiftClient(credential: token(for: toUse)!)
 
     session.adapter = oauth.requestAdapter
     session.retrier = oauth.requestAdapter
+    return session
   }
 
   // MARK: Saved Account Loading

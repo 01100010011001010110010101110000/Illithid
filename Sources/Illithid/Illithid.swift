@@ -3,6 +3,7 @@
 // Copyright (c) 2018 flayware. All rights reserved.
 //
 
+import AuthenticationServices
 import Cocoa
 import Foundation
 
@@ -12,7 +13,7 @@ import OAuthSwift
 import Willow
 
 /// Handles Reddit API meta-operations
-open class RedditClientBroker {
+open class RedditClientBroker: ObservableObject {
   public static var shared: RedditClientBroker = .init(configuration: TestableConfiguration())
 
   private enum baseURLs: String, Codable {
@@ -32,7 +33,11 @@ open class RedditClientBroker {
   // TODO: Make this private
   public let accountManager: AccountManager
 
-  public var configuration: ClientConfiguration
+  public var configuration: ClientConfiguration {
+    didSet {
+      configure(configuration: configuration)
+    }
+  }
 
   internal let decoder: JSONDecoder = .init()
 
@@ -46,8 +51,9 @@ open class RedditClientBroker {
     #endif
     self.configuration = configuration
 
-    self.session = Self.makeSessionManager(configuration: configuration)
-    self.accountManager = AccountManager(logger: logger, configuration: self.configuration, session: session)
+    self.accountManager = AccountManager(logger: logger,
+                                         configuration: self.configuration)
+    self.session = accountManager.makeSession()
 
     decoder.dateDecodingStrategy = .secondsSince1970
     decoder.keyDecodingStrategy = .convertFromSnakeCase
@@ -55,26 +61,7 @@ open class RedditClientBroker {
 
   public func configure(configuration: ClientConfiguration) {
     self.configuration = configuration
-    self.session = Self.makeSessionManager(configuration: configuration)
-  }
-
-  private static func makeSessionManager(configuration: ClientConfiguration) -> SessionManager {
-    let alamoConfiguration = URLSessionConfiguration.default
-    let osVersion = ProcessInfo().operatingSystemVersion
-    let userAgentComponents = [
-      "macOS \(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion)",
-      "\(configuration.consumerKey)",
-      "\(configuration.version) (by \(configuration.author))"
-    ]
-    let headers = SessionManager.defaultHTTPHeaders.merging([
-      "User-Agent": userAgentComponents.joined(separator: ":"),
-      "Accept": "application/json"
-    ]) { _, new in new }
-    alamoConfiguration.httpAdditionalHeaders = headers
-
-    return SessionManager(configuration: alamoConfiguration)
+    session = accountManager.makeSession(for: accountManager.currentAccount)
+    accountManager.configuration = configuration
   }
 }
-
-@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-extension RedditClientBroker: ObservableObject {}
