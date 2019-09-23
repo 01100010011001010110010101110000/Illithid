@@ -113,6 +113,8 @@ public final class AccountManager: ObservableObject {
     if let toSet = account {
       // If we are set to an account which doees not exist, do nothing
       guard toSet != currentAccount, accounts.contains(toSet) else { return }
+      currentAccount = account
+
       let data = try! encoder.encode(currentAccount)
       defaults.set(data, forKey: "SelectedAccount")
 
