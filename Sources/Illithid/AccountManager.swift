@@ -18,6 +18,7 @@ import Willow
 /// `AccountManager` is the class responsible for Reddit account management, including adding, deleting, and switching accounts
 public final class AccountManager: ObservableObject {
   var configuration: ClientConfiguration = TestableConfiguration()
+  public let objectWillChange = ObservableObjectPublisher()
 
   private let logger: Logger
   private let defaults: UserDefaults = .standard
@@ -42,13 +43,21 @@ public final class AccountManager: ObservableObject {
   // MARK: Published attributes
 
   @Published public private(set) var accounts: OrderedSet<RedditAccount> = [] {
+    willSet {
+      objectWillChange.send()
+    }
     didSet {
       let data = try! encoder.encode(accounts.contents)
       defaults.set(data, forKey: "RedditAccounts")
     }
   }
 
-  @Published public private(set) var currentAccount: RedditAccount? = nil
+  @Published public private(set) var currentAccount: RedditAccount? = nil {
+    willSet {
+      objectWillChange.send()
+    }
+  }
+  
 
   // MARK: Account login
 
@@ -105,6 +114,35 @@ public final class AccountManager: ObservableObject {
         }
       case .failure(let error):
         self.logger.errorMessage("ERROR fetching account data: \(error)")
+      }
+    }
+  }
+
+  public func reauthenticate(account: RedditAccount, anchor: ASWebAuthenticationPresentationContextProviding) {
+    let oauth = OAuth2Swift(parameters: configuration.oauthParameters)!
+    oauth.accessTokenBasicAuthentification = true
+    oauth.authorizeURLHandler = IllithidWebAuthURLHandler(callbackURLScheme: configuration.redirectURI.absoluteString,
+                                                          anchor: anchor)
+
+    // Generate random state value to protect from CSRF
+    let state = ((0 ... 11).map { _ in Int.random(in: 0 ... 9) }).reduce("") { accumulator, next in
+      accumulator + String(next)
+    }
+    oauth.authorize(
+      withCallbackURL: configuration.redirectURI,
+      scope: configuration.scope,
+      state: state, parameters: configuration.oauthParameters
+    ) { result in
+      switch result {
+      case .success:
+        self.logger.debugMessage("Authorization successful")
+        do {
+          try self.write(token: oauth.client.credential, for: account)
+        } catch {
+          self.logger.errorMessage("ERROR reauthenticating \(account.name): \(error)")
+        }
+      case .failure(let error):
+        self.logger.errorMessage("Authorization failed: \(error)")
       }
     }
   }
@@ -224,6 +262,7 @@ public final class AccountManager: ObservableObject {
   private func write(token: OAuthSwiftCredential, for account: RedditAccount) throws {
     do {
       let encodedCredential = try encoder.encode(token)
+      objectWillChange.send()
       try keychain
         .label("www.reddit.com (\(account.name))")
         .set(encodedCredential, key: account.name)
@@ -234,6 +273,7 @@ public final class AccountManager: ObservableObject {
 
   private func removeToken(for account: RedditAccount) {
     do {
+      objectWillChange.send()
       try keychain.remove(account.name)
     } catch {
       logger.errorMessage("ERROR Removing token for \(account.name): \(error)")
