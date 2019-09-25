@@ -2,7 +2,7 @@
 import XCTest
 
 final class IllithidTests: XCTestCase {
-  let illithid = Illithid(configuration: TestableConfiguration())
+  let illithid: Illithid = .shared
 
   func testCommentSingleton() {
     Comment.fetch(name: "t1_ernlwui", client: illithid) { result in
