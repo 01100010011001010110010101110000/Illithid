@@ -53,7 +53,6 @@ public extension Illithid {
     ]
     encodedParameters.merge(commentsParameters) { (current, _) in current }
 
-
     return session.requestPublisher(url: commentsListingURL, method: .get, parameters: encodedParameters, encoding: queryEncoding)
       .compactMap { response in
         return response.data

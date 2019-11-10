@@ -43,7 +43,7 @@ public struct Subreddit: RedditObject {
     self.over18 = try container.decode(Bool.self, forKey: .over18)
     self.createdUtc = try container.decode(Date.self, forKey: .createdUtc)
 
-    if let emptyString = try? container.decode(String.self, forKey: .headerImg), emptyString.isEmpty {
+    if let emptyString = try? container.decodeIfPresent(String.self, forKey: .headerImg), emptyString.isEmpty {
       headerImg = nil
     } else {
       headerImg = try container.decodeIfPresent(URL.self, forKey: .headerImg)

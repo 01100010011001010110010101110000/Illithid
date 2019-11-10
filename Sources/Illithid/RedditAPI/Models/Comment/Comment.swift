@@ -59,7 +59,8 @@ public struct Comment: RedditObject {
   /// The `Fullname` of this comment's parent comment
   public let parentId: Fullname
   public let score: Int
-  public let authorFullname: String
+  /// The `Fullname` of the comment's author. This is nil when the comment has been deleted
+  public let authorFullname: Fullname?
   public let approvedBy: String?
   public let allAwardings: [Award]
   /// The `Fullname` of this comment's subreddit
@@ -69,8 +70,8 @@ public struct Comment: RedditObject {
   public let authorFlairCssClass: String?
   public let isSubmitter: Bool
   public let downs: Int
-  public let authorFlairRichtext: [String]
-  public let authorPatreonFlair: Bool
+  public let authorFlairRichtext: [String]?
+  public let authorPatreonFlair: Bool?
   public let collapsedReason: String?
   public let bodyHtml: String
   public let stickied: Bool
@@ -198,7 +199,7 @@ public struct Comment: RedditObject {
     sendReplies = try container.decode(Bool.self, forKey: .sendReplies)
     parentId = try container.decode(String.self, forKey: .parentId)
     score = try container.decode(Int.self, forKey: .score)
-    authorFullname = try container.decode(String.self, forKey: .authorFullname)
+    authorFullname = try container.decodeIfPresent(String.self, forKey: .authorFullname)
     approvedBy = try container.decodeIfPresent(String.self, forKey: .approvedBy)
     allAwardings = try container.decode([Award].self, forKey: .allAwardings)
     subredditId = try container.decode(String.self, forKey: .subredditId)
@@ -207,8 +208,8 @@ public struct Comment: RedditObject {
     authorFlairCssClass = try container.decodeIfPresent(String.self, forKey: .authorFlairCssClass)
     isSubmitter = try container.decode(Bool.self, forKey: .isSubmitter)
     downs = try container.decode(Int.self, forKey: .downs)
-    authorFlairRichtext = try container.decode([String].self, forKey: .authorFlairRichtext)
-    authorPatreonFlair = try container.decode(Bool.self, forKey: .authorPatreonFlair)
+    authorFlairRichtext = try container.decodeIfPresent([String].self, forKey: .authorFlairRichtext)
+    authorPatreonFlair = try container.decodeIfPresent(Bool.self, forKey: .authorPatreonFlair)
     collapsedReason = try? container.decodeIfPresent(String.self, forKey: .collapsedReason)
     bodyHtml = try container.decode(String.self, forKey: .bodyHtml)
     stickied = try container.decode(Bool.self, forKey: .stickied)
