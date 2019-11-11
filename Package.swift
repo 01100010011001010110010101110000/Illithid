@@ -38,5 +38,6 @@ let package = Package(
         .testTarget(
             name: "IllithidTests",
             dependencies: ["Illithid"]),
-    ]
+    ],
+    swiftLanguageVersions: [.v5]
 )
