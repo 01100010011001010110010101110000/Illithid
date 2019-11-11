@@ -39,7 +39,7 @@ extension ClientConfiguration {
       "authorizeUrl": Illithid.authorizeEndpoint.absoluteString,
       "accessTokenUrl": Illithid.tokenEndpoint.absoluteString,
       "responseType": responseType.rawValue,
-      "scope": scope
+      "scope": scope,
     ]
   }
 }

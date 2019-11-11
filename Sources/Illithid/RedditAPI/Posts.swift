@@ -7,17 +7,17 @@
 //
 
 #if canImport(Combine)
-import Combine
+  import Combine
 #endif
 #if canImport(SwiftUI)
-import SwiftUI
+  import SwiftUI
 #endif
 import Foundation
 
 import Alamofire
 import AlamofireImage
-import Willow
 import SwiftyJSON
+import Willow
 
 public extension Illithid {
   func fetchPosts(for subreddit: Subreddit, sortBy postSort: PostSort,
@@ -26,7 +26,7 @@ public extension Illithid {
     var parameters = params.toParameters()
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
     let postsUrl = URL(string: "/r/\(subreddit.displayName)/\(postSort)", relativeTo: baseURL)!
-    
+
     // Handle nonsense magic string parameters which apply to specific sorts
     switch postSort {
     case .controversial, .top:
@@ -36,7 +36,7 @@ public extension Illithid {
     default:
       break
     }
-    
+
     session.request(postsUrl, method: .get, parameters: parameters, encoding: queryEncoding).validate()
       .responseData { response in
         switch response.result {
@@ -58,7 +58,7 @@ public extension Illithid {
         case let .failure(error):
           self.logger.errorMessage("Failed to call posts API endpoint: \(error)")
         }
-    }
+      }
   }
 }
 
@@ -67,8 +67,8 @@ public extension Post {
   static func fetch(name: Fullname, client: Illithid) -> AnyPublisher<Post, Error> {
     client.info(name: name)
       .compactMap { listing in
-        return listing.posts.last
-    }.eraseToAnyPublisher()
+        listing.posts.last
+      }.eraseToAnyPublisher()
   }
 }
 
@@ -76,13 +76,13 @@ public extension Post {
   static func fetch(name: Fullname, client: Illithid, completion: @escaping (Result<Post>) -> Void) {
     client.info(name: name) { result in
       switch result {
-      case .success(let listing):
+      case let .success(listing):
         guard let post = listing.posts.last else {
           completion(.failure(Illithid.NotFound(lookingFor: name)))
           return
         }
         completion(.success(post))
-      case .failure(let error):
+      case let .failure(error):
         completion(.failure(error))
       }
     }

@@ -38,13 +38,13 @@ open class Illithid: ObservableObject {
 
   private init() {
     #if DEBUG
-    self.logger = .debugLogger()
+      logger = .debugLogger()
     #else
-    self.logger = .releaseLogger(subsystem: "com.illithid.illithid")
+      logger = .releaseLogger(subsystem: "com.illithid.illithid")
     #endif
 
-    self.accountManager = AccountManager(logger: logger)
-    self.session = accountManager.makeSession(for: accountManager.currentAccount)
+    accountManager = AccountManager(logger: logger)
+    session = accountManager.makeSession(for: accountManager.currentAccount)
 
     decoder.dateDecodingStrategy = .secondsSince1970
     decoder.keyDecodingStrategy = .convertFromSnakeCase

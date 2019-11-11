@@ -57,7 +57,6 @@ public final class AccountManager: ObservableObject {
       objectWillChange.send()
     }
   }
-  
 
   // MARK: Account login
 
@@ -84,7 +83,7 @@ public final class AccountManager: ObservableObject {
       case .success:
         self.logger.debugMessage("Authorization successful")
         self.fetchNewAccount(oauth: oauth, completion: completion)
-      case .failure(let error):
+      case let .failure(error):
         self.logger.errorMessage("Authorization failed: \(error)")
       }
     }
@@ -102,7 +101,7 @@ public final class AccountManager: ObservableObject {
   private func fetchNewAccount(oauth: OAuth2Swift, completion: @escaping (_ account: RedditAccount) -> Void) {
     oauth.startAuthorizedRequest("https://oauth.reddit.com/api/v1/me", method: .GET, parameters: oauth.parameters) { result in
       switch result {
-      case .success(let response):
+      case let .success(response):
         do {
           let account = try self.decoder.decode(RedditAccount.self, from: response.data)
           self.accounts.append(account)
@@ -112,7 +111,7 @@ public final class AccountManager: ObservableObject {
         } catch {
           self.logger.errorMessage("ERROR decoding new account: \(error)")
         }
-      case .failure(let error):
+      case let .failure(error):
         self.logger.errorMessage("ERROR fetching account data: \(error)")
       }
     }
@@ -141,7 +140,7 @@ public final class AccountManager: ObservableObject {
         } catch {
           self.logger.errorMessage("ERROR reauthenticating \(account.name): \(error)")
         }
-      case .failure(let error):
+      case let .failure(error):
         self.logger.errorMessage("Authorization failed: \(error)")
       }
     }
@@ -171,11 +170,11 @@ public final class AccountManager: ObservableObject {
     let userAgentComponents = [
       "macOS \(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion)",
       "\(configuration.consumerKey)",
-      "\(configuration.version) (by \(configuration.author))"
+      "\(configuration.version) (by \(configuration.author))",
     ]
     let headers = SessionManager.defaultHTTPHeaders.merging([
       "User-Agent": userAgentComponents.joined(separator: ":"),
-      "Accept": "application/json"
+      "Accept": "application/json",
     ]) { _, new in new }
     alamoConfiguration.httpAdditionalHeaders = headers
     let session = SessionManager(configuration: alamoConfiguration)
@@ -239,7 +238,7 @@ public final class AccountManager: ObservableObject {
   // MARK: OAuth token management
 
   public func isAuthenticated(_ account: RedditAccount) -> Bool {
-    return token(for: account) != nil
+    token(for: account) != nil
   }
 
   private func token(for accountName: String) -> OAuthSwiftCredential? {
@@ -256,7 +255,7 @@ public final class AccountManager: ObservableObject {
   }
 
   private func token(for account: RedditAccount) -> OAuthSwiftCredential? {
-    return token(for: account.name)
+    token(for: account.name)
   }
 
   private func write(token: OAuthSwiftCredential, for account: RedditAccount) throws {

@@ -38,13 +38,13 @@ public extension Illithid {
   /// - Note: The Reddit search API is weird and seems to return results depending on which `resultTypes` combination is chosen. It also seems to ignore the `limit` argument.
   func search(for query: String, subreddit: String? = nil, after: Fullname? = nil, before: Fullname? = nil,
               limit: UInt = 25, showAll: ShowAllPreference = .filtered, sort: SearchSort = .relevance,
-              topInterval: TopInterval? = nil, resultTypes: Set<SearchType> = [.subreddit, .post, .user], completion: @escaping (Result<[Listing]>) -> ()) {
+              topInterval: TopInterval? = nil, resultTypes: Set<SearchType> = [.subreddit, .post, .user], completion: @escaping (Result<[Listing]>) -> Void) {
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
     var parameters: Parameters = [
       "q": query,
-      "raw_json": true
+      "raw_json": true,
     ]
-    
+
     // If a subreddit is supplied, restrict results to that subreddit
     let endpoint = subreddit != nil ? URL(string: "/r/\(subreddit!)/search", relativeTo: baseURL)! :
       URL(string: "/search", relativeTo: baseURL)!
@@ -64,7 +64,7 @@ public extension Illithid {
 
     session.request(endpoint, method: .get, parameters: parameters, encoding: queryEncoding).validate().responseData { response in
       switch response.result {
-      case .success(let data):
+      case let .success(data):
         do {
           // The search API combines the user and subreddits results into a single listing
           // Therefore, we have a single listing when either we are searching for one term or both subreddits and users, and an array otherwise
@@ -81,7 +81,7 @@ public extension Illithid {
         } catch {
           completion(.failure(error))
         }
-      case .failure(let error):
+      case let .failure(error):
         completion(.failure(error))
       }
     }

@@ -12,25 +12,25 @@ import Foundation
 extension NSImage {
   /// The height of the image.
   var height: CGFloat {
-    return size.height
+    size.height
   }
-  
+
   /// The width of the image.
   var width: CGFloat {
-    return size.width
+    size.width
   }
-  
+
   /// A PNG representation of the image.
   var PNGRepresentation: Data? {
     if let tiff = self.tiffRepresentation, let tiffData = NSBitmapImageRep(data: tiff) {
       return tiffData.representation(using: .png, properties: [:])
     }
-    
+
     return nil
   }
-  
+
   // MARK: Resizing
-  
+
   /// Resize the image to the given size.
   ///
   /// - Parameter size: The size to resize the image to.
@@ -40,14 +40,14 @@ extension NSImage {
     guard let representation = self.bestRepresentation(for: frame, context: nil, hints: nil) else {
       return nil
     }
-    
+
     let image = NSImage(size: targetSize, flipped: false) { (_) -> Bool in
       representation.draw(in: frame)
     }
-    
+
     return image
   }
-  
+
   /// Copy the image and resize it to the supplied size, while maintaining it's
   /// original aspect ratio.
   ///
@@ -57,7 +57,7 @@ extension NSImage {
     let newSize: NSSize
     let widthRatio = targetSize.width / width
     let heightRatio = targetSize.height / height
-    
+
     if widthRatio > heightRatio {
       newSize = NSSize(width: floor(width * widthRatio),
                        height: floor(height * widthRatio))
@@ -67,9 +67,9 @@ extension NSImage {
     }
     return resize(withSize: newSize)
   }
-  
+
   // MARK: Cropping
-  
+
   /// Resize the image, to nearly fit the supplied cropping size
   /// and return a cropped copy the image.
   ///
@@ -82,22 +82,22 @@ extension NSImage {
     let x = floor((resizedImage.width - targetSize.width) / 2)
     let y = floor((resizedImage.height - targetSize.height) / 2)
     let frame = NSRect(x: x, y: y, width: targetSize.width, height: targetSize.height)
-    
+
     guard let representation = resizedImage.bestRepresentation(for: frame, context: nil, hints: nil) else {
       return nil
     }
-    
+
     let image = NSImage(size: targetSize,
                         flipped: false,
                         drawingHandler: { (destinationRect: NSRect) -> Bool in
                           representation.draw(in: destinationRect)
     })
-    
+
     return image
   }
-  
+
   // MARK: Saving
-  
+
   /// Save the images PNG representation the the supplied file URL:
   ///
   /// - Parameter url: The file URL to save the png file to.

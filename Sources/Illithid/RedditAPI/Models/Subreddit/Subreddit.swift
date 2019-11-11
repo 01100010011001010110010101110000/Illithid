@@ -18,7 +18,7 @@ public enum SubredditSort {
 
 public struct Subreddit: RedditObject {
   public static func == (lhs: Subreddit, rhs: Subreddit) -> Bool {
-    return lhs.name == rhs.name
+    lhs.name == rhs.name
   }
 
   public let id: String // swiftlint:disable:this identifier_name
@@ -35,13 +35,13 @@ public struct Subreddit: RedditObject {
   /// - Parameter decoder: A `Decoder` conforming object
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
-    self.id = try container.decode(String.self, forKey: .id)
-    self.name = try container.decode(String.self, forKey: .name)
-    self.publicDescription = try container.decode(String.self, forKey: .publicDescription)
-    self.displayName = try container.decode(String.self, forKey: .displayName)
-    self.wikiEnabled = try container.decodeIfPresent(Bool.self, forKey: .wikiEnabled)
-    self.over18 = try container.decode(Bool.self, forKey: .over18)
-    self.createdUtc = try container.decode(Date.self, forKey: .createdUtc)
+    id = try container.decode(String.self, forKey: .id)
+    name = try container.decode(String.self, forKey: .name)
+    publicDescription = try container.decode(String.self, forKey: .publicDescription)
+    displayName = try container.decode(String.self, forKey: .displayName)
+    wikiEnabled = try container.decodeIfPresent(Bool.self, forKey: .wikiEnabled)
+    over18 = try container.decode(Bool.self, forKey: .over18)
+    createdUtc = try container.decode(Date.self, forKey: .createdUtc)
 
     if let emptyString = try? container.decodeIfPresent(String.self, forKey: .headerImg), emptyString.isEmpty {
       headerImg = nil

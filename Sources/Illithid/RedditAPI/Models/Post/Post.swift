@@ -59,11 +59,11 @@ public enum PostHint: String, Codable {
 
 public struct Post: RedditObject {
   public static func == (lhs: Post, rhs: Post) -> Bool {
-    return lhs.name == rhs.name
+    lhs.name == rhs.name
   }
 
   public func hash(into hasher: inout Hasher) {
-    hasher.combine(self.name)
+    hasher.combine(name)
   }
 
   public let id: String
@@ -83,7 +83,7 @@ public struct Post: RedditObject {
   public let authorFullname: String
   public let author: String
   public var authorPrefixed: String {
-    return "u/\(self.author)"
+    "u/\(author)"
   }
 
   public let authorPatreonFlair: Bool
@@ -147,9 +147,9 @@ public struct Post: RedditObject {
 
   public var previews: [ImagePreview.Image] {
     var previews: [ImagePreview.Image] = []
-    guard self.thumbnail != nil, self.thumbnail?.scheme != nil else { return previews }
-    previews.reserveCapacity((self.preview?.images.first?.resolutions.count ?? 0) + 2)
-    previews.append(.init(url: self.thumbnail!, width: self.thumbnailWidth!, height: self.thumbnailHeight!))
+    guard thumbnail != nil, thumbnail?.scheme != nil else { return previews }
+    previews.reserveCapacity((preview?.images.first?.resolutions.count ?? 0) + 2)
+    previews.append(.init(url: thumbnail!, width: thumbnailWidth!, height: thumbnailHeight!))
     if let preview = self.preview?.images.first {
       previews.append(contentsOf: preview.resolutions)
       previews.append(preview.source)

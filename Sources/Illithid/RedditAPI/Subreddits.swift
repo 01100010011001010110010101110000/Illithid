@@ -7,7 +7,7 @@
 //
 
 #if canImport(Combine)
-import Combine
+  import Combine
 #endif
 import Foundation
 
@@ -59,8 +59,8 @@ public extension Subreddit {
   static func fetch(name: Fullname, client: Illithid) -> AnyPublisher<Subreddit, Error> {
     client.info(name: name)
       .compactMap { listing in
-        return listing.subreddits.last
-    }.eraseToAnyPublisher()
+        listing.subreddits.last
+      }.eraseToAnyPublisher()
   }
 }
 
@@ -68,13 +68,13 @@ public extension Post {
   static func fetch(name: Fullname, client: Illithid, completion: @escaping (Result<Subreddit>) -> Void) {
     client.info(name: name) { result in
       switch result {
-      case .success(let listing):
+      case let .success(listing):
         guard let subreddit = listing.subreddits.last else {
           completion(.failure(Illithid.NotFound(lookingFor: name)))
           return
         }
         completion(.success(subreddit))
-      case .failure(let error):
+      case let .failure(error):
         completion(.failure(error))
       }
     }

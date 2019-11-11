@@ -77,7 +77,7 @@ public struct Comment: RedditObject {
   public let stickied: Bool
   public let subredditType: String
   public let canGild: Bool
-//  public let gildings: [Any: Any]
+  //  public let gildings: [Any: Any]
   public let authorFlairTextColor: String?
   public let scoreHidden: Bool
   public let permalink: String

@@ -6,7 +6,7 @@
 //
 
 #if canImport(Combine)
-import Combine
+  import Combine
 #endif
 import Foundation
 
@@ -49,13 +49,13 @@ public extension Illithid {
       "showmore": showMore,
       "sort": sort.rawValue,
       "threaded": threaded,
-      "truncate": truncate
+      "truncate": truncate,
     ]
-    encodedParameters.merge(commentsParameters) { (current, _) in current }
+    encodedParameters.merge(commentsParameters) { current, _ in current }
 
     return session.requestPublisher(url: commentsListingURL, method: .get, parameters: encodedParameters, encoding: queryEncoding)
       .compactMap { response in
-        return response.data
+        response.data
       }
       .decode(type: [Listing].self, decoder: decoder)
       .mapError { (error) -> Error in
@@ -73,8 +73,8 @@ public extension Comment {
   static func fetch(name: Fullname, client: Illithid) -> AnyPublisher<Comment, Error> {
     client.info(name: name)
       .compactMap { listing in
-        return listing.comments.last
-    }.eraseToAnyPublisher()
+        listing.comments.last
+      }.eraseToAnyPublisher()
   }
 }
 
@@ -82,13 +82,13 @@ public extension Comment {
   static func fetch(name: Fullname, client: Illithid, completion: @escaping (Result<Comment>) -> Void) {
     client.info(name: name) { result in
       switch result {
-      case .success(let listing):
+      case let .success(listing):
         guard let comment = listing.comments.last else {
           completion(.failure(Illithid.NotFound(lookingFor: name)))
           return
         }
         completion(.success(comment))
-      case .failure(let error):
+      case let .failure(error):
         completion(.failure(error))
       }
     }

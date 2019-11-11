@@ -7,9 +7,9 @@ final class IllithidTests: XCTestCase {
   func testCommentSingleton() {
     Comment.fetch(name: "t1_ernlwui", client: illithid) { result in
       switch result {
-      case .success(let comment):
+      case let .success(comment):
         XCTAssertEqual(comment.author, "paulfknwalsh")
-      case .failure(let error):
+      case let .failure(error):
         XCTFail(error.localizedDescription)
       }
     }

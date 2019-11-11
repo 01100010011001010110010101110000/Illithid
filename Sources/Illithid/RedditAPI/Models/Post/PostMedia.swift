@@ -12,7 +12,7 @@ public struct PostMedia: Codable {
   public let type: String?
   public let oembed: EmbeddingParameters?
   public let redditVideo: RedditVideo?
-  
+
   public struct RedditVideo: Codable {
     public let dashUrl: URL
     public let duration: Int
@@ -24,11 +24,11 @@ public struct PostMedia: Codable {
     public let transcodingStatus: TranscodeStatus
     public let width: Int
   }
-  
+
   public enum TranscodeStatus: String, Codable {
     case completed
   }
-  
+
   public struct EmbeddingParameters: Codable {
     public let providerUrl: URL
     public let title: String?

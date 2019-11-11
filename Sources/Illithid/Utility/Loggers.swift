@@ -61,6 +61,6 @@ public struct LevelLabelModifier: LogModifier {
    - returns: The modified `message`
    */
   public func modifyMessage(_ message: String, with logLevel: LogLevel) -> String {
-    return "[\(logLevel.description.uppercased())] => \(message)"
+    "[\(logLevel.description.uppercased())] => \(message)"
   }
 }

@@ -22,7 +22,7 @@ public struct ImagePreview: Codable {
   public let resolutions: [Image]
   public let variants: Variants
   public let id: String
-  
+
   public struct Image: Codable {
     public let url: URL
     public let width: Int

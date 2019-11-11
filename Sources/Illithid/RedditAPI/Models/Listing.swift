@@ -41,20 +41,20 @@ public struct Listing: Codable {
 
 private extension Listing {
   func items<T>(kind: Kind) -> [T] {
-    return data.children.compactMap { child in
+    data.children.compactMap { child in
       if child.kind == kind {
         switch child {
-        case .comment(let comment):
+        case let .comment(comment):
           return comment as? T
-        case .account(let account):
+        case let .account(account):
           return account as? T
-        case .post(let post):
+        case let .post(post):
           return post as? T
-        case .subreddit(let subreddit):
+        case let .subreddit(subreddit):
           return subreddit as? T
-        case .award(let award):
+        case let .award(award):
           return award as? T
-        case .more(let more):
+        case let .more(more):
           return more as? T
         }
       } else { return nil }
@@ -69,12 +69,12 @@ public extension Listing {
 
   var posts: [Post] { items(kind: .post) }
 
-//  var messages: [Message] {
+  //  var messages: [Message] {
 //    return data.children.compactMap { wrappedMessage in
 //      if case .message(let message) = wrappedMessage { return message }
 //      else { return nil }
 //    }
-//  }
+  //  }
 
   var subreddits: [Subreddit] { items(kind: .subreddit) }
 
@@ -148,19 +148,19 @@ public enum Content: Codable {
     try container.encode(self.kind, forKey: .kind)
 
     switch self {
-    case .comment(let comment):
+    case let .comment(comment):
       try container.encode(comment, forKey: .data)
-    case .account(let account):
+    case let .account(account):
       try container.encode(account, forKey: .data)
-    case .post(let post):
+    case let .post(post):
       try container.encode(post, forKey: .data)
 //    case .message:
 //      break
-    case .subreddit(let subreddit):
+    case let .subreddit(subreddit):
       try container.encode(subreddit, forKey: .data)
-    case .award(let award):
+    case let .award(award):
       try container.encode(award, forKey: .data)
-    case .more(let more):
+    case let .more(more):
       try container.encode(more, forKey: .data)
     }
   }

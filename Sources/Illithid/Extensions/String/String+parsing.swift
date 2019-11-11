@@ -9,26 +9,30 @@
 import Foundation
 
 struct Stack<Element> {
-  fileprivate var array: [Element] = []
+  private var array: [Element] = []
   mutating func push(_ element: Element) {
     array.append(element)
   }
+
   mutating func pop() -> Element? {
-    return array.popLast()
+    array.popLast()
   }
+
   func peek() -> Element? {
-    return array.last
+    array.last
   }
+
   func count() -> Int {
-    return array.count
+    array.count
   }
+
   func isEmpty() -> Bool {
-    return array.isEmpty
+    array.isEmpty
   }
 }
 
 extension String {
-  func iFrameSrc () -> URL? {
+  func iFrameSrc() -> URL? {
     guard let range = self.range(of: "src") else { return nil }
     var urlString = ""
     var quotes = 0
@@ -40,10 +44,10 @@ extension String {
     }
     return URL(string: urlString)
   }
-  
+
   func htmlToDict() -> [String: Any] {
-    //TODO Implement
-    return [:]
+    // TODO: Implement
+    [:]
   }
 }
 

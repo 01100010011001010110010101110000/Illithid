@@ -22,23 +22,24 @@ public struct Award: Codable {
   public let awardType: String
   public let coinPrice: Int
 
-  // TODO Reddit has (recently?) implemented "community" awards, which have GUID IDs and can have any name;
+  // TODO: Reddit has (recently?) implemented "community" awards, which have GUID IDs and can have any name;
   // decide whether to leave this unhandled as strings or special case it via custom coding
   public let id: String
   public let name: String
   public let resizedIcons: [AwardIcons]
-  
+
   public enum AwardID: String, Codable {
     case gid1
     case gid2
     case gid3
   }
+
   public enum AwardName: String, Codable {
     case Silver
     case Gold
     case Platinum
   }
-  
+
   public struct AwardIcons: Codable {
     public let url: URL
     public let width: Int

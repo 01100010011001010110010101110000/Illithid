@@ -37,7 +37,7 @@ final class IllithidWebAuthURLHandler: OAuthSwiftURLHandlerType {
 }
 
 extension NSWindow: ASWebAuthenticationPresentationContextProviding {
-  public func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
-    return self
+  public func presentationAnchor(for _: ASWebAuthenticationSession) -> ASPresentationAnchor {
+    self
   }
 }
