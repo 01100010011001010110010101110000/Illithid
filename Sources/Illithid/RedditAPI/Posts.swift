@@ -9,6 +9,9 @@
 #if canImport(Combine)
 import Combine
 #endif
+#if canImport(SwiftUI)
+import SwiftUI
+#endif
 import Foundation
 
 import Alamofire
@@ -86,3 +89,27 @@ public extension Post {
   }
 }
 
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+public extension Post {
+  func content() -> some View {
+    switch postHint {
+    case .`self`:
+      return GroupBox {
+        Text(selftext)
+      }.eraseToAnyView()
+    case .link:
+      return EmptyView().eraseToAnyView()
+    case .image:
+      return EmptyView().eraseToAnyView()
+    case .hostedVideo:
+      return EmptyView().eraseToAnyView()
+    case .richVideo:
+      return EmptyView().eraseToAnyView()
+    default:
+      // If there is no hint, assume self post. Later we will attempt to guess the post type by other available attributes
+      return GroupBox {
+        Text(selftext)
+      }.eraseToAnyView()
+    }
+  }
+}
