@@ -71,7 +71,6 @@ public struct Comment: RedditObject {
   public let isSubmitter: Bool
   public let downs: Int
   public let authorFlairRichtext: [String]?
-  public let authorPatreonFlair: Bool?
   public let collapsedReason: String?
   public let bodyHtml: String
   public let stickied: Bool
@@ -137,7 +136,6 @@ public struct Comment: RedditObject {
     case isSubmitter
     case downs
     case authorFlairRichtext
-    case authorPatreonFlair
     case collapsedReason
     case bodyHtml
     case stickied
@@ -209,7 +207,6 @@ public struct Comment: RedditObject {
     isSubmitter = try container.decode(Bool.self, forKey: .isSubmitter)
     downs = try container.decode(Int.self, forKey: .downs)
     authorFlairRichtext = try container.decodeIfPresent([String].self, forKey: .authorFlairRichtext)
-    authorPatreonFlair = try container.decodeIfPresent(Bool.self, forKey: .authorPatreonFlair)
     collapsedReason = try? container.decodeIfPresent(String.self, forKey: .collapsedReason)
     bodyHtml = try container.decode(String.self, forKey: .bodyHtml)
     stickied = try container.decode(Bool.self, forKey: .stickied)

@@ -80,13 +80,12 @@ public struct Post: RedditObject {
   public let domain: String
 
   public let title: String
-  public let authorFullname: String
+  public let authorFullname: String?
   public let author: String
   public var authorPrefixed: String {
     "u/\(author)"
   }
 
-  public let authorPatreonFlair: Bool
   public let authorFlairTextColor: String?
   public let authorFlairText: String?
 
