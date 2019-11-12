@@ -54,10 +54,18 @@ public extension Illithid {
   }
 }
 
+extension Subreddit {
+  public func posts(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
+                    params: ListingParameters = .init(), completion: @escaping (Listing) -> Void) {
+    Illithid.shared.fetchPosts(for: self, sortBy: postSort, location: location, topInterval: topInterval,
+                      params: params, completion: completion)
+  }
+}
+
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public extension Subreddit {
-  static func fetch(name: Fullname, client: Illithid) -> AnyPublisher<Subreddit, Error> {
-    client.info(name: name)
+  static func fetch(name: Fullname) -> AnyPublisher<Subreddit, Error> {
+    Illithid.shared.info(name: name)
       .compactMap { listing in
         listing.subreddits.last
       }.eraseToAnyPublisher()
@@ -65,8 +73,8 @@ public extension Subreddit {
 }
 
 public extension Post {
-  static func fetch(name: Fullname, client: Illithid, completion: @escaping (Result<Subreddit>) -> Void) {
-    client.info(name: name) { result in
+  static func fetch(name: Fullname, completion: @escaping (Result<Subreddit>) -> Void) {
+    Illithid.shared.info(name: name) { result in
       switch result {
       case let .success(listing):
         guard let subreddit = listing.subreddits.last else {

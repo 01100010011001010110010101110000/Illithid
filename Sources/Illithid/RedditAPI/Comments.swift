@@ -70,8 +70,8 @@ public extension Illithid {
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public extension Comment {
-  static func fetch(name: Fullname, client: Illithid) -> AnyPublisher<Comment, Error> {
-    client.info(name: name)
+  static func fetch(name: Fullname) -> AnyPublisher<Comment, Error> {
+    Illithid.shared.info(name: name)
       .compactMap { listing in
         listing.comments.last
       }.eraseToAnyPublisher()
@@ -79,8 +79,8 @@ public extension Comment {
 }
 
 public extension Comment {
-  static func fetch(name: Fullname, client: Illithid, completion: @escaping (Result<Comment>) -> Void) {
-    client.info(name: name) { result in
+  static func fetch(name: Fullname, completion: @escaping (Result<Comment>) -> Void) {
+    Illithid.shared.info(name: name) { result in
       switch result {
       case let .success(listing):
         guard let comment = listing.comments.last else {

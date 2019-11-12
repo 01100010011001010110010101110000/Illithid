@@ -61,11 +61,3 @@ public struct Subreddit: RedditObject {
     case createdUtc
   }
 }
-
-extension Subreddit {
-  public func posts(_ broker: Illithid, sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
-                    params: ListingParameters = .init(), completion: @escaping (Listing) -> Void) {
-    broker.fetchPosts(for: self, sortBy: postSort, location: location, topInterval: topInterval,
-                      params: params, completion: completion)
-  }
-}
