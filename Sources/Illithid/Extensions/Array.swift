@@ -8,8 +8,8 @@
 import Foundation
 
 public extension Array {
-  var middle: Element {
-    let middleIndex = isEmpty ? 0 : count / 2
-    return self[middleIndex]
+  var middle: Element? {
+    guard !isEmpty else { return nil }
+    return self[count / 2]
   }
 }
