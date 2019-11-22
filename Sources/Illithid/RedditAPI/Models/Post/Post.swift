@@ -144,8 +144,8 @@ public struct Post: RedditObject {
   public let createdUtc: Date
   public let isVideo: Bool
 
-  public var previews: [ImagePreview.Image] {
-    var previews: [ImagePreview.Image] = []
+  public var previews: [Preview.Source] {
+    var previews: [Preview.Source] = []
     guard thumbnail != nil, thumbnail?.scheme != nil else { return previews }
     previews.reserveCapacity((preview?.images.first?.resolutions.count ?? 0) + 2)
     previews.append(.init(url: thumbnail!, width: thumbnailWidth!, height: thumbnailHeight!))
