@@ -11,7 +11,6 @@
 import Foundation
 
 import Alamofire
-import SwiftyJSON
 
 // TODO: Ensure these methods switch the user context to their user prior to issuing these requests
 
@@ -39,7 +38,6 @@ public extension RedditAccount {
     illithid.session.request(multiredditsUrl).validate().responseData { response in
       switch response.result {
       case let .success(data):
-        let json = try! JSON(data: data)
         let multis = try! illithid.decoder.decode([Multireddit].self, from: data)
         completion(multis)
       case let .failure(error):
