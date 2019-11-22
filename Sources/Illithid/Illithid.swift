@@ -56,3 +56,60 @@ open class Illithid: ObservableObject {
     session = accountManager.makeSession(for: accountManager.currentAccount)
   }
 }
+
+internal extension Illithid {
+  /// Reads a `Listing` from `url`
+  /// - Parameters:
+  ///   - url: The `Listing` returning endpoint from which to read a listing
+  ///   - completion: The function to call upon fetching a `Listing`
+  func readListing(url: URL, _ completion: @escaping (Listing) -> Void) {
+    let queryEncoding = URLEncoding(boolEncoding: .numeric)
+    session.request(url, method: .get, parameters: ListingParameters().toParameters(), encoding: queryEncoding).validate().responseData { request in
+      switch request.result {
+      case let .success(data):
+        let list = try! self.decoder.decode(Listing.self, from: data)
+        completion(list)
+      case let .failure(error):
+        return
+      }
+    }
+  }
+
+  /// Reads all `Listings` from `url`
+  /// - Parameters:
+  ///   - url: The `Listing` returning endpoint from which to read a listing
+  ///   - completion: The function to call upon fetching all `Listings`
+  /// - Warning: If this method is called on a large endpoint, like the endpoint for fetching all subreddits, this method may take a very long time to terminate or not terminate at all
+  func readAllListings(url: URL, completion: @escaping ([Listing]) -> Void) {
+    let queryEncoding = URLEncoding(boolEncoding: .numeric)
+    var results: [Listing] = []
+    var after: Fullname? = "" {
+      didSet {
+        if after == nil {
+          completion(results)
+        } else {
+          session.request(url, method: .get, parameters: ListingParameters(after: after!).toParameters(), encoding: queryEncoding).validate().responseData { request in
+            switch request.result {
+            case let .success(data):
+              let list = try! self.decoder.decode(Listing.self, from: data)
+              results.append(list)
+              after = list.after
+            case let .failure(error):
+              return
+            }
+          }
+        }
+      }
+    }
+    session.request(url, method: .get, parameters: ListingParameters(after: after!).toParameters(), encoding: queryEncoding).validate().responseData { request in
+      switch request.result {
+      case let .success(data):
+        let list = try! self.decoder.decode(Listing.self, from: data)
+        results.append(list)
+        after = list.after
+      case let .failure(error):
+        return
+      }
+    }
+  }
+}

@@ -1,75 +1,107 @@
 //
-//  MultiReddit.swift
+//  Multireddit.swift
 //
 //  Created by Tyler Gregory on 11/20/19.
 //
 
 import Foundation
 
-// MARK: - MultiReddit
+// MARK: - Multireddit
 
 /// A user defined multireddit
-public struct MultiReddit: Codable {
-  /// A `MultiReddit`'s different possible visibility levels
+public struct Multireddit: Codable, Identifiable {
+  /// A `Multireddit`'s different possible visibility levels
   public enum Visibility: String, Codable {
     case `private`
   }
 
+  public let id: String
+
   /// Whether the current user can edit the `MultiReddit`'s member subreddits
-  let canEdit: Bool
-  let displayName: String
-  let name: String
+  public let canEdit: Bool
+  public let displayName: String
+  public let name: String
   /// `descriptionMd` rendered as HTML
-  let descriptionHTML: String
-  let subscriberCount: Int
+  public let descriptionHtml: String
+  public let subscriberCount: Int
   /// The URL path to the `MultiReddit` from which this `MultiReddit` was copied
-  let copiedFrom: String?
-  let iconURL: URL
-  let subreddits: [MultiSubreddit]
+  public let copiedFrom: URL?
+  public let iconUrl: URL
+  public let subreddits: [MultiSubreddit]
   /// When the `MultiReddit` was created in UTC
-  let createdUTC: Date
+  public let createdUtc: Date
   /// Whether the `MultiReddit` is public
-  let visibility: Visibility
+  public let visibility: Visibility
   /// When the `MultiReddit` was created
-  let created: Date
-  let over18: Bool
+  public let created: Date
+  public let over18: Bool
   /// The URL path to the `MultiReddit`
-  let path: String
+  public let path: URL
   /// The `name` of the `RedditAccount` that owns the `MultiReddit`
-  let owner: String
+  public let owner: String
   /// This has been null on every `MultiReddit` I've seen, waiting to see what it is
 //  let keyColor: String
   /// Whether the current user subscribes to the `MultiReddit`
-  let isSubscriber: Bool
+  public let isSubscriber: Bool
   /// The `Fullname` of the `RedditAccount` that owns the `MultiReddit`
-  let ownerID: String
+  public let ownerId: Fullname
   /// The `MultiReddit`'s description in MarkDown
-  let descriptionMd: String
+  public let descriptionMd: String
   /// Whether the current user has favorited the `MultiReddit`
-  let isFavorited: Bool
+  public let isFavorited: Bool
 
   enum CodingKeys: String, CodingKey {
     case canEdit
     case displayName
     case name
-    case descriptionHTML
+    case descriptionHtml
     case subscriberCount = "numSubscribers"
     case copiedFrom
-    case iconURL
+    case iconUrl
     case subreddits
-    case createdUTC
+    case createdUtc
     case visibility, created
     case over18
     case path, owner
 //    case keyColor
     case isSubscriber
-    case ownerID
+    case ownerId
     case descriptionMd
     case isFavorited
   }
 
-  /// Trivial class for deserializing the list of member `Subreddits` returned from the `MultiReddit` API
-  struct MultiSubreddit: Codable {
+  private enum WrapperKeys: String, CodingKey {
+    case kind
+    case data
+  }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: WrapperKeys.self)
+
+    let nestedContainer = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .data)
+    canEdit = try nestedContainer.decode(Bool.self, forKey: .canEdit)
+    displayName = try nestedContainer.decode(String.self, forKey: .displayName)
+    name = try nestedContainer.decode(String.self, forKey: .name)
+    descriptionHtml = try nestedContainer.decode(String.self, forKey: .descriptionHtml)
+    subscriberCount = try nestedContainer.decode(Int.self, forKey: .subscriberCount)
+    copiedFrom = try nestedContainer.decodeIfPresent(URL.self, forKey: .copiedFrom)
+    iconUrl = try nestedContainer.decode(URL.self, forKey: .iconUrl)
+    subreddits = try nestedContainer.decode([MultiSubreddit].self, forKey: .subreddits)
+    createdUtc = try nestedContainer.decode(Date.self, forKey: .createdUtc)
+    visibility = try nestedContainer.decode(Visibility.self, forKey: .visibility)
+    created = try nestedContainer.decode(Date.self, forKey: .created)
+    over18 = try nestedContainer.decode(Bool.self, forKey: .over18)
+    path = try nestedContainer.decode(URL.self, forKey: .path)
+    owner = try nestedContainer.decode(String.self, forKey: .owner)
+    isSubscriber = try nestedContainer.decode(Bool.self, forKey: .isSubscriber)
+    ownerId = try nestedContainer.decode(Fullname.self, forKey: .ownerId)
+    descriptionMd = try nestedContainer.decode(String.self, forKey: .descriptionMd)
+    isFavorited = try nestedContainer.decode(Bool.self, forKey: .isFavorited)
+    id = path.absoluteString
+  }
+
+  /// Trivial class for deserializing the list of member `Subreddits` returned from the `Multireddit` API
+  public struct MultiSubreddit: Codable {
     let name: String
   }
 }
