@@ -54,8 +54,9 @@ public extension Illithid {
   }
 }
 
-extension Subreddit {
-  public func posts(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
+public extension Subreddit {
+  /// Fetches `Posts` on a `Subreddit`
+  func posts(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
                     params: ListingParameters = .init(), completion: @escaping (Listing) -> Void) {
     Illithid.shared.fetchPosts(for: self, sortBy: postSort, location: location, topInterval: topInterval,
                       params: params, completion: completion)
@@ -64,6 +65,7 @@ extension Subreddit {
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public extension Subreddit {
+  /// Loads a specific `Subreddit` by its `Fullname`
   static func fetch(name: Fullname) -> AnyPublisher<Subreddit, Error> {
     Illithid.shared.info(name: name)
       .compactMap { listing in
@@ -73,6 +75,7 @@ public extension Subreddit {
 }
 
 public extension Post {
+  /// Loads a specific `Subreddit` by its `Fullname`
   static func fetch(name: Fullname, completion: @escaping (Result<Subreddit>) -> Void) {
     Illithid.shared.info(name: name) { result in
       switch result {
