@@ -16,8 +16,8 @@ public struct Listing: Codable {
     let modhash: String?
     let dist: Int?
     let children: [Content]
-    let after: String?
-    let before: String?
+    let after: Fullname?
+    let before: Fullname?
 
     init() {
       modhash = nil
