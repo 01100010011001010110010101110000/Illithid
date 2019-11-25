@@ -74,7 +74,7 @@ public extension Subreddit {
   }
 }
 
-public extension Post {
+public extension Subreddit {
   /// Loads a specific `Subreddit` by its `Fullname`
   static func fetch(name: Fullname, completion: @escaping (Result<Subreddit>) -> Void) {
     Illithid.shared.info(name: name) { result in
