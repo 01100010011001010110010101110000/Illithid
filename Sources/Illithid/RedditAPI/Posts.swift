@@ -35,25 +35,12 @@ public extension Illithid {
     }
 
     session.request(postsUrl, method: .get, parameters: parameters, encoding: queryEncoding).validate()
-      .responseData { response in
+      .responseListing { response in
         switch response.result {
-        case let .success(data):
-          do {
-            let list = try self.decoder.decode(Listing.self, from: data)
-            completion(list)
-          } catch let error as DecodingError {
-            let json = try? JSON(data: data).rawString(options: [.sortedKeys, .prettyPrinted])
-            let response = json ?? String(data: data, encoding: .utf8) ?? "All decoding attempts failed"
-            self.logger.errorMessage("Error decoding post list: \(error)")
-            self.logger.errorMessage("JSON data response: \(response)")
-          } catch {
-            let json = try? JSON(data: data).rawString(options: [.sortedKeys, .prettyPrinted])
-            let response = json ?? String(data: data, encoding: .utf8) ?? "All decoding attempts failed"
-            self.logger.errorMessage("Error decoding post list: \(error)")
-            self.logger.errorMessage("JSON data response: \(response)")
-          }
+        case let .success(listing):
+          completion(listing)
         case let .failure(error):
-          self.logger.errorMessage("Failed to call posts API endpoint: \(error)")
+          self.logger.errorMessage("Error calling posts endpoint \(error)")
         }
       }
   }
@@ -76,25 +63,12 @@ public extension Illithid {
     }
 
     session.request(postsUrl, method: .get, parameters: parameters, encoding: queryEncoding).validate()
-      .responseData { response in
+      .responseListing { response in
         switch response.result {
-        case let .success(data):
-          do {
-            let list = try self.decoder.decode(Listing.self, from: data)
-            completion(list)
-          } catch let error as DecodingError {
-            let json = try? JSON(data: data).rawString(options: [.sortedKeys, .prettyPrinted])
-            let response = json ?? String(data: data, encoding: .utf8) ?? "All decoding attempts failed"
-            self.logger.errorMessage("Error decoding post list: \(error)")
-            self.logger.errorMessage("JSON data response: \(response)")
-          } catch {
-            let json = try? JSON(data: data).rawString(options: [.sortedKeys, .prettyPrinted])
-            let response = json ?? String(data: data, encoding: .utf8) ?? "All decoding attempts failed"
-            self.logger.errorMessage("Error decoding post list: \(error)")
-            self.logger.errorMessage("JSON data response: \(response)")
-          }
+        case let .success(listing):
+          completion(listing)
         case let .failure(error):
-          self.logger.errorMessage("Failed to call posts API endpoint: \(error)")
+          self.logger.errorMessage("Error calling posts endpoint \(error)")
         }
       }
   }
@@ -116,25 +90,12 @@ public extension Illithid {
     }
 
     session.request(frontPage, method: .get, parameters: parameters, encoding: queryEncoding).validate()
-      .responseData { response in
+      .responseListing { response in
         switch response.result {
-        case let .success(data):
-          do {
-            let list = try self.decoder.decode(Listing.self, from: data)
-            completion(list)
-          } catch let error as DecodingError {
-            let json = try? JSON(data: data).rawString(options: [.sortedKeys, .prettyPrinted])
-            let response = json ?? String(data: data, encoding: .utf8) ?? "All decoding attempts failed"
-            self.logger.errorMessage("Error decoding post list: \(error)")
-            self.logger.errorMessage("JSON data response: \(response)")
-          } catch {
-            let json = try? JSON(data: data).rawString(options: [.sortedKeys, .prettyPrinted])
-            let response = json ?? String(data: data, encoding: .utf8) ?? "All decoding attempts failed"
-            self.logger.errorMessage("Error decoding post list: \(error)")
-            self.logger.errorMessage("JSON data response: \(response)")
-          }
+        case let .success(listing):
+          completion(listing)
         case let .failure(error):
-          self.logger.errorMessage("Failed to call posts API endpoint: \(error)")
+          self.logger.errorMessage("Error calling posts endpoint \(error)")
         }
       }
   }
@@ -174,7 +135,7 @@ public extension Post {
   ///   - params: Default parameters applicable to every `Listing` returning endpoint on Reddit
   ///   - completion: The callback function to execute when we get the `Post` `Listing` back from Reddit
   func all(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
-  params: ListingParameters = .init(), completion: @escaping (Listing) -> Void) {
+           params: ListingParameters = .init(), completion: @escaping (Listing) -> Void) {
     Illithid.shared.fetchPosts(for: .all, sortBy: postSort, location: location, topInterval: topInterval,
                                params: params, completion: completion)
   }
@@ -188,7 +149,7 @@ public extension Post {
   ///   - params: Default parameters applicable to every `Listing` returning endpoint on Reddit
   ///   - completion: The callback function to execute when we get the `Post` `Listing` back from Reddit
   func popular(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
-  params: ListingParameters = .init(), completion: @escaping (Listing) -> Void) {
+               params: ListingParameters = .init(), completion: @escaping (Listing) -> Void) {
     Illithid.shared.fetchPosts(for: .popular, sortBy: postSort, location: location, topInterval: topInterval,
                                params: params, completion: completion)
   }
@@ -201,7 +162,7 @@ public extension Post {
   ///   - params: Default parameters applicable to every `Listing` returning endpoint on Reddit
   ///   - completion: The callback function to execute when we get the `Post` `Listing` back from Reddit
   func random(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
-  params: ListingParameters = .init(), completion: @escaping (Listing) -> Void) {
+              params: ListingParameters = .init(), completion: @escaping (Listing) -> Void) {
     Illithid.shared.fetchPosts(for: .random, sortBy: postSort, location: location, topInterval: topInterval,
                                params: params, completion: completion)
   }

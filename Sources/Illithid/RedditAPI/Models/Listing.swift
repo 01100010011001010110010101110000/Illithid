@@ -8,6 +8,8 @@
 
 import Foundation
 
+import Alamofire
+
 public struct Listing: Codable {
   public let kind: Kind = .listing
   private let data: ListingData
@@ -79,6 +81,35 @@ public extension Listing {
   var subreddits: [Subreddit] { items(kind: .subreddit) }
 
   var awards: [Award] { items(kind: .award) }
+}
+
+public extension DataRequest {
+  static func listingResponseSerializer() -> DataResponseSerializer<Listing> {
+    return DataResponseSerializer { request, response, data, error in
+      guard error == nil else { return .failure(error!) }
+
+      let result = Request.serializeResponseData(response: response, data: data, error: nil)
+      guard case let .success(validData) = result else {
+        return .failure(result.error! as! AFError)
+      }
+
+      do {
+        let listing = try Illithid.shared.decoder.decode(Listing.self, from: validData)
+        return .success(listing)
+      } catch {
+        return .failure(error)
+      }
+    }
+  }
+
+  @discardableResult
+  func responseListing(queue: DispatchQueue? = nil, completionHandler: @escaping (DataResponse<Listing>) -> Void) -> Self {
+    return response(
+        queue: queue,
+        responseSerializer: DataRequest.listingResponseSerializer(),
+        completionHandler: completionHandler
+    )
+  }
 }
 
 public enum Content: Codable {

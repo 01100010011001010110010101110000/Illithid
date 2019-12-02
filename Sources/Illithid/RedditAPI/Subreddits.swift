@@ -30,25 +30,12 @@ public extension Illithid {
     let subredditsListUrl = URL(string: "/subreddits/\(subredditSort)", relativeTo: baseURL)!
 
     session.request(subredditsListUrl, method: .get, parameters: parameters, encoding: queryEncoding)
-      .validate().responseData { response in
+      .validate().responseListing { response in
         switch response.result {
-        case let .success(data):
-          do {
-            let list = try self.decoder.decode(Listing.self, from: data)
-            completion(list)
-          } catch let error as DecodingError {
-            let json = try? JSON(data: data).rawString(options: [.sortedKeys, .prettyPrinted])
-            let response = json ?? String(data: data, encoding: .utf8) ?? "All decoding attempts failed"
-            self.logger.errorMessage("Error decoding subreddits list: \(error)")
-            self.logger.errorMessage("JSON data response: \(response)")
-          } catch {
-            let json = try? JSON(data: data).rawString(options: [.sortedKeys, .prettyPrinted])
-            let response = json ?? String(data: data, encoding: .utf8) ?? "All decoding attempts failed"
-            self.logger.errorMessage("Unknown error decoding data: \(error)")
-            self.logger.errorMessage("JSON data response: \(response)")
-          }
+        case let .success(listing):
+          completion(listing)
         case let .failure(error):
-          self.logger.errorMessage("Failed to call subreddits API endpoint: \(error)")
+          self.logger.errorMessage("Error calling posts endpoint \(error)")
         }
       }
   }
