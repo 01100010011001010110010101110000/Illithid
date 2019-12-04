@@ -34,8 +34,8 @@ public struct Listing: Codable {
     data = ListingData()
   }
 
-  public var after: String? { data.after }
-  public var before: String? { data.before }
+  public var after: Fullname? { data.after }
+  public var before: Fullname? { data.before }
   public var dist: Int? { data.dist }
   public var children: [Content] { data.children }
   public var modhash: String? { data.modhash }

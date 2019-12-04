@@ -29,15 +29,9 @@ public extension Illithid {
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
     let subredditsListUrl = URL(string: "/subreddits/\(subredditSort)", relativeTo: baseURL)!
 
-    session.request(subredditsListUrl, method: .get, parameters: parameters, encoding: queryEncoding)
-      .validate().responseListing { response in
-        switch response.result {
-        case let .success(listing):
-          completion(listing)
-        case let .failure(error):
-          self.logger.errorMessage("Error calling posts endpoint \(error)")
-        }
-      }
+    readListing(url: subredditsListUrl, parameters: parameters) { listing in
+      completion(listing)
+    }
   }
 }
 

@@ -62,15 +62,9 @@ public extension Illithid {
       break
     }
 
-    session.request(postsUrl, method: .get, parameters: parameters, encoding: queryEncoding).validate()
-      .responseListing { response in
-        switch response.result {
-        case let .success(listing):
-          completion(listing)
-        case let .failure(error):
-          self.logger.errorMessage("Error calling posts endpoint \(error)")
-        }
-      }
+    readListing(url: postsUrl, parameters: parameters) { (listing) in
+      completion(listing)
+    }
   }
 
   func fetchPosts(for frontPage: FrontPage, sortBy postSort: PostSort,
@@ -89,15 +83,9 @@ public extension Illithid {
       break
     }
 
-    session.request(frontPage, method: .get, parameters: parameters, encoding: queryEncoding).validate()
-      .responseListing { response in
-        switch response.result {
-        case let .success(listing):
-          completion(listing)
-        case let .failure(error):
-          self.logger.errorMessage("Error calling posts endpoint \(error)")
-        }
-      }
+    readListing(url: frontPage, parameters: parameters) { listing in
+      completion(listing)
+    }
   }
 }
 
