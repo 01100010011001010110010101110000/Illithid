@@ -101,7 +101,10 @@ public struct Multireddit: Codable, Identifiable {
   }
 
   /// Trivial class for deserializing the list of member `Subreddits` returned from the `Multireddit` API
-  public struct MultiSubreddit: Codable {
-    let name: String
+  public struct MultiSubreddit: Codable, Identifiable {
+    public var id: String {
+      return name
+    }
+    public let name: String
   }
 }
