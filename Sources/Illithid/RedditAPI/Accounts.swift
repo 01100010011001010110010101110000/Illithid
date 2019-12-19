@@ -31,6 +31,15 @@ public extension RedditAccount {
     }
   }
 
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+  func subscribedSubreddits() -> AnyPublisher<[Subreddit], Error> {
+    Future { result in
+      self.subscribedSubreddits { subreddits in
+        result(.success(subreddits))
+      }
+    }.eraseToAnyPublisher()
+  }
+
   func multireddits(_ completion: @escaping ([Multireddit]) -> Void) {
     let illithid: Illithid = .shared
     let multiredditsUrl = URL(string: "/api/multi/mine", relativeTo: illithid.baseURL)!
@@ -44,5 +53,14 @@ public extension RedditAccount {
         return
       }
     }
+  }
+
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+  func multireddits() -> AnyPublisher<[Multireddit], Error> {
+    Future { result in
+      self.multireddits { multis in
+        result(.success(multis))
+      }
+    }.eraseToAnyPublisher()
   }
 }
