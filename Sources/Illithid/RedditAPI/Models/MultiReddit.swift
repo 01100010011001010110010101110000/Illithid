@@ -9,7 +9,11 @@ import Foundation
 // MARK: - Multireddit
 
 /// A user defined multireddit
-public struct Multireddit: Codable, Identifiable {
+public struct Multireddit: Codable, Identifiable, Equatable {
+  public static func == (lhs: Multireddit, rhs: Multireddit) -> Bool {
+    lhs.id == rhs.id
+  }
+
   /// A `Multireddit`'s different possible visibility levels
   public enum Visibility: String, Codable {
     case `private`
