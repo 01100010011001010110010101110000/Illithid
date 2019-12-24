@@ -1,9 +1,7 @@
 //
-//  File.swift
-//  Illithid
-//
-//  Created by Tyler Gregory on 4/30/19.
-//  Copyright © 2019 flayware. All rights reserved.
+// Posts.swift
+// Copyright (c) 2019 Flayware
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 12/24/19
 //
 
 #if canImport(Combine)
@@ -62,7 +60,7 @@ public extension Illithid {
       break
     }
 
-    readListing(url: postsUrl, parameters: parameters) { (listing) in
+    readListing(url: postsUrl, parameters: parameters) { listing in
       completion(listing)
     }
   }

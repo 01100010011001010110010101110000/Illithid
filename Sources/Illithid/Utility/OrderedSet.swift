@@ -1,10 +1,8 @@
-/*
- OrderedSwift.swift
- Heavily influenced by the OrderedSet structure in the swift-package-manager source at:
- https://github.com/apple/swift-package-manager/blob/5d05348c6fd072ae7989ed8b55ac2b017486acf4/Sources/Basic/OrderedSet.swift
-
- Created by Tyler Gregory on 8/8/19.
- */
+//
+// OrderedSet.swift
+// Copyright (c) 2019 Flayware
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 12/24/19
+//
 
 /// A data structure which guarantees unique membership and preserves lement ordering
 public struct OrderedSet<E: Hashable>: RandomAccessCollection, Equatable, Hashable {
@@ -34,9 +32,17 @@ public struct OrderedSet<E: Hashable>: RandomAccessCollection, Equatable, Hashab
   // MARK: Working with OrderedSet
 
   /// The number of elements in the ordered set
-  public var count: Int { return set.count }
+  public var count: Int {
+    get {
+      set.count
+    }
+  }
   /// Whether the oredered set is empty
-  public var isEmpty: Bool { return set.isEmpty }
+  public var isEmpty: Bool {
+    get {
+      set.isEmpty
+    }
+  }
   /// A copy of the contents of the ordered set as an array
   public var contents: [Element] { array }
 

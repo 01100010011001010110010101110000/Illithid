@@ -1,9 +1,7 @@
 //
-//  Listable.swift
-//  Illithid
-//
-//  Created by Tyler Gregory on 3/3/19.
-//  Copyright © 2019 flayware. All rights reserved.
+// Listing.swift
+// Copyright (c) 2019 Flayware
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 12/24/19
 //
 
 import Foundation
@@ -85,7 +83,7 @@ public extension Listing {
 
 public extension DataRequest {
   static func listingResponseSerializer() -> DataResponseSerializer<Listing> {
-    return DataResponseSerializer { request, response, data, error in
+    DataResponseSerializer { _, response, data, error in
       guard error == nil else { return .failure(error!) }
 
       let result = Request.serializeResponseData(response: response, data: data, error: nil)
@@ -104,10 +102,10 @@ public extension DataRequest {
 
   @discardableResult
   func responseListing(queue: DispatchQueue? = nil, completionHandler: @escaping (DataResponse<Listing>) -> Void) -> Self {
-    return response(
-        queue: queue,
-        responseSerializer: DataRequest.listingResponseSerializer(),
-        completionHandler: completionHandler
+    response(
+      queue: queue,
+      responseSerializer: DataRequest.listingResponseSerializer(),
+      completionHandler: completionHandler
     )
   }
 }

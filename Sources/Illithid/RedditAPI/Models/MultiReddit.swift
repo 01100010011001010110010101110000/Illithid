@@ -1,7 +1,7 @@
 //
-//  Multireddit.swift
-//
-//  Created by Tyler Gregory on 11/20/19.
+// Multireddit.swift
+// Copyright (c) 2019 Flayware
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 12/24/19
 //
 
 import Foundation
@@ -111,8 +111,9 @@ public struct Multireddit: RedditObject {
   /// Trivial class for deserializing the list of member `Subreddits` returned from the `Multireddit` API
   public struct MultiSubreddit: Codable, Identifiable {
     public var id: String {
-      return name
+      name
     }
+
     public let name: String
   }
 }

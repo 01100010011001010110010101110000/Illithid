@@ -1,8 +1,7 @@
 //
-//  SpecialSubreddits.swift
-//
-//
-//  Created by Tyler Gregory on 11/22/19.
+// FrontPage.swift
+// Copyright (c) 2019 Flayware
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 12/24/19
 //
 
 import Foundation

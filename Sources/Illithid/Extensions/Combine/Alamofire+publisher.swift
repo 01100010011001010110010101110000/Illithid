@@ -1,8 +1,7 @@
 //
-//  File.swift
-//
-//
-//  Created by Tyler Gregory on 6/11/19.
+// Alamofire+publisher.swift
+// Copyright (c) 2019 Flayware
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 12/24/19
 //
 
 #if canImport(Combine)

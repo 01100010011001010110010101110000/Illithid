@@ -1,6 +1,7 @@
 //
-// Created by Tyler Gregory on 11/19/18.
-// Copyright (c) 2018 flayware. All rights reserved.
+// Subreddit.swift
+// Copyright (c) 2019 Flayware
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 12/24/19
 //
 
 import Cocoa

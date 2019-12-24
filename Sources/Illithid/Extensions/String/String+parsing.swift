@@ -1,9 +1,7 @@
 //
-//  String+parsing.swift
-//  Illithid
-//
-//  Created by Tyler Gregory on 5/4/19.
-//  Copyright © 2019 flayware. All rights reserved.
+// String+parsing.swift
+// Copyright (c) 2019 Flayware
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 12/24/19
 //
 
 import Foundation

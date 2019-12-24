@@ -1,9 +1,7 @@
 //
-//  SessionManager+subreddits.swift
-//  Illithid
-//
-//  Created by Tyler Gregory on 3/3/19.
-//  Copyright © 2019 flayware. All rights reserved.
+// Subreddits.swift
+// Copyright (c) 2019 Flayware
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 12/24/19
 //
 
 #if canImport(Combine)
@@ -46,9 +44,9 @@ extension Subreddit: PostsProvider {
 public extension Subreddit {
   /// Fetches `Posts` on a `Subreddit`
   func posts(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
-                    params: ListingParameters = .init(), completion: @escaping (Listing) -> Void) {
+             params: ListingParameters = .init(), completion: @escaping (Listing) -> Void) {
     Illithid.shared.fetchPosts(for: self, sortBy: postSort, location: location, topInterval: topInterval,
-                      params: params, completion: completion)
+                               params: params, completion: completion)
   }
 }
 
