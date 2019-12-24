@@ -35,6 +35,14 @@ public extension Illithid {
   }
 }
 
+extension Subreddit: PostsProvider {
+  public func posts(sortBy sort: PostSort, location: Location?, topInterval: TopInterval?, parameters: ListingParameters, completion: @escaping (Swift.Result<Listing, Error>) -> Void) {
+    Illithid.shared.fetchPosts(for: self, sortBy: sort, location: location, topInterval: topInterval, params: parameters) { listing in
+      completion(.success(listing))
+    }
+  }
+}
+
 public extension Subreddit {
   /// Fetches `Posts` on a `Subreddit`
   func posts(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
