@@ -13,7 +13,7 @@ import Alamofire
 
 // TODO: Ensure these methods switch the user context to their user prior to issuing these requests
 
-public extension RedditAccount {
+public extension Account {
   func subscribedSubreddits(_ completion: @escaping ([Subreddit]) -> Void) {
     let illithid: Illithid = .shared
     let subscribedSubredditsUrl = URL(string: "/subreddits/mine/subscriber", relativeTo: illithid.baseURL)!

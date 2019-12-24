@@ -41,7 +41,7 @@ public final class AccountManager: ObservableObject {
 
   // MARK: Published attributes
 
-  @Published public private(set) var accounts: OrderedSet<RedditAccount> = [] {
+  @Published public private(set) var accounts: OrderedSet<Account> = [] {
     willSet {
       objectWillChange.send()
     }
@@ -51,7 +51,7 @@ public final class AccountManager: ObservableObject {
     }
   }
 
-  @Published public private(set) var currentAccount: RedditAccount? = nil {
+  @Published public private(set) var currentAccount: Account? = nil {
     willSet {
       objectWillChange.send()
     }
@@ -63,7 +63,7 @@ public final class AccountManager: ObservableObject {
   /// - Parameter anchor: The `NSWindow` or `UIWindow` to use as an anchor for presenting the authentication dialog
   /// - Parameter completion: The method to call when authentication has completed
   public func addAccount(anchor: ASWebAuthenticationPresentationContextProviding,
-                         completion: @escaping (_ account: RedditAccount) -> Void = { _ in }) {
+                         completion: @escaping (_ account: Account) -> Void = { _ in }) {
     let oauth = OAuth2Swift(parameters: configuration.oauthParameters)!
     oauth.accessTokenBasicAuthentification = true
     oauth.authorizeURLHandler = IllithidWebAuthURLHandler(callbackURLScheme: configuration.redirectURI.absoluteString,
@@ -97,12 +97,12 @@ public final class AccountManager: ObservableObject {
    - Precondition: The `authorize` method must have returned successfully on `oauth` prior to invocation
 
    */
-  private func fetchNewAccount(oauth: OAuth2Swift, completion: @escaping (_ account: RedditAccount) -> Void) {
+  private func fetchNewAccount(oauth: OAuth2Swift, completion: @escaping (_ account: Account) -> Void) {
     oauth.startAuthorizedRequest("https://oauth.reddit.com/api/v1/me", method: .GET, parameters: oauth.parameters) { result in
       switch result {
       case let .success(response):
         do {
-          let account = try self.decoder.decode(RedditAccount.self, from: response.data)
+          let account = try self.decoder.decode(Account.self, from: response.data)
           self.accounts.append(account)
           try self.write(token: oauth.client.credential, for: account)
           self.currentAccount = account
@@ -116,7 +116,7 @@ public final class AccountManager: ObservableObject {
     }
   }
 
-  public func reauthenticate(account: RedditAccount, anchor: ASWebAuthenticationPresentationContextProviding) {
+  public func reauthenticate(account: Account, anchor: ASWebAuthenticationPresentationContextProviding) {
     let oauth = OAuth2Swift(parameters: configuration.oauthParameters)!
     oauth.accessTokenBasicAuthentification = true
     oauth.authorizeURLHandler = IllithidWebAuthURLHandler(callbackURLScheme: configuration.redirectURI.absoluteString,
@@ -145,7 +145,7 @@ public final class AccountManager: ObservableObject {
     }
   }
 
-  public func setAccount(_ account: RedditAccount?) {
+  public func setAccount(_ account: Account?) {
     if let toSet = account {
       // If we are set to an account which doees not exist, do nothing
       guard toSet != currentAccount, accounts.contains(toSet) else { return }
@@ -163,7 +163,7 @@ public final class AccountManager: ObservableObject {
     }
   }
 
-  internal func makeSession(for account: RedditAccount? = nil) -> SessionManager {
+  internal func makeSession(for account: Account? = nil) -> SessionManager {
     let alamoConfiguration = URLSessionConfiguration.default
     let osVersion = ProcessInfo().operatingSystemVersion
     let userAgentComponents = [
@@ -192,18 +192,18 @@ public final class AccountManager: ObservableObject {
 
   // MARK: Saved Account Loading
 
-  private func loadSelectedAccount() -> RedditAccount? {
+  private func loadSelectedAccount() -> Account? {
     if let selectedAccountData = defaults.data(forKey: "SelectedAccount") {
-      guard let account = try? decoder.decode(RedditAccount.self, from: selectedAccountData) else { return nil }
+      guard let account = try? decoder.decode(Account.self, from: selectedAccountData) else { return nil }
       return account
     } else {
       return nil
     }
   }
 
-  private func loadAccounts() -> [RedditAccount] {
+  private func loadAccounts() -> [Account] {
     guard let accountData = defaults.data(forKey: "RedditAccounts") else { return [] }
-    guard let accounts = try? decoder.decode([RedditAccount].self, from: accountData) else { return [] }
+    guard let accounts = try? decoder.decode([Account].self, from: accountData) else { return [] }
     return accounts
   }
 
@@ -225,7 +225,7 @@ public final class AccountManager: ObservableObject {
     setAccount(nil)
   }
 
-  public func removeAccount(toRemove account: RedditAccount) {
+  public func removeAccount(toRemove account: Account) {
     // Remove account from in memory logged in accounts and from the savedAccounts entry in UserDefaults
     accounts.remove(account)
     if account == currentAccount { setAccount(nil) }
@@ -236,7 +236,7 @@ public final class AccountManager: ObservableObject {
 
   // MARK: OAuth token management
 
-  public func isAuthenticated(_ account: RedditAccount) -> Bool {
+  public func isAuthenticated(_ account: Account) -> Bool {
     token(for: account) != nil
   }
 
@@ -253,11 +253,11 @@ public final class AccountManager: ObservableObject {
     }
   }
 
-  private func token(for account: RedditAccount) -> OAuthSwiftCredential? {
+  private func token(for account: Account) -> OAuthSwiftCredential? {
     token(for: account.name)
   }
 
-  private func write(token: OAuthSwiftCredential, for account: RedditAccount) throws {
+  private func write(token: OAuthSwiftCredential, for account: Account) throws {
     do {
       let encodedCredential = try encoder.encode(token)
       objectWillChange.send()
@@ -269,7 +269,7 @@ public final class AccountManager: ObservableObject {
     }
   }
 
-  private func removeToken(for account: RedditAccount) {
+  private func removeToken(for account: Account) {
     do {
       objectWillChange.send()
       try keychain.remove(account.name)

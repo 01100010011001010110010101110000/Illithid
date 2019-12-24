@@ -65,7 +65,7 @@ private extension Listing {
 public extension Listing {
   var comments: [Comment] { items(kind: .comment) }
 
-  var accounts: [RedditAccount] { items(kind: .account) }
+  var accounts: [Account] { items(kind: .account) }
 
   var posts: [Post] { items(kind: .post) }
 
@@ -112,7 +112,7 @@ public extension DataRequest {
 
 public enum Content: Codable {
   case comment(Comment)
-  case account(RedditAccount)
+  case account(Account)
   case post(Post)
   //    case message(Message)
   case subreddit(Subreddit)
@@ -150,7 +150,7 @@ public enum Content: Codable {
     case .comment:
       self = .comment(try container.decode(Comment.self, forKey: .data))
     case .account:
-      self = .account(try container.decode(RedditAccount.self, forKey: .data))
+      self = .account(try container.decode(Account.self, forKey: .data))
     case .post:
       self = .post(try container.decode(Post.self, forKey: .data))
     case .message:
