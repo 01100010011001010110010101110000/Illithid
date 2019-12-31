@@ -38,6 +38,9 @@ open class Illithid: ObservableObject {
   internal var session: SessionManager
 
   private init() {
+    decoder.dateDecodingStrategy = .secondsSince1970
+    decoder.keyDecodingStrategy = .convertFromSnakeCase
+    
     #if DEBUG
       logger = .debugLogger()
     #else
@@ -46,9 +49,6 @@ open class Illithid: ObservableObject {
 
     accountManager = AccountManager(logger: logger)
     session = accountManager.makeSession(for: accountManager.currentAccount)
-
-    decoder.dateDecodingStrategy = .secondsSince1970
-    decoder.keyDecodingStrategy = .convertFromSnakeCase
   }
 
   public func configure(configuration: ClientConfiguration) {

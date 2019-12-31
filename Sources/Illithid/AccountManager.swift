@@ -194,8 +194,12 @@ public final class AccountManager: ObservableObject {
 
   private func loadSelectedAccount() -> Account? {
     if let selectedAccountData = defaults.data(forKey: "SelectedAccount") {
-      guard let account = try? decoder.decode(Account.self, from: selectedAccountData) else { return nil }
-      return account
+      do {
+        return try decoder.decode(Account.self, from: selectedAccountData)
+      } catch {
+        logger.errorMessage("Error decoding stored account: \(error)")
+        return nil
+      }
     } else {
       return nil
     }
@@ -203,8 +207,13 @@ public final class AccountManager: ObservableObject {
 
   private func loadAccounts() -> [Account] {
     guard let accountData = defaults.data(forKey: "RedditAccounts") else { return [] }
-    guard let accounts = try? decoder.decode([Account].self, from: accountData) else { return [] }
-    return accounts
+    do {
+      let accounts = try decoder.decode([Account].self, from: accountData)
+      return accounts
+    } catch {
+      logger.errorMessage("Unable to decode saved accounts: \(error)")
+      return []
+    }
   }
 
   // MARK: Account removal

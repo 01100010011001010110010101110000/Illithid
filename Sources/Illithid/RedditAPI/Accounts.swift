@@ -11,7 +11,29 @@ import Foundation
 
 import Alamofire
 
-// TODO: Ensure these methods switch the user context to their user prior to issuing these requests
+// MARK: Account fetching
+
+public extension Illithid {
+  func fetchAccount(name: String, completion: @escaping (Swift.Result<Account, Error>) -> Void) {
+    let accountUrl = URL(string: "/user/\(name)/about", relativeTo: baseURL)!
+
+    session.request(accountUrl, method: .get).validate().responseData { response in
+      switch response.result {
+      case .success(let data):
+        do {
+          let account = try self.decoder.decode(Account.self, from: data)
+          completion(.success(account))
+        } catch {
+          completion(.failure(error))
+        }
+      case .failure(let error):
+        completion(.failure(error))
+      }
+    }
+  }
+}
+
+// MARK: Subscriptions
 
 public extension Account {
   func subscribedSubreddits(_ completion: @escaping ([Subreddit]) -> Void) {
@@ -41,7 +63,7 @@ public extension Account {
 
   func multireddits(_ completion: @escaping ([Multireddit]) -> Void) {
     let illithid: Illithid = .shared
-    let multiredditsUrl = URL(string: "/api/multi/mine", relativeTo: illithid.baseURL)!
+    let multiredditsUrl = URL(string: "/api/multi/user/\(self.name)", relativeTo: illithid.baseURL)!
 
     illithid.session.request(multiredditsUrl).validate().responseData { response in
       switch response.result {
@@ -61,5 +83,13 @@ public extension Account {
         result(.success(multis))
       }
     }.eraseToAnyPublisher()
+  }
+}
+
+public extension Account {
+  static func fetch(name: String, completion: @escaping (Swift.Result<Account, Error>) -> Void) {
+    Illithid.shared.fetchAccount(name: name) { result in
+      completion(result)
+    }
   }
 }
