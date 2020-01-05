@@ -11,13 +11,55 @@ import Foundation
 
 import Alamofire
 
+fileprivate enum AccountRouter: URLRequestConvertible {
+  case account(username: String)
+  case comments(username: String)
+  case downvoted(username: String)
+  case hidden(username: String)
+  case multireddits(username: String)
+  case overview(username: String)
+  case posts(username: String)
+  case saved(username: String)
+  case subscriptions
+  case upvoted(username: String)
+
+  var path: String {
+    switch self {
+    case let .account(username):
+      return "/user/\(username)/about"
+    case let .comments(username):
+      return "/user/\(username)/comments"
+    case let .downvoted(username):
+      return "/user/\(username)/downvoted"
+    case let .hidden(username):
+      return "/user/\(username)/hidden"
+    case let .multireddits(username):
+      return "/api/multi/user/\(username)"
+    case let .overview(username):
+      return "/user/\(username)/overview"
+    case let .posts(username):
+      return "/user/\(username)/submitted"
+    case let .saved(username):
+      return "/user/\(username)/saved"
+    case .subscriptions:
+      return "/subreddits/mine/subscriber"
+    case let .upvoted(username):
+      return "/user/\(username)/upvoted"
+    }
+  }
+
+  func asURLRequest() throws -> URLRequest {
+    return try URLRequest(url: URL(string: path, relativeTo: Illithid.shared.baseURL)!,
+                      method: .get)
+  }
+}
+
 // MARK: Account fetching
 
 public extension Illithid {
   func fetchAccount(name: String, completion: @escaping (Swift.Result<Account, Error>) -> Void) {
-    let accountUrl = URL(string: "/user/\(name)/about", relativeTo: baseURL)!
-
-    session.request(accountUrl, method: .get).validate().responseData { response in
+    session.request(AccountRouter.account(username: name))
+      .validate().responseData { response in
       switch response.result {
       case .success(let data):
         do {
@@ -63,9 +105,10 @@ public extension Account {
 
   func multireddits(_ completion: @escaping ([Multireddit]) -> Void) {
     let illithid: Illithid = .shared
-    let multiredditsUrl = URL(string: "/api/multi/user/\(self.name)", relativeTo: illithid.baseURL)!
 
-    illithid.session.request(multiredditsUrl).validate().responseData { response in
+    illithid.session.request(AccountRouter.multireddits(username: self.name))
+      // The multireddits endpoint is not a listing
+      .validate().responseData { response in
       switch response.result {
       case let .success(data):
         let multis = try! illithid.decoder.decode([Multireddit].self, from: data)
@@ -83,6 +126,104 @@ public extension Account {
         result(.success(multis))
       }
     }.eraseToAnyPublisher()
+  }
+
+  func overview(_ completion: @escaping (Swift.Result<Listing, Error>) -> Void) {
+    let illithid: Illithid = .shared
+
+    illithid.session.request(AccountRouter.overview(username: self.name))
+      .validate().responseListing { response in
+      switch response.result {
+      case let .success(listing):
+        return completion(.success(listing))
+      case let .failure(error):
+        completion(.failure(error))
+      }
+    }
+  }
+
+  func comments(_ completion: @escaping (Swift.Result<[Comment], Error>) -> Void) {
+    let illithid: Illithid = .shared
+
+    illithid.session.request(AccountRouter.comments(username: self.name))
+      .validate().responseListing { response in
+      switch response.result {
+      case let .success(listing):
+        return completion(.success(listing.comments))
+      case let .failure(error):
+        completion(.failure(error))
+      }
+    }
+  }
+
+  func submittedPosts(_ completion: @escaping (Swift.Result<[Post], Error>) -> Void) {
+    let illithid: Illithid = .shared
+
+    illithid.session.request(AccountRouter.posts(username: self.name))
+      .validate().responseListing { response in
+      switch response.result {
+      case let .success(listing):
+        return completion(.success(listing.posts))
+      case let .failure(error):
+        completion(.failure(error))
+      }
+    }
+  }
+
+  func upvotedPosts(_ completion: @escaping (Swift.Result<[Post], Error>) -> Void) {
+    let illithid: Illithid = .shared
+
+    illithid.session.request(AccountRouter.upvoted(username: self.name))
+      .validate().responseListing { response in
+      switch response.result {
+      case let .success(listing):
+        return completion(.success(listing.posts))
+      case let .failure(error):
+        completion(.failure(error))
+      }
+    }
+  }
+
+  func downvotedPosts(_ completion: @escaping (Swift.Result<[Post], Error>) -> Void) {
+    let illithid: Illithid = .shared
+
+    illithid.session.request(AccountRouter.downvoted(username: self.name))
+      .validate().responseListing { response in
+      switch response.result {
+      case let .success(listing):
+        return completion(.success(listing.posts))
+      case let .failure(error):
+        completion(.failure(error))
+      }
+    }
+  }
+
+  func hiddenPosts(_ completion: @escaping (Swift.Result<[Post], Error>) -> Void) {
+    let illithid: Illithid = .shared
+
+    illithid.session.request(AccountRouter.hidden(username: self.name))
+      .validate().responseListing { response in
+      switch response.result {
+      case let .success(listing):
+        return completion(.success(listing.posts))
+      case let .failure(error):
+        completion(.failure(error))
+      }
+    }
+  }
+
+  func savedContent(_ completion: @escaping (Swift.Result<Listing, Error>) -> Void) {
+    let illithid: Illithid = .shared
+
+    illithid.session.request(AccountRouter.saved(username: self.name))
+      .validate().responseListing { response in
+      switch response.result {
+      case let .success(listing):
+        return completion(.success(listing))
+      case let .failure(error):
+        completion(.failure(error))
+      }
+    }
   }
 }
 
