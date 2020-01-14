@@ -12,7 +12,7 @@ let package = Package(
     // Products define the executables and libraries produced by a package, and make them visible to other packages.
     .library(
       name: "Illithid",
-      targets: ["Illithid"]
+      targets: ["Illithid", "Ulithcat"]
     ),
   ],
   dependencies: [
@@ -43,6 +43,9 @@ let package = Package(
       name: "IllithidTests",
       dependencies: ["Illithid"]
     ),
+    .target(name: "Ulithcat", dependencies: [
+      .product(name: "Alamofire"),
+    ]),
   ],
   swiftLanguageVersions: [.v5]
 )

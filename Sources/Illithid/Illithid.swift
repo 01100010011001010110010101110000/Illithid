@@ -15,7 +15,6 @@ import Willow
 /// Handles Reddit API meta-operations
 open class Illithid: ObservableObject {
   public static var shared: Illithid = .init()
-
   private enum baseURLs: String, Codable {
     case unauthenticated = "https://api.reddit.com/"
     case authenticated = "https://oauth.reddit.com/"
