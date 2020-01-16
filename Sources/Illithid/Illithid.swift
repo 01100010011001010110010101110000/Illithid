@@ -20,6 +20,7 @@ open class Illithid: ObservableObject {
     case authenticated = "https://oauth.reddit.com/"
   }
 
+  public let redditBrowserUrl: URL = URL(string: "https://www.reddit.com/")!
   public var baseURL: URL {
     accountManager.currentAccount != nil ? URL(string: baseURLs.authenticated.rawValue)! : URL(string: baseURLs.unauthenticated.rawValue)!
   }

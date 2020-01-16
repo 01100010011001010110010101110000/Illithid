@@ -99,6 +99,9 @@ public struct Post: RedditObject {
       return URL(string: url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)!
     }
   }
+  public var postUrl: URL {
+    URL(string: permalink, relativeTo: Illithid.shared.redditBrowserUrl)!
+  }
 
   public let saved: Bool
 
