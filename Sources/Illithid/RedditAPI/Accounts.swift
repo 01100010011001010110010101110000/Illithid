@@ -114,7 +114,7 @@ public extension Account {
         let multis = try! illithid.decoder.decode([Multireddit].self, from: data)
         completion(multis)
       case let .failure(error):
-        return
+        illithid.logger.errorMessage("Failed to load multireddits: \(error)")
       }
     }
   }

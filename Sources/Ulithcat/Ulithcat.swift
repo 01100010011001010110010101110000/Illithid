@@ -45,4 +45,9 @@ public extension Ulithcat {
         }
     }
   }
+
+  func fetchGfycat(from url: URL, completion: @escaping (Swift.Result<GfyItem, Error>) -> Void) {
+    let gfyId = String(url.path.dropFirst())
+    fetchGfycat(id: gfyId, completion: completion)
+  }
 }
