@@ -144,12 +144,17 @@ public struct Post: RedditObject {
   public let contestMode: Bool
   public let createdUtc: Date
   public let isVideo: Bool
+}
 
-  public var previews: [Preview.Source] {
+public extension Post {
+  var imagePreviews: [Preview.Source] {
+    guard thumbnail != nil, thumbnail?.scheme != nil else { return [] }
+
     var previews: [Preview.Source] = []
-    guard thumbnail != nil, thumbnail?.scheme != nil else { return previews }
     previews.reserveCapacity((preview?.images.first?.resolutions.count ?? 0) + 2)
-    previews.append(.init(url: thumbnail!, width: thumbnailWidth!, height: thumbnailHeight!))
+    // Add thumbnail URL as a fallback
+    previews.append(Preview.Source(url: thumbnail!, width: thumbnailWidth!, height: thumbnailHeight!))
+    // Add regular preview images
     if let preview = self.preview?.images.first {
       previews.append(contentsOf: preview.resolutions)
       previews.append(preview.source)
