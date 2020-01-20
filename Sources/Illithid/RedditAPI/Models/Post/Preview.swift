@@ -54,7 +54,14 @@ public struct Preview: Codable {
   // MARK: - Source
 
   public struct Source: Codable {
+    public init(url: URL, width: Int, height: Int) {
+      self.url = url
+      self.width = width
+      self.height = height
+    }
+    
     public let url: URL
-    public let width, height: Int
+    public let width: Int
+    public let height: Int
   }
 }
