@@ -57,9 +57,9 @@ fileprivate enum AccountRouter: URLRequestConvertible {
 // MARK: Account fetching
 
 public extension Illithid {
-  func fetchAccount(name: String, completion: @escaping (Swift.Result<Account, Error>) -> Void) {
+  func fetchAccount(name: String, queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Account, Error>) -> Void) {
     session.request(AccountRouter.account(username: name))
-      .validate().responseData { response in
+      .validate().responseData(queue: queue) { response in
       switch response.result {
       case .success(let data):
         do {
@@ -78,12 +78,12 @@ public extension Illithid {
 // MARK: Subscriptions
 
 public extension Account {
-  func subscribedSubreddits(_ completion: @escaping ([Subreddit]) -> Void) {
+  func subscribedSubreddits(queue: DispatchQueue? = nil, _ completion: @escaping ([Subreddit]) -> Void) {
     let illithid: Illithid = .shared
     let subscribedSubredditsUrl = URL(string: "/subreddits/mine/subscriber", relativeTo: illithid.baseURL)!
 
     var subreddits: [Subreddit] = []
-    illithid.readAllListings(url: subscribedSubredditsUrl) { listings in
+    illithid.readAllListings(url: subscribedSubredditsUrl, queue: queue) { listings in
       // Reduce memory shuffling by preallocating capacity
       let subredditCount = listings.reduce(0) { $0 + $1.subreddits.count }
       subreddits.reserveCapacity(subredditCount)
@@ -95,20 +95,20 @@ public extension Account {
   }
 
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-  func subscribedSubreddits() -> AnyPublisher<[Subreddit], Error> {
+  func subscribedSubreddits(queue: DispatchQueue? = nil) -> AnyPublisher<[Subreddit], Error> {
     Future { result in
-      self.subscribedSubreddits { subreddits in
+      self.subscribedSubreddits(queue: queue) { subreddits in
         result(.success(subreddits))
       }
     }.eraseToAnyPublisher()
   }
 
-  func multireddits(_ completion: @escaping ([Multireddit]) -> Void) {
+  func multireddits(queue: DispatchQueue? = nil, _ completion: @escaping ([Multireddit]) -> Void) {
     let illithid: Illithid = .shared
 
     illithid.session.request(AccountRouter.multireddits(username: self.name))
       // The multireddits endpoint is not a listing
-      .validate().responseData { response in
+      .validate().responseData(queue: queue) { response in
       switch response.result {
       case let .success(data):
         let multis = try! illithid.decoder.decode([Multireddit].self, from: data)
@@ -120,19 +120,19 @@ public extension Account {
   }
 
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-  func multireddits() -> AnyPublisher<[Multireddit], Error> {
+  func multireddits(queue: DispatchQueue? = nil) -> AnyPublisher<[Multireddit], Error> {
     Future { result in
-      self.multireddits { multis in
+      self.multireddits(queue: queue) { multis in
         result(.success(multis))
       }
     }.eraseToAnyPublisher()
   }
 
-  func overview(_ completion: @escaping (Swift.Result<Listing, Error>) -> Void) {
+  func overview(queue: DispatchQueue? = nil, _ completion: @escaping (Swift.Result<Listing, Error>) -> Void) {
     let illithid: Illithid = .shared
 
     illithid.session.request(AccountRouter.overview(username: self.name))
-      .validate().responseListing { response in
+      .validate().responseListing(queue: queue) { response in
       switch response.result {
       case let .success(listing):
         return completion(.success(listing))
@@ -142,11 +142,11 @@ public extension Account {
     }
   }
 
-  func comments(_ completion: @escaping (Swift.Result<[Comment], Error>) -> Void) {
+  func comments(queue: DispatchQueue? = nil, _ completion: @escaping (Swift.Result<[Comment], Error>) -> Void) {
     let illithid: Illithid = .shared
 
     illithid.session.request(AccountRouter.comments(username: self.name))
-      .validate().responseListing { response in
+      .validate().responseListing(queue: queue) { response in
       switch response.result {
       case let .success(listing):
         return completion(.success(listing.comments))
@@ -156,11 +156,11 @@ public extension Account {
     }
   }
 
-  func submittedPosts(_ completion: @escaping (Swift.Result<[Post], Error>) -> Void) {
+  func submittedPosts(queue: DispatchQueue? = nil, _ completion: @escaping (Swift.Result<[Post], Error>) -> Void) {
     let illithid: Illithid = .shared
 
     illithid.session.request(AccountRouter.posts(username: self.name))
-      .validate().responseListing { response in
+      .validate().responseListing(queue: queue) { response in
       switch response.result {
       case let .success(listing):
         return completion(.success(listing.posts))
@@ -170,11 +170,11 @@ public extension Account {
     }
   }
 
-  func upvotedPosts(_ completion: @escaping (Swift.Result<[Post], Error>) -> Void) {
+  func upvotedPosts(queue: DispatchQueue? = nil, _ completion: @escaping (Swift.Result<[Post], Error>) -> Void) {
     let illithid: Illithid = .shared
 
     illithid.session.request(AccountRouter.upvoted(username: self.name))
-      .validate().responseListing { response in
+      .validate().responseListing(queue: queue) { response in
       switch response.result {
       case let .success(listing):
         return completion(.success(listing.posts))
@@ -184,11 +184,11 @@ public extension Account {
     }
   }
 
-  func downvotedPosts(_ completion: @escaping (Swift.Result<[Post], Error>) -> Void) {
+  func downvotedPosts(queue: DispatchQueue? = nil, _ completion: @escaping (Swift.Result<[Post], Error>) -> Void) {
     let illithid: Illithid = .shared
 
     illithid.session.request(AccountRouter.downvoted(username: self.name))
-      .validate().responseListing { response in
+      .validate().responseListing(queue: queue) { response in
       switch response.result {
       case let .success(listing):
         return completion(.success(listing.posts))
@@ -198,11 +198,11 @@ public extension Account {
     }
   }
 
-  func hiddenPosts(_ completion: @escaping (Swift.Result<[Post], Error>) -> Void) {
+  func hiddenPosts(queue: DispatchQueue? = nil, _ completion: @escaping (Swift.Result<[Post], Error>) -> Void) {
     let illithid: Illithid = .shared
 
     illithid.session.request(AccountRouter.hidden(username: self.name))
-      .validate().responseListing { response in
+      .validate().responseListing(queue: queue) { response in
       switch response.result {
       case let .success(listing):
         return completion(.success(listing.posts))
@@ -212,11 +212,11 @@ public extension Account {
     }
   }
 
-  func savedContent(_ completion: @escaping (Swift.Result<Listing, Error>) -> Void) {
+  func savedContent(queue: DispatchQueue? = nil, _ completion: @escaping (Swift.Result<Listing, Error>) -> Void) {
     let illithid: Illithid = .shared
 
     illithid.session.request(AccountRouter.saved(username: self.name))
-      .validate().responseListing { response in
+      .validate().responseListing(queue: queue) { response in
       switch response.result {
       case let .success(listing):
         return completion(.success(listing))
@@ -228,8 +228,8 @@ public extension Account {
 }
 
 public extension Account {
-  static func fetch(name: String, completion: @escaping (Swift.Result<Account, Error>) -> Void) {
-    Illithid.shared.fetchAccount(name: name) { result in
+  static func fetch(name: String, queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Account, Error>) -> Void) {
+    Illithid.shared.fetchAccount(name: name, queue: queue) { result in
       completion(result)
     }
   }

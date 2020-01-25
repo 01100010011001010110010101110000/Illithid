@@ -34,9 +34,9 @@ open class Ulithcat {
 }
 
 public extension Ulithcat {
-  func fetchGfycat(id: String, completion: @escaping (Swift.Result<GfyItem, Error>) -> Void) {
+  func fetchGfycat(id: String, queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<GfyItem, Error>) -> Void) {
     session.request(URL(string: "gfycats/\(id)", relativeTo: self.baseUrl)!).validate()
-      .responseGfyWrapper { response in
+      .responseGfyWrapper(queue: queue) { response in
         switch response.result {
         case let .success(wrapper):
           completion(.success(wrapper.item))
@@ -46,8 +46,8 @@ public extension Ulithcat {
     }
   }
 
-  func fetchGfycat(from url: URL, completion: @escaping (Swift.Result<GfyItem, Error>) -> Void) {
+  func fetchGfycat(from url: URL, queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<GfyItem, Error>) -> Void) {
     let gfyId = String(url.path.dropFirst())
-    fetchGfycat(id: gfyId, completion: completion)
+    fetchGfycat(id: gfyId, queue: queue, completion: completion)
   }
 }

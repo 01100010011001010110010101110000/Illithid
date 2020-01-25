@@ -63,11 +63,11 @@ internal extension Illithid {
   /// - Parameters:
   ///   - url: The `Listing` returning endpoint from which to read a listing
   ///   - completion: The function to call upon fetching a `Listing`
-  func readListing(url: Alamofire.URLConvertible, parameters: Parameters = .init(), _ completion: @escaping (Listing) -> Void) {
+  func readListing(url: Alamofire.URLConvertible, parameters: Parameters = .init(), queue: DispatchQueue? = nil, _ completion: @escaping (Listing) -> Void) {
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
 
     session.request(url, method: .get, parameters: parameters, encoding: queryEncoding).validate()
-      .responseListing { request in
+      .responseListing(queue: queue) { request in
         switch request.result {
         case let .success(listing):
           completion(listing)
@@ -82,7 +82,7 @@ internal extension Illithid {
   ///   - url: The `Listing` returning endpoint from which to read a listing
   ///   - completion: The function to call upon fetching all `Listings`
   /// - Warning: If this method is called on a large endpoint, like the endpoint for fetching all subreddits, this method may take a very long time to terminate or not terminate at all
-  func readAllListings(url: Alamofire.URLConvertible, completion: @escaping ([Listing]) -> Void) {
+  func readAllListings(url: Alamofire.URLConvertible, queue: DispatchQueue? = nil, completion: @escaping ([Listing]) -> Void) {
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
     var results: [Listing] = []
     var parameters: Parameters = ["after": ""] {
@@ -91,13 +91,13 @@ internal extension Illithid {
           completion(results)
           return
         }
-        readListing(url: url, parameters: parameters) { listing in
+        readListing(url: url, parameters: parameters, queue: queue) { listing in
           results.append(listing)
           parameters["after"] = listing.after ?? ""
         }
       }
     }
-    readListing(url: url) { listing in
+    readListing(url: url, queue: queue) { listing in
       results.append(listing)
       parameters["after"] = listing.after ?? ""
     }

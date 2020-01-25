@@ -19,11 +19,12 @@ public extension SessionManager {
                         method: HTTPMethod = .get,
                         parameters: Parameters? = nil,
                         encoding: ParameterEncoding = URLEncoding.default,
-                        headers: HTTPHeaders? = nil)
+                        headers: HTTPHeaders? = nil,
+                        queue: DispatchQueue? = nil)
     -> AnyPublisher<DataResponse<Data>, Error> {
     Future { result in
       self.request(url, method: method, parameters: parameters,
-                   encoding: encoding, headers: headers).validate().responseData { response in
+                   encoding: encoding, headers: headers).validate().responseData(queue: queue) { response in
         switch response.result {
         case .success:
           result(.success(response))

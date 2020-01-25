@@ -1,7 +1,7 @@
 //
-// Comments.swift
-// Copyright (c) 2019 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 12/24/19
+// {file}
+// Copyright (c) 2020 Flayware
+// Created by Tyler Gregory (@01100010011001010110010101110000) on {created}
 //
 
 #if canImport(Combine)
@@ -35,7 +35,7 @@ public extension Illithid {
   func comments(for post: Post, parameters: ListingParameters,
                 by sort: CommentsSort = .confidence, focusOn comment: Comment? = nil, context: Int? = nil,
                 depth: Int = 0, showEdits: Bool = true, showMore: Bool = true,
-                threaded: Bool = true, truncate: Int = 0) -> AnyPublisher<Listing, Error> {
+                threaded: Bool = true, truncate: Int = 0, queue: DispatchQueue? = nil) -> AnyPublisher<Listing, Error> {
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
     let commentsListingURL = URL(string: "/r/\(post.subreddit)/comments/\(post.id)", relativeTo: baseURL)!
 
@@ -52,7 +52,8 @@ public extension Illithid {
     ]
     encodedParameters.merge(commentsParameters) { current, _ in current }
 
-    return session.requestPublisher(url: commentsListingURL, method: .get, parameters: encodedParameters, encoding: queryEncoding)
+    return session.requestPublisher(url: commentsListingURL, method: .get, parameters: encodedParameters,
+                                    encoding: queryEncoding, queue: queue)
       .compactMap { response in
         response.data
       }
@@ -63,23 +64,25 @@ public extension Illithid {
       }
       .map { listings in
         listings.last!
-      }.eraseToAnyPublisher()
+      }
+      .eraseToAnyPublisher()
   }
 }
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public extension Comment {
-  static func fetch(name: Fullname) -> AnyPublisher<Comment, Error> {
-    Illithid.shared.info(name: name)
+  static func fetch(name: Fullname, queue: DispatchQueue? = nil) -> AnyPublisher<Comment, Error> {
+    Illithid.shared.info(name: name, queue: queue)
       .compactMap { listing in
         listing.comments.last
-      }.eraseToAnyPublisher()
+      }
+      .eraseToAnyPublisher()
   }
 }
 
 public extension Comment {
-  static func fetch(name: Fullname, completion: @escaping (Result<Comment>) -> Void) {
-    Illithid.shared.info(name: name) { result in
+  static func fetch(name: Fullname, queue: DispatchQueue? = nil, completion: @escaping (Result<Comment>) -> Void) {
+    Illithid.shared.info(name: name, queue: queue) { result in
       switch result {
       case let .success(listing):
         guard let comment = listing.comments.last else {

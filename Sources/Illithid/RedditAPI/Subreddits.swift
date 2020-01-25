@@ -22,20 +22,22 @@ public extension Illithid {
      - completion: Completion handler, is passed the listable as an argument
    */
   func subreddits(sortBy subredditSort: SubredditSort = .popular,
-                  params: ListingParameters = .init(), completion: @escaping (Listing) -> Void) {
+                  params: ListingParameters = .init(), queue: DispatchQueue? = nil, completion: @escaping (Listing) -> Void) {
     let parameters = params.toParameters()
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
     let subredditsListUrl = URL(string: "/subreddits/\(subredditSort)", relativeTo: baseURL)!
 
-    readListing(url: subredditsListUrl, parameters: parameters) { listing in
+    readListing(url: subredditsListUrl, parameters: parameters, queue: queue) { listing in
       completion(listing)
     }
   }
 }
 
 extension Subreddit: PostsProvider {
-  public func posts(sortBy sort: PostSort, location: Location?, topInterval: TopInterval?, parameters: ListingParameters, completion: @escaping (Swift.Result<Listing, Error>) -> Void) {
-    Illithid.shared.fetchPosts(for: self, sortBy: sort, location: location, topInterval: topInterval, params: parameters) { listing in
+  public func posts(sortBy sort: PostSort, location: Location?, topInterval: TopInterval?,
+                    parameters: ListingParameters, queue: DispatchQueue? = nil,
+                    completion: @escaping (Swift.Result<Listing, Error>) -> Void) {
+    Illithid.shared.fetchPosts(for: self, sortBy: sort, location: location, topInterval: topInterval, params: parameters, queue: queue) { listing in
       completion(.success(listing))
     }
   }
@@ -44,17 +46,17 @@ extension Subreddit: PostsProvider {
 public extension Subreddit {
   /// Fetches `Posts` on a `Subreddit`
   func posts(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
-             params: ListingParameters = .init(), completion: @escaping (Listing) -> Void) {
+             params: ListingParameters = .init(), queue: DispatchQueue? = nil, completion: @escaping (Listing) -> Void) {
     Illithid.shared.fetchPosts(for: self, sortBy: postSort, location: location, topInterval: topInterval,
-                               params: params, completion: completion)
+                               params: params, queue: queue, completion: completion)
   }
 }
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public extension Subreddit {
   /// Loads a specific `Subreddit` by its `Fullname`
-  static func fetch(name: Fullname) -> AnyPublisher<Subreddit, Error> {
-    Illithid.shared.info(name: name)
+  static func fetch(name: Fullname, queue: DispatchQueue? = nil) -> AnyPublisher<Subreddit, Error> {
+    Illithid.shared.info(name: name, queue: queue)
       .compactMap { listing in
         listing.subreddits.last
       }.eraseToAnyPublisher()
@@ -63,8 +65,8 @@ public extension Subreddit {
 
 public extension Subreddit {
   /// Loads a specific `Subreddit` by its `Fullname`
-  static func fetch(name: Fullname, completion: @escaping (Result<Subreddit>) -> Void) {
-    Illithid.shared.info(name: name) { result in
+  static func fetch(name: Fullname, queue: DispatchQueue? = nil, completion: @escaping (Result<Subreddit>) -> Void) {
+    Illithid.shared.info(name: name, queue: queue) { result in
       switch result {
       case let .success(listing):
         guard let subreddit = listing.subreddits.last else {

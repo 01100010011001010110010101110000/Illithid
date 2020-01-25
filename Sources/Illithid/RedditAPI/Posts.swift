@@ -17,9 +17,8 @@ import Willow
 public extension Illithid {
   func fetchPosts(for subreddit: Subreddit, sortBy postSort: PostSort,
                   location: Location? = nil, topInterval: TopInterval? = nil,
-                  params: ListingParameters = .init(), completion: @escaping (Listing) -> Void) {
+                  params: ListingParameters = .init(), queue: DispatchQueue? = nil, completion: @escaping (Listing) -> Void) {
     var parameters = params.toParameters()
-    let queryEncoding = URLEncoding(boolEncoding: .numeric)
     let postsUrl = URL(string: "/r/\(subreddit.displayName)/\(postSort)", relativeTo: baseURL)!
 
     // Handle nonsense magic string parameters which apply to specific sorts
@@ -32,22 +31,15 @@ public extension Illithid {
       break
     }
 
-    session.request(postsUrl, method: .get, parameters: parameters, encoding: queryEncoding).validate()
-      .responseListing { response in
-        switch response.result {
-        case let .success(listing):
-          completion(listing)
-        case let .failure(error):
-          self.logger.errorMessage("Error calling posts endpoint \(error)")
-        }
-      }
+    readListing(url: postsUrl, parameters: parameters, queue: queue) { listing in
+      completion(listing)
+    }
   }
 
   func fetchPosts(for multireddit: Multireddit, sortBy postSort: PostSort,
                   location: Location? = nil, topInterval: TopInterval? = nil,
-                  params: ListingParameters = .init(), completion: @escaping (Listing) -> Void) {
+                  params: ListingParameters = .init(), queue: DispatchQueue? = nil,  completion: @escaping (Listing) -> Void) {
     var parameters = params.toParameters()
-    let queryEncoding = URLEncoding(boolEncoding: .numeric)
     let postsUrl = URL(string: "/user/\(multireddit.owner)/m/\(multireddit.name)/\(postSort)", relativeTo: baseURL)!
 
     // Handle nonsense magic string parameters which apply to specific sorts
@@ -60,17 +52,15 @@ public extension Illithid {
       break
     }
 
-    readListing(url: postsUrl, parameters: parameters) { listing in
+    readListing(url: postsUrl, parameters: parameters, queue: queue) { listing in
       completion(listing)
     }
   }
 
   func fetchPosts(for frontPage: FrontPage, sortBy postSort: PostSort,
                   location: Location? = nil, topInterval: TopInterval? = nil,
-                  params: ListingParameters = .init(), completion: @escaping (Listing) -> Void) {
+                  params: ListingParameters = .init(), queue: DispatchQueue? = nil, completion: @escaping (Listing) -> Void) {
     var parameters = params.toParameters()
-    let queryEncoding = URLEncoding(boolEncoding: .numeric)
-
     // Handle nonsense magic string parameters which apply to specific sorts
     switch postSort {
     case .controversial, .top:
@@ -81,7 +71,7 @@ public extension Illithid {
       break
     }
 
-    readListing(url: frontPage, parameters: parameters) { listing in
+    readListing(url: frontPage, parameters: parameters, queue: queue) { listing in
       completion(listing)
     }
   }
@@ -89,8 +79,8 @@ public extension Illithid {
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public extension Post {
-  static func fetch(name: Fullname) -> AnyPublisher<Post, Error> {
-    Illithid.shared.info(name: name)
+  static func fetch(name: Fullname, queue: DispatchQueue? = nil) -> AnyPublisher<Post, Error> {
+    Illithid.shared.info(name: name, queue: queue)
       .compactMap { listing in
         listing.posts.last
       }.eraseToAnyPublisher()
@@ -98,8 +88,8 @@ public extension Post {
 }
 
 public extension Post {
-  static func fetch(name: Fullname, completion: @escaping (Result<Post>) -> Void) {
-    Illithid.shared.info(name: name) { result in
+  static func fetch(name: Fullname, queue: DispatchQueue? = nil, completion: @escaping (Result<Post>) -> Void) {
+    Illithid.shared.info(name: name, queue: queue) { result in
       switch result {
       case let .success(listing):
         guard let post = listing.posts.last else {
@@ -121,9 +111,9 @@ public extension Post {
   ///   - params: Default parameters applicable to every `Listing` returning endpoint on Reddit
   ///   - completion: The callback function to execute when we get the `Post` `Listing` back from Reddit
   func all(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
-           params: ListingParameters = .init(), completion: @escaping (Listing) -> Void) {
+           params: ListingParameters = .init(), queue: DispatchQueue? = nil, completion: @escaping (Listing) -> Void) {
     Illithid.shared.fetchPosts(for: .all, sortBy: postSort, location: location, topInterval: topInterval,
-                               params: params, completion: completion)
+                               params: params, queue: queue, completion: completion)
   }
 
   /// Fetches `Posts` from `r/popular`, which is a subset of the posts from `r/all` and is the default front page for non-authenticated users
@@ -135,9 +125,9 @@ public extension Post {
   ///   - params: Default parameters applicable to every `Listing` returning endpoint on Reddit
   ///   - completion: The callback function to execute when we get the `Post` `Listing` back from Reddit
   func popular(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
-               params: ListingParameters = .init(), completion: @escaping (Listing) -> Void) {
+               params: ListingParameters = .init(), queue: DispatchQueue? = nil, completion: @escaping (Listing) -> Void) {
     Illithid.shared.fetchPosts(for: .popular, sortBy: postSort, location: location, topInterval: topInterval,
-                               params: params, completion: completion)
+                               params: params, queue: queue, completion: completion)
   }
 
   /// Fetches `Posts` from a random `Subreddit`
@@ -148,8 +138,8 @@ public extension Post {
   ///   - params: Default parameters applicable to every `Listing` returning endpoint on Reddit
   ///   - completion: The callback function to execute when we get the `Post` `Listing` back from Reddit
   func random(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
-              params: ListingParameters = .init(), completion: @escaping (Listing) -> Void) {
+              params: ListingParameters = .init(), queue: DispatchQueue? = nil, completion: @escaping (Listing) -> Void) {
     Illithid.shared.fetchPosts(for: .random, sortBy: postSort, location: location, topInterval: topInterval,
-                               params: params, completion: completion)
+                               params: params, queue: queue, completion: completion)
   }
 }

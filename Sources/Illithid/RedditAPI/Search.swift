@@ -37,7 +37,8 @@ public extension Illithid {
   /// - Note: The Reddit search API is weird and seems to return results depending on which `resultTypes` combination is chosen. It also seems to ignore the `limit` argument.
   func search(for query: String, subreddit: String? = nil, after: Fullname? = nil, before: Fullname? = nil,
               limit: UInt = 25, showAll: ShowAllPreference = .filtered, sort: SearchSort = .relevance,
-              topInterval: TopInterval? = nil, resultTypes: Set<SearchType> = [.subreddit, .post, .user], completion: @escaping (Result<[Listing]>) -> Void) {
+              topInterval: TopInterval? = nil, resultTypes: Set<SearchType> = [.subreddit, .post, .user], queue: DispatchQueue? = nil,
+              completion: @escaping (Result<[Listing]>) -> Void) {
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
     var parameters: Parameters = [
       "q": query,
@@ -61,7 +62,7 @@ public extension Illithid {
 
     // MARK: Submit request
 
-    session.request(endpoint, method: .get, parameters: parameters, encoding: queryEncoding).validate().responseData { response in
+    session.request(endpoint, method: .get, parameters: parameters, encoding: queryEncoding).validate().responseData(queue: queue) { response in
       switch response.result {
       case let .success(data):
         do {
