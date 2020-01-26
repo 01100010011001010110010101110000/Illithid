@@ -11,8 +11,8 @@ extension Multireddit: PostsProvider {
                     parameters: ListingParameters, queue: DispatchQueue? = nil,
                     completion: @escaping (Result<Listing, Error>) -> Void) {
     Illithid.shared.fetchPosts(for: self, sortBy: sort, location: location,
-                               topInterval: topInterval, params: parameters) { listing in
-      completion(.success(listing))
+                               topInterval: topInterval, params: parameters) { result in
+      completion(result)
     }
   }
 }

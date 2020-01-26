@@ -31,7 +31,7 @@ public extension Illithid {
 }
 
 public extension Illithid {
-  func info(names: [Fullname], queue: DispatchQueue? = nil, completion: @escaping (Result<Listing>) -> Void) {
+  func info(names: [Fullname], queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Listing, Error>) -> Void) {
     let endpoint = URL(string: "/api/info", relativeTo: baseURL)!
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
     let infoParameters: Parameters = [
@@ -54,7 +54,8 @@ public extension Illithid {
     }
   }
 
-  func info(name: Fullname, queue: DispatchQueue? = nil, completion: @escaping (Result<Listing>) -> Void) {
+  func info(name: Fullname, queue: DispatchQueue? = nil,
+            completion: @escaping (Swift.Result<Listing, Error>) -> Void) {
     info(names: [name], queue: queue) { completion($0) }
   }
 }

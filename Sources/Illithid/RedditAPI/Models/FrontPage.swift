@@ -41,8 +41,8 @@ extension FrontPage: PostsProvider {
   public func posts(sortBy sort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
                     parameters: ListingParameters, queue: DispatchQueue? = nil,
                     completion: @escaping (Swift.Result<Listing, Error>) -> Void) {
-    Illithid.shared.fetchPosts(for: self, sortBy: sort, location: location, topInterval: topInterval, params: parameters, queue: queue) { listing in
-      completion(.success(listing))
+    Illithid.shared.fetchPosts(for: self, sortBy: sort, location: location, topInterval: topInterval, params: parameters, queue: queue) { result in
+      completion(result)
     }
   }
 }

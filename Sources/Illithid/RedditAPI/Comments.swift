@@ -81,7 +81,7 @@ public extension Comment {
 }
 
 public extension Comment {
-  static func fetch(name: Fullname, queue: DispatchQueue? = nil, completion: @escaping (Result<Comment>) -> Void) {
+  static func fetch(name: Fullname, queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Comment, Error>) -> Void) {
     Illithid.shared.info(name: name, queue: queue) { result in
       switch result {
       case let .success(listing):

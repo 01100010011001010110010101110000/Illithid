@@ -38,7 +38,7 @@ public extension Illithid {
   func search(for query: String, subreddit: String? = nil, after: Fullname? = nil, before: Fullname? = nil,
               limit: UInt = 25, showAll: ShowAllPreference = .filtered, sort: SearchSort = .relevance,
               topInterval: TopInterval? = nil, resultTypes: Set<SearchType> = [.subreddit, .post, .user], queue: DispatchQueue? = nil,
-              completion: @escaping (Result<[Listing]>) -> Void) {
+              completion: @escaping (Swift.Result<[Listing], Error>) -> Void) {
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
     var parameters: Parameters = [
       "q": query,

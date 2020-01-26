@@ -78,32 +78,38 @@ public extension Illithid {
 // MARK: Subscriptions
 
 public extension Account {
-  func subscribedSubreddits(queue: DispatchQueue? = nil, _ completion: @escaping ([Subreddit]) -> Void) {
+  func subscribedSubreddits(queue: DispatchQueue? = nil, _ completion: @escaping (Swift.Result<[Subreddit], Error>) -> Void) {
     let illithid: Illithid = .shared
     let subscribedSubredditsUrl = URL(string: "/subreddits/mine/subscriber", relativeTo: illithid.baseURL)!
 
     var subreddits: [Subreddit] = []
-    illithid.readAllListings(url: subscribedSubredditsUrl, queue: queue) { listings in
-      // Reduce memory shuffling by preallocating capacity
-      let subredditCount = listings.reduce(0) { $0 + $1.subreddits.count }
-      subreddits.reserveCapacity(subredditCount)
-      listings.forEach { listing in
-        subreddits.append(contentsOf: listing.subreddits)
+    illithid.readAllListings(url: subscribedSubredditsUrl, queue: queue) { result in
+      switch result {
+      case let .success(listings):
+        // Reduce memory shuffling by preallocating capacity
+        let subredditCount = listings.reduce(0) { $0 + $1.subreddits.count }
+        subreddits.reserveCapacity(subredditCount)
+        listings.forEach { listing in
+          subreddits.append(contentsOf: listing.subreddits)
+        }
+        completion(.success(subreddits))
+      case let .failure(error):
+        completion(.failure(error))
       }
-      completion(subreddits)
     }
   }
 
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
   func subscribedSubreddits(queue: DispatchQueue? = nil) -> AnyPublisher<[Subreddit], Error> {
     Future { result in
-      self.subscribedSubreddits(queue: queue) { subreddits in
-        result(.success(subreddits))
+      self.subscribedSubreddits(queue: queue) { subredditResult in
+        result(subredditResult)
       }
-    }.eraseToAnyPublisher()
+    }
+    .eraseToAnyPublisher()
   }
 
-  func multireddits(queue: DispatchQueue? = nil, _ completion: @escaping ([Multireddit]) -> Void) {
+  func multireddits(queue: DispatchQueue? = nil, _ completion: @escaping (Swift.Result<[Multireddit], Error>) -> Void) {
     let illithid: Illithid = .shared
 
     illithid.session.request(AccountRouter.multireddits(username: self.name))
@@ -112,9 +118,10 @@ public extension Account {
       switch response.result {
       case let .success(data):
         let multis = try! illithid.decoder.decode([Multireddit].self, from: data)
-        completion(multis)
+        completion(.success(multis))
       case let .failure(error):
         illithid.logger.errorMessage("Failed to load multireddits: \(error)")
+        completion(.failure(error))
       }
     }
   }
@@ -122,8 +129,8 @@ public extension Account {
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
   func multireddits(queue: DispatchQueue? = nil) -> AnyPublisher<[Multireddit], Error> {
     Future { result in
-      self.multireddits(queue: queue) { multis in
-        result(.success(multis))
+      self.multireddits(queue: queue) { multisResult in
+        result(multisResult)
       }
     }.eraseToAnyPublisher()
   }
