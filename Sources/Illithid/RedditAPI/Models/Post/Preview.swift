@@ -1,6 +1,6 @@
 //
 // Preview.swift
-// Copyright (c) 2019 Flayware
+// Copyright (c) 2020 Flayware
 // Created by Tyler Gregory (@01100010011001010110010101110000) on 12/24/19
 //
 
@@ -59,7 +59,7 @@ public struct Preview: Codable {
       self.width = width
       self.height = height
     }
-    
+
     public let url: URL
     public let width: Int
     public let height: Int

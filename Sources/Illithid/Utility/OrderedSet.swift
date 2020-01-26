@@ -1,6 +1,6 @@
 //
 // OrderedSet.swift
-// Copyright (c) 2019 Flayware
+// Copyright (c) 2020 Flayware
 // Created by Tyler Gregory (@01100010011001010110010101110000) on 12/24/19
 //
 
@@ -37,12 +37,14 @@ public struct OrderedSet<E: Hashable>: RandomAccessCollection, Equatable, Hashab
       set.count
     }
   }
+
   /// Whether the oredered set is empty
   public var isEmpty: Bool {
     get {
       set.isEmpty
     }
   }
+
   /// A copy of the contents of the ordered set as an array
   public var contents: [Element] { array }
 

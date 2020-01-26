@@ -1,6 +1,6 @@
 //
 // Post.swift
-// Copyright (c) 2019 Flayware
+// Copyright (c) 2020 Flayware
 // Created by Tyler Gregory (@01100010011001010110010101110000) on 12/24/19
 //
 
@@ -99,6 +99,7 @@ public struct Post: RedditObject {
       return URL(string: url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)!
     }
   }
+
   public var postUrl: URL {
     URL(string: permalink, relativeTo: Illithid.shared.redditBrowserUrl)!
   }

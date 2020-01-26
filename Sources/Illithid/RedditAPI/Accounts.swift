@@ -1,6 +1,6 @@
 //
 // Accounts.swift
-// Copyright (c) 2019 Flayware
+// Copyright (c) 2020 Flayware
 // Created by Tyler Gregory (@01100010011001010110010101110000) on 12/24/19
 //
 
@@ -11,7 +11,7 @@ import Foundation
 
 import Alamofire
 
-fileprivate enum AccountRouter: URLRequestConvertible {
+private enum AccountRouter: URLRequestConvertible {
   case account(username: String)
   case comments(username: String)
   case downvoted(username: String)
@@ -49,8 +49,8 @@ fileprivate enum AccountRouter: URLRequestConvertible {
   }
 
   func asURLRequest() throws -> URLRequest {
-    return try URLRequest(url: URL(string: path, relativeTo: Illithid.shared.baseURL)!,
-                      method: .get)
+    try URLRequest(url: URL(string: path, relativeTo: Illithid.shared.baseURL)!,
+                   method: .get)
   }
 }
 
@@ -60,18 +60,18 @@ public extension Illithid {
   func fetchAccount(name: String, queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Account, Error>) -> Void) {
     session.request(AccountRouter.account(username: name))
       .validate().responseData(queue: queue) { response in
-      switch response.result {
-      case .success(let data):
-        do {
-          let account = try self.decoder.decode(Account.self, from: data)
-          completion(.success(account))
-        } catch {
+        switch response.result {
+        case let .success(data):
+          do {
+            let account = try self.decoder.decode(Account.self, from: data)
+            completion(.success(account))
+          } catch {
+            completion(.failure(error))
+          }
+        case let .failure(error):
           completion(.failure(error))
         }
-      case .failure(let error):
-        completion(.failure(error))
       }
-    }
   }
 }
 
@@ -112,18 +112,18 @@ public extension Account {
   func multireddits(queue: DispatchQueue? = nil, _ completion: @escaping (Swift.Result<[Multireddit], Error>) -> Void) {
     let illithid: Illithid = .shared
 
-    illithid.session.request(AccountRouter.multireddits(username: self.name))
+    illithid.session.request(AccountRouter.multireddits(username: name))
       // The multireddits endpoint is not a listing
       .validate().responseData(queue: queue) { response in
-      switch response.result {
-      case let .success(data):
-        let multis = try! illithid.decoder.decode([Multireddit].self, from: data)
-        completion(.success(multis))
-      case let .failure(error):
-        illithid.logger.errorMessage("Failed to load multireddits: \(error)")
-        completion(.failure(error))
+        switch response.result {
+        case let .success(data):
+          let multis = try! illithid.decoder.decode([Multireddit].self, from: data)
+          completion(.success(multis))
+        case let .failure(error):
+          illithid.logger.errorMessage("Failed to load multireddits: \(error)")
+          completion(.failure(error))
+        }
       }
-    }
   }
 
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
@@ -138,99 +138,99 @@ public extension Account {
   func overview(queue: DispatchQueue? = nil, _ completion: @escaping (Swift.Result<Listing, Error>) -> Void) {
     let illithid: Illithid = .shared
 
-    illithid.session.request(AccountRouter.overview(username: self.name))
+    illithid.session.request(AccountRouter.overview(username: name))
       .validate().responseListing(queue: queue) { response in
-      switch response.result {
-      case let .success(listing):
-        return completion(.success(listing))
-      case let .failure(error):
-        completion(.failure(error))
+        switch response.result {
+        case let .success(listing):
+          return completion(.success(listing))
+        case let .failure(error):
+          completion(.failure(error))
+        }
       }
-    }
   }
 
   func comments(queue: DispatchQueue? = nil, _ completion: @escaping (Swift.Result<[Comment], Error>) -> Void) {
     let illithid: Illithid = .shared
 
-    illithid.session.request(AccountRouter.comments(username: self.name))
+    illithid.session.request(AccountRouter.comments(username: name))
       .validate().responseListing(queue: queue) { response in
-      switch response.result {
-      case let .success(listing):
-        return completion(.success(listing.comments))
-      case let .failure(error):
-        completion(.failure(error))
+        switch response.result {
+        case let .success(listing):
+          return completion(.success(listing.comments))
+        case let .failure(error):
+          completion(.failure(error))
+        }
       }
-    }
   }
 
   func submittedPosts(queue: DispatchQueue? = nil, _ completion: @escaping (Swift.Result<[Post], Error>) -> Void) {
     let illithid: Illithid = .shared
 
-    illithid.session.request(AccountRouter.posts(username: self.name))
+    illithid.session.request(AccountRouter.posts(username: name))
       .validate().responseListing(queue: queue) { response in
-      switch response.result {
-      case let .success(listing):
-        return completion(.success(listing.posts))
-      case let .failure(error):
-        completion(.failure(error))
+        switch response.result {
+        case let .success(listing):
+          return completion(.success(listing.posts))
+        case let .failure(error):
+          completion(.failure(error))
+        }
       }
-    }
   }
 
   func upvotedPosts(queue: DispatchQueue? = nil, _ completion: @escaping (Swift.Result<[Post], Error>) -> Void) {
     let illithid: Illithid = .shared
 
-    illithid.session.request(AccountRouter.upvoted(username: self.name))
+    illithid.session.request(AccountRouter.upvoted(username: name))
       .validate().responseListing(queue: queue) { response in
-      switch response.result {
-      case let .success(listing):
-        return completion(.success(listing.posts))
-      case let .failure(error):
-        completion(.failure(error))
+        switch response.result {
+        case let .success(listing):
+          return completion(.success(listing.posts))
+        case let .failure(error):
+          completion(.failure(error))
+        }
       }
-    }
   }
 
   func downvotedPosts(queue: DispatchQueue? = nil, _ completion: @escaping (Swift.Result<[Post], Error>) -> Void) {
     let illithid: Illithid = .shared
 
-    illithid.session.request(AccountRouter.downvoted(username: self.name))
+    illithid.session.request(AccountRouter.downvoted(username: name))
       .validate().responseListing(queue: queue) { response in
-      switch response.result {
-      case let .success(listing):
-        return completion(.success(listing.posts))
-      case let .failure(error):
-        completion(.failure(error))
+        switch response.result {
+        case let .success(listing):
+          return completion(.success(listing.posts))
+        case let .failure(error):
+          completion(.failure(error))
+        }
       }
-    }
   }
 
   func hiddenPosts(queue: DispatchQueue? = nil, _ completion: @escaping (Swift.Result<[Post], Error>) -> Void) {
     let illithid: Illithid = .shared
 
-    illithid.session.request(AccountRouter.hidden(username: self.name))
+    illithid.session.request(AccountRouter.hidden(username: name))
       .validate().responseListing(queue: queue) { response in
-      switch response.result {
-      case let .success(listing):
-        return completion(.success(listing.posts))
-      case let .failure(error):
-        completion(.failure(error))
+        switch response.result {
+        case let .success(listing):
+          return completion(.success(listing.posts))
+        case let .failure(error):
+          completion(.failure(error))
+        }
       }
-    }
   }
 
   func savedContent(queue: DispatchQueue? = nil, _ completion: @escaping (Swift.Result<Listing, Error>) -> Void) {
     let illithid: Illithid = .shared
 
-    illithid.session.request(AccountRouter.saved(username: self.name))
+    illithid.session.request(AccountRouter.saved(username: name))
       .validate().responseListing(queue: queue) { response in
-      switch response.result {
-      case let .success(listing):
-        return completion(.success(listing))
-      case let .failure(error):
-        completion(.failure(error))
+        switch response.result {
+        case let .success(listing):
+          return completion(.success(listing))
+        case let .failure(error):
+          completion(.failure(error))
+        }
       }
-    }
   }
 }
 

@@ -1,7 +1,7 @@
 //
-// {file}
+// Ulithcat.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on {created}
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 1/13/20
 //
 
 #if canImport(Combine)
@@ -35,7 +35,7 @@ open class Ulithcat {
 
 public extension Ulithcat {
   func fetchGfycat(id: String, queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<GfyItem, Error>) -> Void) {
-    session.request(URL(string: "gfycats/\(id)", relativeTo: self.baseUrl)!).validate()
+    session.request(URL(string: "gfycats/\(id)", relativeTo: baseUrl)!).validate()
       .responseGfyWrapper(queue: queue) { response in
         switch response.result {
         case let .success(wrapper):
@@ -43,7 +43,7 @@ public extension Ulithcat {
         case let .failure(error):
           completion(.failure(error))
         }
-    }
+      }
   }
 
   func fetchGfycat(from url: URL, queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<GfyItem, Error>) -> Void) {

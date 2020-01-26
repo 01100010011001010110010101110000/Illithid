@@ -1,6 +1,6 @@
 //
 // Illithid.swift
-// Copyright (c) 2019 Flayware
+// Copyright (c) 2020 Flayware
 // Created by Tyler Gregory (@01100010011001010110010101110000) on 12/24/19
 //
 
@@ -40,7 +40,7 @@ open class Illithid: ObservableObject {
   private init() {
     decoder.dateDecodingStrategy = .secondsSince1970
     decoder.keyDecodingStrategy = .convertFromSnakeCase
-    
+
     #if DEBUG
       logger = .debugLogger()
     #else
@@ -85,7 +85,6 @@ internal extension Illithid {
       didSet {
         guard let after = parameters["after"] as? String, !after.isEmpty else {
           completion(.success(results))
-          print("After completion")
           return
         }
         readListing(url: url, parameters: parameters, queue: queue) { result in
@@ -94,8 +93,8 @@ internal extension Illithid {
             results.append(listing)
             parameters["after"] = listing.after ?? ""
           case let .failure(error):
-            completion(.failure(error))
             self.logger.errorMessage("Error reading all listings for [\((try? url.asURL().absoluteString) ?? "Invalid URL")]: \(error)")
+            completion(.failure(error))
             return
           }
         }
@@ -107,8 +106,8 @@ internal extension Illithid {
         results.append(listing)
         parameters["after"] = listing.after ?? ""
       case let .failure(error):
-        completion(.failure(error))
         self.logger.errorMessage("Error reading all listings for [\((try? url.asURL().absoluteString) ?? "Invalid URL")]: \(error)")
+        completion(.failure(error))
         return
       }
     }

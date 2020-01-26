@@ -1,6 +1,6 @@
 //
 // Posts.swift
-// Copyright (c) 2019 Flayware
+// Copyright (c) 2020 Flayware
 // Created by Tyler Gregory (@01100010011001010110010101110000) on 12/24/19
 //
 
@@ -38,7 +38,7 @@ public extension Illithid {
 
   func fetchPosts(for multireddit: Multireddit, sortBy postSort: PostSort,
                   location: Location? = nil, topInterval: TopInterval? = nil,
-                  params: ListingParameters = .init(), queue: DispatchQueue? = nil,  completion: @escaping (Swift.Result<Listing, Error>) -> Void) {
+                  params: ListingParameters = .init(), queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Listing, Error>) -> Void) {
     var parameters = params.toParameters()
     let postsUrl = URL(string: "/user/\(multireddit.owner)/m/\(multireddit.name)/\(postSort)", relativeTo: baseURL)!
 

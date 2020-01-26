@@ -1,6 +1,6 @@
 //
 // Edited.swift
-// Copyright (c) 2019 Flayware
+// Copyright (c) 2020 Flayware
 // Created by Tyler Gregory (@01100010011001010110010101110000) on 12/24/19
 //
 
@@ -15,8 +15,7 @@ public struct Edited: Codable {
     let container = try decoder.singleValueContainer()
     if container.decodeNil() {
       on = nil
-    }
-    else if let _ = try? container.decode(Bool.self) {
+    } else if let _ = try? container.decode(Bool.self) {
       on = nil
     } else {
       on = try container.decode(Date.self)

@@ -1,6 +1,6 @@
 //
 // Comment.swift
-// Copyright (c) 2019 Flayware
+// Copyright (c) 2020 Flayware
 // Created by Tyler Gregory (@01100010011001010110010101110000) on 12/24/19
 //
 
@@ -69,7 +69,7 @@ public struct Comment: RedditObject {
   public let authorFlairCssClass: String?
   public let isSubmitter: Bool
   public let downs: Int
-  public let authorFlairRichtext: [[String:String]]?
+  public let authorFlairRichtext: [[String: String]]?
   public let collapsedReason: String?
   public let bodyHtml: String
   public let stickied: Bool
@@ -205,7 +205,7 @@ public struct Comment: RedditObject {
     authorFlairCssClass = try container.decodeIfPresent(String.self, forKey: .authorFlairCssClass)
     isSubmitter = try container.decode(Bool.self, forKey: .isSubmitter)
     downs = try container.decode(Int.self, forKey: .downs)
-    authorFlairRichtext = try container.decodeIfPresent([[String:String]].self, forKey: .authorFlairRichtext)
+    authorFlairRichtext = try container.decodeIfPresent([[String: String]].self, forKey: .authorFlairRichtext)
     collapsedReason = try? container.decodeIfPresent(String.self, forKey: .collapsedReason)
     bodyHtml = try container.decode(String.self, forKey: .bodyHtml)
     stickied = try container.decode(Bool.self, forKey: .stickied)

@@ -1,8 +1,7 @@
 //
-//  File.swift
-//  
-//
-//  Created by Tyler Gregory on 1/25/20.
+// SwiftResult+AFResult.swift
+// Copyright (c) 2020 Flayware
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 1/25/20
 //
 
 import Alamofire

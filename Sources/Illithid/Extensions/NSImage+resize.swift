@@ -1,6 +1,6 @@
 //
 // NSImage+resize.swift
-// Copyright (c) 2019 Flayware
+// Copyright (c) 2020 Flayware
 // Created by Tyler Gregory (@01100010011001010110010101110000) on 12/24/19
 //
 
@@ -20,7 +20,7 @@ extension NSImage {
 
   /// A PNG representation of the image.
   var PNGRepresentation: Data? {
-    if let tiff = self.tiffRepresentation, let tiffData = NSBitmapImageRep(data: tiff) {
+    if let tiff = tiffRepresentation, let tiffData = NSBitmapImageRep(data: tiff) {
       return tiffData.representation(using: .png, properties: [:])
     }
 
@@ -35,7 +35,7 @@ extension NSImage {
   /// - Returns: The resized image.
   func resize(withSize targetSize: NSSize) -> NSImage? {
     let frame = NSRect(x: 0, y: 0, width: targetSize.width, height: targetSize.height)
-    guard let representation = self.bestRepresentation(for: frame, context: nil, hints: nil) else {
+    guard let representation = bestRepresentation(for: frame, context: nil, hints: nil) else {
       return nil
     }
 
@@ -74,7 +74,7 @@ extension NSImage {
   /// - Parameter size: The size of the new image.
   /// - Returns: The cropped image.
   func crop(to targetSize: NSSize) -> NSImage? {
-    guard let resizedImage = self.resizeMaintainingAspectRatio(to: targetSize) else {
+    guard let resizedImage = resizeMaintainingAspectRatio(to: targetSize) else {
       return nil
     }
     let x = floor((resizedImage.width - targetSize.width) / 2)
@@ -101,7 +101,7 @@ extension NSImage {
   /// - Parameter url: The file URL to save the png file to.
   /// - Throws: An unwrappingPNGRepresentationFailed when the image has no png representation.
   func savePngTo(url: URL) throws {
-    if let png = self.PNGRepresentation {
+    if let png = PNGRepresentation {
       try png.write(to: url, options: .atomicWrite)
     } else {
       throw NSImageExtensionError.unwrappingPNGRepresentationFailed

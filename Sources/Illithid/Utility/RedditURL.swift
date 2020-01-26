@@ -1,7 +1,7 @@
 //
-// {file}
-// Copyright (c) 2019 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on {created}
+// RedditURL.swift
+// Copyright (c) 2020 Flayware
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 12/30/19
 //
 
 import Foundation
@@ -15,8 +15,7 @@ public struct RedditURL: Codable {
     let container = try decoder.singleValueContainer()
     if container.decodeNil() {
       url = nil
-    }
-    else if let emptyString = try? container.decode(String.self), emptyString.isEmpty {
+    } else if let emptyString = try? container.decode(String.self), emptyString.isEmpty {
       url = nil
     } else {
       url = try container.decode(URL.self)

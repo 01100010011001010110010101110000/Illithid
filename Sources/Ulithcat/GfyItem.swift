@@ -1,7 +1,7 @@
 //
-// {file}
+// GfyItem.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on {created}
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 1/13/20
 //
 
 import Foundation
@@ -155,7 +155,7 @@ public struct Content: Codable, Hashable {
 
 public extension DataRequest {
   fileprivate func decodableResponseSerializer<T: Decodable>() -> DataResponseSerializer<T> {
-    return DataResponseSerializer { _, _, data, error in
+    DataResponseSerializer { _, _, data, error in
       guard error == nil else { return .failure(error!) }
 
       guard let data = data else {
@@ -169,11 +169,11 @@ public extension DataRequest {
 
   @discardableResult
   fileprivate func responseDecodable<T: Decodable>(queue: DispatchQueue? = nil, completionHandler: @escaping (DataResponse<T>) -> Void) -> Self {
-    return response(queue: queue, responseSerializer: decodableResponseSerializer(), completionHandler: completionHandler)
+    response(queue: queue, responseSerializer: decodableResponseSerializer(), completionHandler: completionHandler)
   }
 
   @discardableResult
   func responseGfyWrapper(queue: DispatchQueue? = nil, completionHandler: @escaping (DataResponse<GfyWrapper>) -> Void) -> Self {
-    return responseDecodable(queue: queue, completionHandler: completionHandler)
+    responseDecodable(queue: queue, completionHandler: completionHandler)
   }
 }
