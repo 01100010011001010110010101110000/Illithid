@@ -123,6 +123,8 @@ public struct Post: RedditObject {
   public let clicked: Bool
   public let created: Date
   public let numComments: Int
+  public let crosspostParent: Fullname?
+  public let crosspostParentList: [Post]?
   public let numCrossposts: Int
   public let permalink: String
   public let contentCategories: [String]?
