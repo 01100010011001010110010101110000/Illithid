@@ -147,6 +147,10 @@ public struct Post: RedditObject {
   public let contestMode: Bool
   public let createdUtc: Date
   public let isVideo: Bool
+
+  public var relativePostTime: String {
+    DateComponentsFormatter.ShortFormatter.string(from: createdUtc, to: Date()) ?? "UNKNOWN"
+  }
 }
 
 public extension Post {
