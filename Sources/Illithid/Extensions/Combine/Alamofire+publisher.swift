@@ -35,17 +35,3 @@ public extension SessionManager {
     }.eraseToAnyPublisher()
   }
 }
-
-@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-public extension ImageDownloader {
-  func imagePublisher(for url: URL) -> AnyPublisher<Image, Never> {
-    Future { result in
-      let urlRequest = URLRequest(url: url)
-      self.download(urlRequest) { response in
-        if let image = response.result.value {
-          result(.success(image))
-        }
-      }
-    }.eraseToAnyPublisher()
-  }
-}
