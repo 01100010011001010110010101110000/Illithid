@@ -12,7 +12,8 @@ import Foundation
 import Alamofire
 
 open class Ulithcat {
-  public let baseUrl = URL(string: "https://api.gfycat.com/v1/")!
+  public let gfycatBaseUrl = URL(string: "https://api.gfycat.com/v1/")!
+  public let imgurBaseUrl = URL(string: "https://api.imgur.com/3/")!
 
   internal let session: SessionManager
 
@@ -35,7 +36,7 @@ open class Ulithcat {
 
 public extension Ulithcat {
   func fetchGfycat(id: String, queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<GfyItem, Error>) -> Void) {
-    session.request(URL(string: "gfycats/\(id)", relativeTo: baseUrl)!).validate()
+    session.request(URL(string: "gfycats/\(id)", relativeTo: gfycatBaseUrl)!).validate()
       .responseGfyWrapper(queue: queue) { response in
         switch response.result {
         case let .success(wrapper):
@@ -49,5 +50,19 @@ public extension Ulithcat {
   func fetchGfycat(from url: URL, queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<GfyItem, Error>) -> Void) {
     let gfyId = String(url.path.dropFirst())
     fetchGfycat(id: gfyId, queue: queue, completion: completion)
+  }
+}
+
+public extension Ulithcat {
+  func fetchImgurImage(id: String, queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<ImgurImage, Error>) -> Void) {
+    session.request(URL(string: "image/\(id)", relativeTo: imgurBaseUrl)!).validate()
+      .responseImgurImage(queue: queue) { response in
+        switch response.result {
+        case let .success(image):
+          completion(.success(image))
+        case let .failure(error):
+          completion(.failure(error))
+        }
+    }
   }
 }
