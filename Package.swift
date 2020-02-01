@@ -17,12 +17,9 @@ let package = Package(
   ],
   dependencies: [
     .package(url: "https://github.com/Alamofire/Alamofire.git", from: .init(4, 9, 1)),
-    .package(url: "https://github.com/Alamofire/AlamofireImage.git", from: .init(3, 6, 0)),
     .package(url: "https://github.com/OAuthSwift/OAuthSwift.git", from: .init(2, 1, 0)),
-    .package(url: "https://github.com/SwiftyJSON/SwiftyJSON.git", from: .init(5, 0, 0)),
     .package(url: "https://github.com/Nike-Inc/Willow.git", from: .init(6, 0, 0)),
     .package(url: "https://github.com/kishikawakatsumi/KeychainAccess.git", from: .init(4, 1, 0)),
-    .package(url: "https://github.com/scinfu/SwiftSoup.git", from: .init(2, 2, 2)),
   ],
   targets: [
     // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -31,12 +28,9 @@ let package = Package(
       name: "Illithid",
       dependencies: [
         .product(name: "Alamofire"),
-        .product(name: "AlamofireImage"),
         .product(name: "OAuthSwift"),
-        .product(name: "SwiftyJSON"),
         .product(name: "Willow"),
         .product(name: "KeychainAccess"),
-        .product(name: "SwiftSoup"),
       ]
     ),
     .testTarget(

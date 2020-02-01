@@ -76,7 +76,6 @@ public extension Illithid {
             completion(.success(listings))
           }
         } catch let error as DecodingError {
-          self.decoder.writeDecodingContext(decoding: data, error: error)
           completion(.failure(error))
         } catch {
           completion(.failure(error))

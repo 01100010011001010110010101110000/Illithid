@@ -10,7 +10,6 @@
 import Foundation
 
 import Alamofire
-import SwiftyJSON
 
 public extension Illithid {
   /**
