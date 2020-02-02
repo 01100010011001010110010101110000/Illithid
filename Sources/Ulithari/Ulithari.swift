@@ -1,5 +1,5 @@
 //
-// Ulithcat.swift
+// Ulithari.swift
 // Copyright (c) 2020 Flayware
 // Created by Tyler Gregory (@01100010011001010110010101110000) on 1/13/20
 //
@@ -11,18 +11,21 @@ import Foundation
 
 import Alamofire
 
-open class Ulithcat {
-  public let gfycatBaseUrl = URL(string: "https://api.gfycat.com/v1/")!
-  public let imgurBaseUrl = URL(string: "https://api.imgur.com/3/")!
+open class Ulithari {
+  public static let shared = Ulithari()
+  public static let gfycatBaseUrl = URL(string: "https://api.gfycat.com/v1/")!
+  public static let imgurBaseUrl = URL(string: "https://api.imgur.com/3/")!
 
   internal let session: SessionManager
-
   internal let decoder: JSONDecoder = .init()
-  public init() {
+
+  internal var imgurAuthorizationHeader: [String: String] = [:]
+
+  private init() {
     let alamoConfiguration = URLSessionConfiguration.default
     let osVersion = ProcessInfo().operatingSystemVersion
     let userAgentComponents = [
-      "Ulithcat/1",
+      "Ulithari/1",
       "macOS \(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion)",
     ]
     let headers = SessionManager.defaultHTTPHeaders.merging([
@@ -32,11 +35,17 @@ open class Ulithcat {
     alamoConfiguration.httpAdditionalHeaders = headers
     session = SessionManager(configuration: alamoConfiguration)
   }
+
+  public func configure(imgurClientId: String) {
+    self.imgurAuthorizationHeader = [
+      "Authorization": "Client-ID \(imgurClientId)"
+    ]
+  }
 }
 
-public extension Ulithcat {
+public extension Ulithari {
   func fetchGfycat(id: String, queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<GfyItem, Error>) -> Void) {
-    session.request(URL(string: "gfycats/\(id)", relativeTo: gfycatBaseUrl)!).validate()
+    session.request(URL(string: "gfycats/\(id)", relativeTo: Self.gfycatBaseUrl)!).validate()
       .responseGfyWrapper(queue: queue) { response in
         switch response.result {
         case let .success(wrapper):
@@ -53,9 +62,9 @@ public extension Ulithcat {
   }
 }
 
-public extension Ulithcat {
+public extension Ulithari {
   func fetchImgurImage(id: String, queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<ImgurImage, Error>) -> Void) {
-    session.request(URL(string: "image/\(id)", relativeTo: imgurBaseUrl)!).validate()
+    session.request(URL(string: "image/\(id)", relativeTo: Self.imgurBaseUrl)!, headers: imgurAuthorizationHeader).validate()
       .responseImgurImage(queue: queue) { response in
         switch response.result {
         case let .success(image):

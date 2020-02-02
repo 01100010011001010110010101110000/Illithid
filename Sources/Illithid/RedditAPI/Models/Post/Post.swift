@@ -168,4 +168,13 @@ public extension Post {
     }
     return previews
   }
+
+  var gifPreviews: [Preview.Source] {
+    if let previews = preview?.images.first?.variants?.gif {
+      var results: [Preview.Source] = []
+      results.append(contentsOf: previews.resolutions)
+      results.append(previews.source)
+      return results
+    } else { return [] }
+  }
 }

@@ -10,7 +10,6 @@
 import Foundation
 
 import Alamofire
-import AlamofireImage
 import Willow
 
 public extension Illithid {

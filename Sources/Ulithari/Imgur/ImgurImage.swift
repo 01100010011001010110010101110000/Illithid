@@ -56,11 +56,11 @@ public struct DataClass: Codable, Hashable {
   public let edited: String
   public let inGallery: Bool
   public let link: URL
-  public let mp4Size: Int
-  public let mp4: URL
-  public let gifv: URL
-  public let hls: URL
-  public let processing: Processing
+  public let mp4Size: Int?
+  public let mp4: URL?
+  public let gifv: URL?
+  public let hls: URL?
+  public let processing: Processing?
   public let adConfig: AdConfig
 
   enum CodingKeys: String, CodingKey {
