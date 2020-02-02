@@ -68,6 +68,25 @@ public extension Illithid {
   }
 }
 
+public extension Comment {
+  func upvote(queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Data, Error>) -> Void) {
+    Illithid.shared.vote(fullname: fullname, direction: .up, queue: queue, completion: completion)
+  }
+  func downvote(queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Data, Error>) -> Void) {
+    Illithid.shared.vote(fullname: fullname, direction: .down, queue: queue, completion: completion)
+  }
+  func clearVote(queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Data, Error>) -> Void) {
+    Illithid.shared.vote(fullname: fullname, direction: .clear, queue: queue, completion: completion)
+  }
+
+  func save(queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Data, Error>) -> Void) {
+    Illithid.shared.save(fullname: fullname, queue: queue, completion: completion)
+  }
+  func unsave(queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Data, Error>) -> Void) {
+    Illithid.shared.unsave(fullname: fullname, queue: queue, completion: completion)
+  }
+}
+
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public extension Comment {
   static func fetch(name: Fullname, queue: DispatchQueue? = nil) -> AnyPublisher<Comment, Error> {

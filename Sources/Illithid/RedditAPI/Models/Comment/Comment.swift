@@ -41,12 +41,15 @@ public struct Comment: RedditObject {
   /// The `Fullname` of this comment's post
   public let linkId: Fullname
   public let authorFlairTemplateId: String?
-  public let likes: String?
+  public let likes: Bool?
   public let noFollow: Bool
   public let replies: Listing?
   public let userReports: [String]
   public let saved: Bool
   public let id: ID36
+  public var fullname: Fullname {
+    "\(Kind.comment.rawValue)_\(id)"
+  }
   public let bannedAtUtc: Date?
   public let modReasonTitle: String?
   public let gilded: Int
@@ -181,7 +184,7 @@ public struct Comment: RedditObject {
     removalReason = try container.decodeIfPresent(String.self, forKey: .removalReason)
     linkId = try container.decode(String.self, forKey: .linkId)
     authorFlairTemplateId = try container.decodeIfPresent(String.self, forKey: .authorFlairTemplateId)
-    likes = try container.decodeIfPresent(String.self, forKey: .likes)
+    likes = try container.decodeIfPresent(Bool.self, forKey: .likes)
     noFollow = try container.decode(Bool.self, forKey: .noFollow)
     userReports = try container.decode([String].self, forKey: .userReports)
     saved = try container.decode(Bool.self, forKey: .saved)

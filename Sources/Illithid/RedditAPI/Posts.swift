@@ -86,6 +86,25 @@ public extension Post {
 }
 
 public extension Post {
+  func upvote(queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Data, Error>) -> Void) {
+    Illithid.shared.vote(fullname: fullname, direction: .up, queue: queue, completion: completion)
+  }
+  func downvote(queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Data, Error>) -> Void) {
+    Illithid.shared.vote(fullname: fullname, direction: .down, queue: queue, completion: completion)
+  }
+  func clearVote(queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Data, Error>) -> Void) {
+    Illithid.shared.vote(fullname: fullname, direction: .clear, queue: queue, completion: completion)
+  }
+
+  func save(queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Data, Error>) -> Void) {
+    Illithid.shared.save(fullname: fullname, queue: queue, completion: completion)
+  }
+  func unsave(queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Data, Error>) -> Void) {
+    Illithid.shared.unsave(fullname: fullname, queue: queue, completion: completion)
+  }
+}
+
+public extension Post {
   static func fetch(name: Fullname, queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Post, Error>) -> Void) {
     Illithid.shared.info(name: name, queue: queue) { result in
       switch result {

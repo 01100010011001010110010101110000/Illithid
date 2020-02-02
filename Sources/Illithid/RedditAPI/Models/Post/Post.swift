@@ -9,6 +9,12 @@ import Foundation
 
 import Alamofire
 
+public enum VoteDirection: Int {
+  case down = -1
+  case clear = 0
+  case up = 1
+}
+
 public enum PostSort: String, Codable {
   case hot
   case best
@@ -64,7 +70,10 @@ public struct Post: RedditObject {
     hasher.combine(name)
   }
 
-  public let id: String
+  public let id: ID36
+  public var fullname: Fullname {
+    "\(Kind.post.rawValue)_\(id)"
+  }
   public let name: String
 
   public let subreddit: String
@@ -119,6 +128,7 @@ public struct Post: RedditObject {
   public let edited: Edited
   public let ups: Int
   public let downs: Int
+  public let likes: Bool?
   public let score: Int
   public let clicked: Bool
   public let created: Date
