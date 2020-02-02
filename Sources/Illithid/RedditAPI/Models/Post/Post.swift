@@ -113,7 +113,7 @@ public struct Post: RedditObject {
     URL(string: permalink, relativeTo: Illithid.shared.redditBrowserUrl)!
   }
 
-  public let saved: Bool
+  public var saved: Bool
 
   public let thumbnailHeight: Int?
   public let thumbnailWidth: Int?
@@ -128,7 +128,7 @@ public struct Post: RedditObject {
   public let edited: Edited
   public let ups: Int
   public let downs: Int
-  public let likes: Bool?
+  public var likes: Bool?
   public let score: Int
   public let clicked: Bool
   public let created: Date

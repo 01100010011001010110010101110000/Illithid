@@ -41,11 +41,11 @@ public struct Comment: RedditObject {
   /// The `Fullname` of this comment's post
   public let linkId: Fullname
   public let authorFlairTemplateId: String?
-  public let likes: Bool?
+  public var likes: Bool?
   public let noFollow: Bool
   public let replies: Listing?
   public let userReports: [String]
-  public let saved: Bool
+  public var saved: Bool
   public let id: ID36
   public var fullname: Fullname {
     "\(Kind.comment.rawValue)_\(id)"
