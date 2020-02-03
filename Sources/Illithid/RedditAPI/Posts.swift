@@ -58,6 +58,7 @@ public extension Illithid {
   func fetchPosts(for frontPage: FrontPage, sortBy postSort: PostSort,
                   location: Location? = nil, topInterval: TopInterval? = nil,
                   params: ListingParameters = .init(), queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Listing, Error>) -> Void) {
+    let frontPageUrl = try! frontPage.asURL().appendingPathComponent("\(postSort)")
     var parameters = params.toParameters()
     // Handle nonsense magic string parameters which apply to specific sorts
     switch postSort {
@@ -69,7 +70,7 @@ public extension Illithid {
       break
     }
 
-    readListing(url: frontPage, parameters: parameters, queue: queue) { result in
+    readListing(url: frontPageUrl, parameters: parameters, queue: queue) { result in
       completion(result)
     }
   }

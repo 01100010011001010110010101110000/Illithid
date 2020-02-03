@@ -11,12 +11,7 @@ import Alamofire
 /// Contains cases for the different front page types
 public enum FrontPage: String, Codable, URLConvertible {
   // Drawn from the user's subscribed Subreddits
-  case hot
-  case best
-  case new
-  case rising
-  case top
-  case controversial
+  case home
 
   // Drawn from posts across Reddit
 
@@ -29,10 +24,10 @@ public enum FrontPage: String, Codable, URLConvertible {
 
   public func asURL() throws -> URL {
     switch self {
-    case .popular, .all:
-      return URL(string: "/r/\(self)", relativeTo: Illithid.shared.baseURL)!
+    case .popular, .all, .random:
+      return URL(string: "/r/\(self)/", relativeTo: Illithid.shared.baseURL)!
     default:
-      return URL(string: "/\(self)", relativeTo: Illithid.shared.baseURL)!
+      return URL(string: "/", relativeTo: Illithid.shared.baseURL)!
     }
   }
 }

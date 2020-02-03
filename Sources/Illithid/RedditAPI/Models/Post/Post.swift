@@ -15,7 +15,11 @@ public enum VoteDirection: Int {
   case up = 1
 }
 
-public enum PostSort: String, Codable {
+public enum PostSort: String, Codable, CaseIterable, Identifiable, Hashable {
+  public var id: String {
+    self.rawValue
+  }
+  
   case hot
   case best
   case new
