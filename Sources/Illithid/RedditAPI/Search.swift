@@ -66,19 +66,15 @@ public extension Illithid {
       switch response.result {
       case let .success(data):
         do {
-          // The search API combines the user and subreddits results into a single listing
-          // Therefore, we have a single listing when either we are searching for one term or both subreddits and users, and an array otherwise
-          if resultTypes.count == 1 || resultTypes == [.subreddit, .user] {
-            let listing = try self.decoder.decode(Listing.self, from: data)
-            completion(.success([listing]))
-          } else {
+          let listing = try self.decoder.decode(Listing.self, from: data)
+          completion(.success([listing]))
+        } catch let _ {
+          do {
             let listings = try self.decoder.decode([Listing].self, from: data)
             completion(.success(listings))
+          } catch let innerError {
+            completion(.failure(innerError))
           }
-        } catch let error as DecodingError {
-          completion(.failure(error))
-        } catch {
-          completion(.failure(error))
         }
       case let .failure(error):
         completion(.failure(error))
