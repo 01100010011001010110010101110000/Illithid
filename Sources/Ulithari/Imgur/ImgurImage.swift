@@ -44,7 +44,7 @@ public struct DataClass: Codable, Hashable {
   public let vote: Int?
   public let favorite: Bool
   public let nsfw: Bool
-  public let section: String
+  public let section: String?
   public let accountUrl: URL?
   public let accountId: String?
   public let isAd: Bool
