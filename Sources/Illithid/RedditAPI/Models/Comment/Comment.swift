@@ -102,6 +102,10 @@ public struct Comment: RedditObject {
   public let previousVisits: [Date]?
   public let contentCategories: [String]?
 
+  public var relativeCommentTime: String {
+    DateComponentsFormatter.ShortFormatter.string(from: createdUtc, to: Date()) ?? "UNKNOWN"
+  }
+
   enum CodingKeys: String, CodingKey {
     case totalAwardsReceived
     case approvedAtUtc
