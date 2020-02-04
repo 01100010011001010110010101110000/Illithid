@@ -68,7 +68,7 @@ public extension Illithid {
         do {
           let listing = try self.decoder.decode(Listing.self, from: data)
           completion(.success([listing]))
-        } catch let _ {
+        } catch {
           do {
             let listings = try self.decoder.decode([Listing].self, from: data)
             completion(.success(listings))

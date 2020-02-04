@@ -28,7 +28,7 @@ public struct Subreddit: RedditObject {
   public let displayName: String
   public let wikiEnabled: Bool?
   public let headerImg: URL?
-  public let over18: Bool
+  public let over18: Bool?
   public let createdUtc: Date
 
   /// The Reddit API sometimes returns the empty string for the `header_img` parameter, and also may return `nil`, so we handle the empty srtring, then
@@ -41,7 +41,7 @@ public struct Subreddit: RedditObject {
     publicDescription = try container.decode(String.self, forKey: .publicDescription)
     displayName = try container.decode(String.self, forKey: .displayName)
     wikiEnabled = try container.decodeIfPresent(Bool.self, forKey: .wikiEnabled)
-    over18 = try container.decode(Bool.self, forKey: .over18)
+    over18 = try container.decodeIfPresent(Bool.self, forKey: .over18)
     createdUtc = try container.decode(Date.self, forKey: .createdUtc)
 
     if let emptyString = try? container.decodeIfPresent(String.self, forKey: .headerImg), emptyString.isEmpty {

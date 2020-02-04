@@ -42,7 +42,7 @@ public struct Multireddit: RedditObject {
   public let visibility: Visibility
   /// When the `MultiReddit` was created
   public let created: Date
-  public let over18: Bool
+  public let over18: Bool?
   /// The URL path to the `MultiReddit`
   public let path: URL
   /// The `name` of the `RedditAccount` that owns the `MultiReddit`
@@ -98,7 +98,7 @@ public struct Multireddit: RedditObject {
     createdUtc = try nestedContainer.decode(Date.self, forKey: .createdUtc)
     visibility = try nestedContainer.decode(Visibility.self, forKey: .visibility)
     created = try nestedContainer.decode(Date.self, forKey: .created)
-    over18 = try nestedContainer.decode(Bool.self, forKey: .over18)
+    over18 = try nestedContainer.decodeIfPresent(Bool.self, forKey: .over18)
     path = try nestedContainer.decode(URL.self, forKey: .path)
     owner = try nestedContainer.decode(String.self, forKey: .owner)
     isSubscriber = try nestedContainer.decode(Bool.self, forKey: .isSubscriber)
