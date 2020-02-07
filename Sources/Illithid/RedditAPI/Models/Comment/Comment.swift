@@ -20,6 +20,20 @@ public enum CommentsSort: String, Codable {
   case live
 }
 
+public enum CommentWrapper: Identifiable {
+  case comment(Comment)
+  case more(More)
+
+  public var id: ID36 {
+    switch self {
+    case let .comment(comment):
+      return comment.id
+    case let .more(more):
+      return more.id
+    }
+  }
+}
+
 public struct Comment: RedditObject {
   public var type = "t1"
 

@@ -37,6 +37,7 @@ public struct Listing: Codable {
   public var dist: Int? { data.dist }
   public var children: [Content] { data.children }
   public var modhash: String? { data.modhash }
+  public var isEmpty: Bool { data.children.isEmpty }
 }
 
 private extension Listing {
@@ -63,22 +64,37 @@ private extension Listing {
 }
 
 public extension Listing {
-  var comments: [Comment] { items(kind: .comment) }
+  var allComments: [CommentWrapper] {
+    data.children.compactMap { child in
+      switch child {
+      case let .comment(comment):
+        return .comment(comment)
+      case let .more(more):
+        return .more(more)
+      default:
+        return nil
+      }
+    }
+  }
+
+  var comments: [Comment] { items(kind: .comment)}
 
   var accounts: [Account] { items(kind: .account) }
 
   var posts: [Post] { items(kind: .post) }
 
   //  var messages: [Message] {
-//    return data.children.compactMap { wrappedMessage in
-//      if case .message(let message) = wrappedMessage { return message }
-//      else { return nil }
-//    }
+  //    return data.children.compactMap { wrappedMessage in
+  //      if case .message(let message) = wrappedMessage { return message }
+  //      else { return nil }
+  //    }
   //  }
 
   var subreddits: [Subreddit] { items(kind: .subreddit) }
 
   var awards: [Award] { items(kind: .award) }
+
+  var more: More? { items(kind: .more).first }
 }
 
 public extension DataRequest {

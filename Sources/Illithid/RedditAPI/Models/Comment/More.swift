@@ -8,9 +8,9 @@ import Foundation
 
 public struct More: RedditObject {
   public let count: Int
-  public let name: String
+  public let name: Fullname
   public let id: ID36
-  public let parentId: String
+  public let parentId: Fullname
   public let depth: Int
   public let children: [ID36]
 }
