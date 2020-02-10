@@ -66,6 +66,26 @@ public extension Illithid {
       }
       .eraseToAnyPublisher()
   }
+
+  func moreComments(for more: More, in post: Post, depth: Int? = nil,
+                    limitChildren: Bool = false, sortBy: CommentsSort = .confidence, queue: DispatchQueue? = nil) -> AnyPublisher<[CommentWrapper], Error> {
+    let moreUrl: URL = URL(string: "/api/morechildren", relativeTo: baseURL)!
+    var parameters: Parameters = [
+      "api_type": "json",
+      "children": more.children.joined(separator: ","),
+      "limit_children": limitChildren,
+      "link_id": post.fullname,
+      "sort": sortBy.rawValue
+    ]
+    if let depth = depth { parameters["depth"] = depth }
+
+    return session.requestPublisher(url: moreUrl, method: .post, parameters: parameters,
+                                    encoding: URLEncoding(destination: .httpBody, boolEncoding: .numeric), queue: queue)
+      .compactMap { $0.data }
+      .decode(type: MoreChildren.self, decoder: decoder)
+      .map { $0.allComments }
+      .eraseToAnyPublisher()
+  }
 }
 
 public extension Comment {

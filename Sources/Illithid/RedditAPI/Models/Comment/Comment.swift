@@ -20,9 +20,18 @@ public enum CommentsSort: String, Codable {
   case live
 }
 
-public enum CommentWrapper: Identifiable {
+public enum CommentWrapper: Identifiable, Equatable {
   case comment(Comment)
   case more(More)
+
+  public var parentId: Fullname {
+    switch self{
+    case let .comment(comment):
+      return comment.parentId
+    case let .more(more):
+      return more.parentId
+    }
+  }
 
   public var id: ID36 {
     switch self {
@@ -57,7 +66,7 @@ public struct Comment: RedditObject {
   public let authorFlairTemplateId: String?
   public var likes: Bool?
   public let noFollow: Bool
-  public let replies: Listing?
+  public var replies: Listing?
   public let userReports: [String]
   public var saved: Bool
   public let id: ID36
