@@ -150,30 +150,3 @@ public struct Content: Codable, Hashable {
     case width
   }
 }
-
-// MARK: - Alamofire response handlers
-
-public extension DataRequest {
-  fileprivate func decodableResponseSerializer<T: Decodable>() -> DataResponseSerializer<T> {
-    DataResponseSerializer { _, _, data, error in
-      guard error == nil else { return .failure(error!) }
-
-      guard let data = data else {
-        return .failure(AFError.responseSerializationFailed(reason: .inputDataNil))
-      }
-      let decoder = JSONDecoder()
-      decoder.dateDecodingStrategy = .secondsSince1970
-      return Result { try decoder.decode(T.self, from: data) }
-    }
-  }
-
-  @discardableResult
-  fileprivate func responseDecodable<T: Decodable>(queue: DispatchQueue? = nil, completionHandler: @escaping (DataResponse<T>) -> Void) -> Self {
-    response(queue: queue, responseSerializer: decodableResponseSerializer(), completionHandler: completionHandler)
-  }
-
-  @discardableResult
-  func responseGfyWrapper(queue: DispatchQueue? = nil, completionHandler: @escaping (DataResponse<GfyWrapper>) -> Void) -> Self {
-    responseDecodable(queue: queue, completionHandler: completionHandler)
-  }
-}
