@@ -57,7 +57,7 @@ private enum AccountRouter: URLRequestConvertible {
 // MARK: Account fetching
 
 public extension Illithid {
-  func fetchAccount(name: String, queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Account, Error>) -> Void) {
+  func fetchAccount(name: String, queue: DispatchQueue = .main, completion: @escaping (Result<Account, AFError>) -> Void) {
     session.request(AccountRouter.account(username: name))
       .validate().responseData(queue: queue) { response in
         switch response.result {
@@ -66,7 +66,7 @@ public extension Illithid {
             let account = try self.decoder.decode(Account.self, from: data)
             completion(.success(account))
           } catch {
-            completion(.failure(error))
+            completion(.failure(AFError.responseSerializationFailed(reason: .decodingFailed(error: error))))
           }
         case let .failure(error):
           completion(.failure(error))
@@ -78,7 +78,7 @@ public extension Illithid {
 // MARK: Subscriptions
 
 public extension Account {
-  func subscribedSubreddits(queue: DispatchQueue? = nil, _ completion: @escaping (Swift.Result<[Subreddit], Error>) -> Void) {
+  func subscribedSubreddits(queue: DispatchQueue = .main, _ completion: @escaping (Result<[Subreddit], AFError>) -> Void) {
     let illithid: Illithid = .shared
     let subscribedSubredditsUrl = URL(string: "/subreddits/mine/subscriber", relativeTo: illithid.baseURL)!
 
@@ -100,7 +100,7 @@ public extension Account {
   }
 
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-  func subscribedSubreddits(queue: DispatchQueue? = nil) -> AnyPublisher<[Subreddit], Error> {
+  func subscribedSubreddits(queue: DispatchQueue = .main) -> AnyPublisher<[Subreddit], AFError> {
     Future { result in
       self.subscribedSubreddits(queue: queue) { subredditResult in
         result(subredditResult)
@@ -109,12 +109,12 @@ public extension Account {
     .eraseToAnyPublisher()
   }
 
-  func multireddits(queue: DispatchQueue? = nil, _ completion: @escaping (Swift.Result<[Multireddit], Error>) -> Void) {
+  func multireddits(queue: DispatchQueue = .main, _ completion: @escaping (Result<[Multireddit], AFError>) -> Void) {
     let illithid: Illithid = .shared
 
     illithid.session.request(AccountRouter.multireddits(username: name))
       // The multireddits endpoint is not a listing
-      .validate().responseData(queue: queue) { response in
+    .validate().responseData(queue: queue) { response in
         switch response.result {
         case let .success(data):
           let multis = try! illithid.decoder.decode([Multireddit].self, from: data)
@@ -127,7 +127,7 @@ public extension Account {
   }
 
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-  func multireddits(queue: DispatchQueue? = nil) -> AnyPublisher<[Multireddit], Error> {
+  func multireddits(queue: DispatchQueue = .main) -> AnyPublisher<[Multireddit], AFError> {
     Future { result in
       self.multireddits(queue: queue) { multisResult in
         result(multisResult)
@@ -135,25 +135,20 @@ public extension Account {
     }.eraseToAnyPublisher()
   }
 
-  func overview(queue: DispatchQueue? = nil, _ completion: @escaping (Swift.Result<Listing, Error>) -> Void) {
+  func overview(queue: DispatchQueue = .main, _ completion: @escaping (Result<Listing, AFError>) -> Void) {
     let illithid: Illithid = .shared
 
     illithid.session.request(AccountRouter.overview(username: name))
-      .validate().responseListing(queue: queue) { response in
-        switch response.result {
-        case let .success(listing):
-          return completion(.success(listing))
-        case let .failure(error):
-          completion(.failure(error))
-        }
+      .validate().responseDecodable(of: Listing.self, queue: queue, decoder: illithid.decoder) { response in
+        completion(response.result)
       }
   }
 
-  func comments(queue: DispatchQueue? = nil, _ completion: @escaping (Swift.Result<[Comment], Error>) -> Void) {
+  func comments(queue: DispatchQueue = .main, _ completion: @escaping (Result<[Comment], AFError>) -> Void) {
     let illithid: Illithid = .shared
 
     illithid.session.request(AccountRouter.comments(username: name))
-      .validate().responseListing(queue: queue) { response in
+      .validate().responseDecodable(of: Listing.self, queue: queue, decoder: illithid.decoder) { response in
         switch response.result {
         case let .success(listing):
           return completion(.success(listing.comments))
@@ -163,11 +158,11 @@ public extension Account {
       }
   }
 
-  func submittedPosts(queue: DispatchQueue? = nil, _ completion: @escaping (Swift.Result<[Post], Error>) -> Void) {
+  func submittedPosts(queue: DispatchQueue = .main, _ completion: @escaping (Result<[Post], AFError>) -> Void) {
     let illithid: Illithid = .shared
 
     illithid.session.request(AccountRouter.posts(username: name))
-      .validate().responseListing(queue: queue) { response in
+      .validate().responseDecodable(of: Listing.self, queue: queue, decoder: illithid.decoder) { response in
         switch response.result {
         case let .success(listing):
           return completion(.success(listing.posts))
@@ -177,11 +172,11 @@ public extension Account {
       }
   }
 
-  func upvotedPosts(queue: DispatchQueue? = nil, _ completion: @escaping (Swift.Result<[Post], Error>) -> Void) {
+  func upvotedPosts(queue: DispatchQueue = .main, _ completion: @escaping (Result<[Post], AFError>) -> Void) {
     let illithid: Illithid = .shared
 
     illithid.session.request(AccountRouter.upvoted(username: name))
-      .validate().responseListing(queue: queue) { response in
+      .validate().responseDecodable(of: Listing.self, queue: queue, decoder: illithid.decoder) { response in
         switch response.result {
         case let .success(listing):
           return completion(.success(listing.posts))
@@ -191,11 +186,11 @@ public extension Account {
       }
   }
 
-  func downvotedPosts(queue: DispatchQueue? = nil, _ completion: @escaping (Swift.Result<[Post], Error>) -> Void) {
+  func downvotedPosts(queue: DispatchQueue = .main, _ completion: @escaping (Result<[Post], AFError>) -> Void) {
     let illithid: Illithid = .shared
 
     illithid.session.request(AccountRouter.downvoted(username: name))
-      .validate().responseListing(queue: queue) { response in
+      .validate().responseDecodable(of: Listing.self, queue: queue, decoder: illithid.decoder) { response in
         switch response.result {
         case let .success(listing):
           return completion(.success(listing.posts))
@@ -205,11 +200,11 @@ public extension Account {
       }
   }
 
-  func hiddenPosts(queue: DispatchQueue? = nil, _ completion: @escaping (Swift.Result<[Post], Error>) -> Void) {
+  func hiddenPosts(queue: DispatchQueue = .main, _ completion: @escaping (Result<[Post], AFError>) -> Void) {
     let illithid: Illithid = .shared
 
     illithid.session.request(AccountRouter.hidden(username: name))
-      .validate().responseListing(queue: queue) { response in
+      .validate().responseDecodable(of: Listing.self, queue: queue, decoder: illithid.decoder) { response in
         switch response.result {
         case let .success(listing):
           return completion(.success(listing.posts))
@@ -219,11 +214,11 @@ public extension Account {
       }
   }
 
-  func savedContent(queue: DispatchQueue? = nil, _ completion: @escaping (Swift.Result<Listing, Error>) -> Void) {
+  func savedContent(queue: DispatchQueue = .main, _ completion: @escaping (Result<Listing, AFError>) -> Void) {
     let illithid: Illithid = .shared
 
     illithid.session.request(AccountRouter.saved(username: name))
-      .validate().responseListing(queue: queue) { response in
+      .validate().responseDecodable(of: Listing.self, queue: queue, decoder: illithid.decoder) { response in
         switch response.result {
         case let .success(listing):
           return completion(.success(listing))
@@ -235,7 +230,7 @@ public extension Account {
 }
 
 public extension Account {
-  static func fetch(name: String, queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Account, Error>) -> Void) {
+  static func fetch(name: String, queue: DispatchQueue = .main, completion: @escaping (Result<Account, AFError>) -> Void) {
     Illithid.shared.fetchAccount(name: name, queue: queue) { result in
       completion(result)
     }

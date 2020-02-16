@@ -13,23 +13,18 @@ import Foundation
 import Alamofire
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-public extension SessionManager {
+public extension Session {
   func requestPublisher(url: URLConvertible,
                         method: HTTPMethod = .get,
                         parameters: Parameters? = nil,
                         encoding: ParameterEncoding = URLEncoding.default,
                         headers: HTTPHeaders? = nil,
-                        queue: DispatchQueue? = nil)
-    -> AnyPublisher<DataResponse<Data>, Error> {
+                        queue: DispatchQueue = .main)
+    -> AnyPublisher<Data, AFError> {
     Future { result in
       self.request(url, method: method, parameters: parameters,
                    encoding: encoding, headers: headers).validate().responseData(queue: queue) { response in
-        switch response.result {
-        case .success:
-          result(.success(response))
-        case let .failure(error):
-          result(.failure(error))
-        }
+                    result(response.result)
       }
     }.eraseToAnyPublisher()
   }

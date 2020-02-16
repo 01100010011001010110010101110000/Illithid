@@ -34,7 +34,7 @@ public extension Illithid {
   func comments(for post: Post, parameters: ListingParameters,
                 by sort: CommentsSort = .confidence, focusOn comment: Comment? = nil, context: Int? = nil,
                 depth: Int = 0, showEdits: Bool = true, showMore: Bool = true,
-                threaded: Bool = true, truncate: Int = 0, queue: DispatchQueue? = nil) -> AnyPublisher<Listing, Error> {
+                threaded: Bool = true, truncate: Int = 0, queue: DispatchQueue = .main) -> AnyPublisher<Listing, Error> {
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
     let commentsListingURL = URL(string: "/r/\(post.subreddit)/comments/\(post.id)", relativeTo: baseURL)!
 
@@ -53,9 +53,6 @@ public extension Illithid {
 
     return session.requestPublisher(url: commentsListingURL, method: .get, parameters: encodedParameters,
                                     encoding: queryEncoding, queue: queue)
-      .compactMap { response in
-        response.data
-      }
       .decode(type: [Listing].self, decoder: decoder)
       .mapError { (error) -> Error in
         self.logger.errorMessage { "Error fetching comments: \(error)" }
@@ -68,7 +65,7 @@ public extension Illithid {
   }
 
   func moreComments(for more: More, in post: Post, depth: Int? = nil,
-                    limitChildren: Bool = false, sortBy: CommentsSort = .confidence, queue: DispatchQueue? = nil) -> AnyPublisher<[CommentWrapper], Error> {
+                    limitChildren: Bool = false, sortBy: CommentsSort = .confidence, queue: DispatchQueue = .main) -> AnyPublisher<[CommentWrapper], Error> {
     let moreUrl: URL = URL(string: "/api/morechildren", relativeTo: baseURL)!
     var parameters: Parameters = [
       "api_type": "json",
@@ -81,7 +78,6 @@ public extension Illithid {
 
     return session.requestPublisher(url: moreUrl, method: .post, parameters: parameters,
                                     encoding: URLEncoding(destination: .httpBody, boolEncoding: .numeric), queue: queue)
-      .compactMap { $0.data }
       .decode(type: MoreChildren.self, decoder: decoder)
       .map { $0.allComments }
       .eraseToAnyPublisher()
@@ -89,27 +85,27 @@ public extension Illithid {
 }
 
 public extension Comment {
-  func upvote(queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Data, Error>) -> Void) {
+  func upvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
     Illithid.shared.vote(fullname: fullname, direction: .up, queue: queue, completion: completion)
   }
-  func downvote(queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Data, Error>) -> Void) {
+  func downvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
     Illithid.shared.vote(fullname: fullname, direction: .down, queue: queue, completion: completion)
   }
-  func clearVote(queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Data, Error>) -> Void) {
+  func clearVote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
     Illithid.shared.vote(fullname: fullname, direction: .clear, queue: queue, completion: completion)
   }
 
-  func save(queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Data, Error>) -> Void) {
+  func save(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
     Illithid.shared.save(fullname: fullname, queue: queue, completion: completion)
   }
-  func unsave(queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Data, Error>) -> Void) {
+  func unsave(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
     Illithid.shared.unsave(fullname: fullname, queue: queue, completion: completion)
   }
 }
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public extension Comment {
-  static func fetch(name: Fullname, queue: DispatchQueue? = nil) -> AnyPublisher<Comment, Error> {
+  static func fetch(name: Fullname, queue: DispatchQueue = .main) -> AnyPublisher<Comment, Error> {
     Illithid.shared.info(name: name, queue: queue)
       .compactMap { listing in
         listing.comments.last
@@ -119,7 +115,7 @@ public extension Comment {
 }
 
 public extension Comment {
-  static func fetch(name: Fullname, queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Comment, Error>) -> Void) {
+  static func fetch(name: Fullname, queue: DispatchQueue = .main, completion: @escaping (Result<Comment, Error>) -> Void) {
     Illithid.shared.info(name: name, queue: queue) { result in
       switch result {
       case let .success(listing):

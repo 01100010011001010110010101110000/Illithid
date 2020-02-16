@@ -15,7 +15,7 @@ import Willow
 public extension Illithid {
   func fetchPosts(for subreddit: Subreddit, sortBy postSort: PostSort,
                   location: Location? = nil, topInterval: TopInterval? = nil,
-                  params: ListingParameters = .init(), queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Listing, Error>) -> Void) {
+                  params: ListingParameters = .init(), queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void) {
     var parameters = params.toParameters()
     let postsUrl = URL(string: "/r/\(subreddit.displayName)/\(postSort)", relativeTo: baseURL)!
 
@@ -36,7 +36,7 @@ public extension Illithid {
 
   func fetchPosts(for multireddit: Multireddit, sortBy postSort: PostSort,
                   location: Location? = nil, topInterval: TopInterval? = nil,
-                  params: ListingParameters = .init(), queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Listing, Error>) -> Void) {
+                  params: ListingParameters = .init(), queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void) {
     var parameters = params.toParameters()
     let postsUrl = URL(string: "/user/\(multireddit.owner)/m/\(multireddit.name)/\(postSort)", relativeTo: baseURL)!
 
@@ -57,7 +57,7 @@ public extension Illithid {
 
   func fetchPosts(for frontPage: FrontPage, sortBy postSort: PostSort,
                   location: Location? = nil, topInterval: TopInterval? = nil,
-                  params: ListingParameters = .init(), queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Listing, Error>) -> Void) {
+                  params: ListingParameters = .init(), queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void) {
     let frontPageUrl = try! frontPage.asURL().appendingPathComponent("\(postSort)")
     var parameters = params.toParameters()
     // Handle nonsense magic string parameters which apply to specific sorts
@@ -78,7 +78,7 @@ public extension Illithid {
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public extension Post {
-  static func fetch(name: Fullname, queue: DispatchQueue? = nil) -> AnyPublisher<Post, Error> {
+  static func fetch(name: Fullname, queue: DispatchQueue = .main) -> AnyPublisher<Post, Error> {
     Illithid.shared.info(name: name, queue: queue)
       .compactMap { listing in
         listing.posts.last
@@ -87,26 +87,26 @@ public extension Post {
 }
 
 public extension Post {
-  func upvote(queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Data, Error>) -> Void) {
+  func upvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
     Illithid.shared.vote(fullname: fullname, direction: .up, queue: queue, completion: completion)
   }
-  func downvote(queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Data, Error>) -> Void) {
+  func downvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
     Illithid.shared.vote(fullname: fullname, direction: .down, queue: queue, completion: completion)
   }
-  func clearVote(queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Data, Error>) -> Void) {
+  func clearVote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
     Illithid.shared.vote(fullname: fullname, direction: .clear, queue: queue, completion: completion)
   }
 
-  func save(queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Data, Error>) -> Void) {
+  func save(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
     Illithid.shared.save(fullname: fullname, queue: queue, completion: completion)
   }
-  func unsave(queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Data, Error>) -> Void) {
+  func unsave(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
     Illithid.shared.unsave(fullname: fullname, queue: queue, completion: completion)
   }
 }
 
 public extension Post {
-  static func fetch(name: Fullname, queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Post, Error>) -> Void) {
+  static func fetch(name: Fullname, queue: DispatchQueue = .main, completion: @escaping (Result<Post, Error>) -> Void) {
     Illithid.shared.info(name: name, queue: queue) { result in
       switch result {
       case let .success(listing):
@@ -129,7 +129,7 @@ public extension Post {
   ///   - params: Default parameters applicable to every `Listing` returning endpoint on Reddit
   ///   - completion: The callback function to execute when we get the `Post` `Listing` back from Reddit
   func all(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
-           params: ListingParameters = .init(), queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Listing, Error>) -> Void) {
+           params: ListingParameters = .init(), queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void) {
     Illithid.shared.fetchPosts(for: .all, sortBy: postSort, location: location, topInterval: topInterval,
                                params: params, queue: queue, completion: completion)
   }
@@ -143,7 +143,7 @@ public extension Post {
   ///   - params: Default parameters applicable to every `Listing` returning endpoint on Reddit
   ///   - completion: The callback function to execute when we get the `Post` `Listing` back from Reddit
   func popular(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
-               params: ListingParameters = .init(), queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Listing, Error>) -> Void) {
+               params: ListingParameters = .init(), queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void) {
     Illithid.shared.fetchPosts(for: .popular, sortBy: postSort, location: location, topInterval: topInterval,
                                params: params, queue: queue, completion: completion)
   }
@@ -156,7 +156,7 @@ public extension Post {
   ///   - params: Default parameters applicable to every `Listing` returning endpoint on Reddit
   ///   - completion: The callback function to execute when we get the `Post` `Listing` back from Reddit
   func random(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
-              params: ListingParameters = .init(), queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Listing, Error>) -> Void) {
+              params: ListingParameters = .init(), queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void) {
     Illithid.shared.fetchPosts(for: .random, sortBy: postSort, location: location, topInterval: topInterval,
                                params: params, queue: queue, completion: completion)
   }

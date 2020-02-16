@@ -35,7 +35,7 @@ open class Illithid: ObservableObject {
 
   internal let decoder: JSONDecoder = .init()
 
-  internal var session: SessionManager
+  internal var session: Session
 
   private init() {
     decoder.dateDecodingStrategy = .secondsSince1970
@@ -64,12 +64,12 @@ internal extension Illithid {
   ///   - url: The `Listing` returning endpoint from which to read a listing
   ///   - completion: The function to call upon fetching a `Listing`
   func readListing(url: Alamofire.URLConvertible, parameters: Parameters = .init(),
-                   queue: DispatchQueue? = nil, _ completion: @escaping (Swift.Result<Listing, Error>) -> Void) {
+                   queue: DispatchQueue = .main, _ completion: @escaping (Result<Listing, AFError>) -> Void) {
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
 
     session.request(url, method: .get, parameters: parameters, encoding: queryEncoding).validate()
-      .responseListing(queue: queue) { request in
-        completion(Swift.Result(from: request.result))
+      .responseDecodable(of: Listing.self, queue: queue, decoder: decoder) { request in
+        completion(request.result)
       }
   }
 
@@ -78,7 +78,7 @@ internal extension Illithid {
   ///   - url: The `Listing` returning endpoint from which to read a listing
   ///   - completion: The function to call upon fetching all `Listings`
   /// - Warning: If this method is called on a large endpoint, like the endpoint for fetching all subreddits, this method may take a very long time to terminate or not terminate at all
-  func readAllListings(url: Alamofire.URLConvertible, queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<[Listing], Error>) -> Void) {
+  func readAllListings(url: Alamofire.URLConvertible, queue: DispatchQueue = .main, completion: @escaping (Result<[Listing], AFError>) -> Void) {
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
     var results: [Listing] = []
     var parameters: Parameters = ["after": ""] {

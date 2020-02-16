@@ -51,7 +51,7 @@ open class Ulithari {
 }
 
 public extension Ulithari {
-  func fetchGfycat(id: String, queue: DispatchQueue = .main, completion: @escaping (Result<GfyItem, Error>) -> Void) {
+  func fetchGfycat(id: String, queue: DispatchQueue = .main, completion: @escaping (Result<GfyItem, AFError>) -> Void) {
     session.request(URL(string: "gfycats/\(id)", relativeTo: Self.gfycatBaseUrl)!).validate()
       .responseDecodable(of: GfyWrapper.self, queue: queue, decoder: gfycatDecoder) { response in
         switch response.result {
@@ -63,22 +63,17 @@ public extension Ulithari {
       }
   }
 
-  func fetchGfycat(from url: URL, queue: DispatchQueue = .main, completion: @escaping (Result<GfyItem, Error>) -> Void) {
+  func fetchGfycat(from url: URL, queue: DispatchQueue = .main, completion: @escaping (Result<GfyItem, AFError>) -> Void) {
     let gfyId = String(url.path.dropFirst())
     fetchGfycat(id: gfyId, queue: queue, completion: completion)
   }
 }
 
 public extension Ulithari {
-  func fetchImgurImage(id: String, queue: DispatchQueue = .main, completion: @escaping (Result<ImgurImage, Error>) -> Void) {
+  func fetchImgurImage(id: String, queue: DispatchQueue = .main, completion: @escaping (Result<ImgurImage, AFError>) -> Void) {
     session.request(URL(string: "image/\(id)", relativeTo: Self.imgurBaseUrl)!, headers: imgurAuthorizationHeader).validate()
       .responseDecodable(of: ImgurImage.self, queue: queue, decoder: imgurDecoder) { response in
-        switch response.result {
-        case let .success(image):
-          completion(.success(image))
-        case let .failure(error):
-          completion(.failure(error))
-        }
+        completion(response.result)
       }
   }
 }

@@ -13,7 +13,7 @@ import Alamofire
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public extension Illithid {
-  func info(names: [Fullname], queue: DispatchQueue? = nil) -> AnyPublisher<Listing, Error> {
+  func info(names: [Fullname], queue: DispatchQueue = .main) -> AnyPublisher<Listing, Error> {
     let endpoint = URL(string: "/api/info", relativeTo: baseURL)!
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
     let infoParameters: Parameters = [
@@ -22,16 +22,15 @@ public extension Illithid {
     ]
 
     return session.requestPublisher(url: endpoint, method: .get, parameters: infoParameters, encoding: queryEncoding, queue: queue)
-      .compactMap { $0.data }
       .decode(type: Listing.self, decoder: decoder)
       .eraseToAnyPublisher()
   }
 
-  func info(name: Fullname, queue: DispatchQueue? = nil) -> AnyPublisher<Listing, Error> { info(names: [name], queue: queue) }
+  func info(name: Fullname, queue: DispatchQueue = .main) -> AnyPublisher<Listing, Error> { info(names: [name], queue: queue) }
 }
 
 public extension Illithid {
-  func info(names: [Fullname], queue: DispatchQueue? = nil, completion: @escaping (Swift.Result<Listing, Error>) -> Void) {
+  func info(names: [Fullname], queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void) {
     let endpoint = URL(string: "/api/info", relativeTo: baseURL)!
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
     let infoParameters: Parameters = [
@@ -39,23 +38,15 @@ public extension Illithid {
       "raw_json": true,
     ]
 
-    session.request(endpoint, method: .get, parameters: infoParameters, encoding: queryEncoding).validate().responseData(queue: queue) { response in
-      switch response.result {
-      case let .success(data):
-        do {
-          let listing = try self.decoder.decode(Listing.self, from: data)
-          completion(.success(listing))
-        } catch {
-          completion(.failure(error))
-        }
-      case let .failure(error):
-        completion(.failure(error))
-      }
+    session.request(endpoint, method: .get, parameters: infoParameters, encoding: queryEncoding)
+      .validate()
+      .responseDecodable(of: Listing.self, queue: queue, decoder: decoder) { response in
+        completion(response.result)
     }
   }
 
-  func info(name: Fullname, queue: DispatchQueue? = nil,
-            completion: @escaping (Swift.Result<Listing, Error>) -> Void) {
+  func info(name: Fullname, queue: DispatchQueue = .main,
+            completion: @escaping (Result<Listing, AFError>) -> Void) {
     info(names: [name], queue: queue) { completion($0) }
   }
 }

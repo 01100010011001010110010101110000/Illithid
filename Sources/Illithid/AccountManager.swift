@@ -163,31 +163,28 @@ public final class AccountManager: ObservableObject {
     }
   }
 
-  internal func makeSession(for account: Account? = nil) -> SessionManager {
+  internal func makeSession(for account: Account? = nil) -> Session {
     let alamoConfiguration = URLSessionConfiguration.default
+    // Construct Reddit's required UA string
     let osVersion = ProcessInfo().operatingSystemVersion
     let userAgentComponents = [
       "macOS \(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion)",
       "\(configuration.consumerKey)",
       "\(configuration.version) (by \(configuration.author))",
     ]
-    let headers = SessionManager.defaultHTTPHeaders.merging([
-      "User-Agent": userAgentComponents.joined(separator: ":"),
-      "Accept": "application/json",
-    ]) { _, new in new }
-    alamoConfiguration.httpAdditionalHeaders = headers
-    let session = SessionManager(configuration: alamoConfiguration)
+    let headers: HTTPHeaders = [
+      .userAgent(userAgentComponents.joined(separator: ":")),
+      .accept("application.json")
+    ]
+    alamoConfiguration.httpAdditionalHeaders = headers.dictionary
 
-    guard let redditAccount = account else { return session }
     // FIXME: This should return an error to the caller instead of silently returning the anonymous session
-    guard let credential = token(for: redditAccount) else { return session }
+    guard let redditAccount = account, let credential = token(for: redditAccount) else { return Session(configuration: alamoConfiguration) }
     let oauth = OAuth2Swift(parameters: configuration.oauthParameters)!
     oauth.accessTokenBasicAuthentification = true
     oauth.client = OAuthSwiftClient(credential: credential)
 
-    session.adapter = oauth.requestAdapter
-    session.retrier = oauth.requestAdapter
-    return session
+    return Session(configuration: alamoConfiguration, startRequestsImmediately: true, interceptor: OAuthSwift2RequestInterceptor(oauth))
   }
 
   // MARK: Saved Account Loading
