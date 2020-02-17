@@ -22,8 +22,8 @@ public struct Subreddit: RedditObject {
     lhs.name == rhs.name
   }
 
-  public let id: String // swiftlint:disable:this identifier_name
-  public let name: String
+  public let id: ID36 // swiftlint:disable:this identifier_name
+  public let name: Fullname
   public let publicDescription: String
   public let publicDescriptionHtml: String?
   public let displayName: String
@@ -33,6 +33,7 @@ public struct Subreddit: RedditObject {
   public let createdUtc: Date
   public let description: String
   public let descriptionHtml: String?
+  public let userIsSubscriber: Bool
 
   /// The Reddit API sometimes returns the empty string for the `header_img` parameter, and also may return `nil`, so we handle the empty srtring, then
   /// decode the actual URL if it is present
@@ -49,6 +50,7 @@ public struct Subreddit: RedditObject {
     createdUtc = try container.decode(Date.self, forKey: .createdUtc)
     description = try container.decode(String.self, forKey: .description)
     descriptionHtml = try container.decodeIfPresent(String.self, forKey: .descriptionHtml)
+    userIsSubscriber = try container.decode(Bool.self, forKey: .userIsSubscriber)
 
     if let emptyString = try? container.decodeIfPresent(String.self, forKey: .headerImg), emptyString.isEmpty {
       headerImg = nil
@@ -69,5 +71,6 @@ public struct Subreddit: RedditObject {
     case createdUtc
     case description
     case descriptionHtml
+    case userIsSubscriber
   }
 }

@@ -25,7 +25,7 @@ internal extension Illithid {
     let saveParameters: [String: Any] = [
       "id": fullname
     ]
-    session.request(saveUrl, method: .post, parameters: saveParameters, encoding: URLEncoding(destination: .httpBody)).validate().responseData { response in
+    session.request(saveUrl, method: .post, parameters: saveParameters, encoding: URLEncoding(destination: .httpBody)).validate().responseData(queue: queue) { response in
       completion(response.result)
     }
   }
@@ -35,8 +35,25 @@ internal extension Illithid {
     let saveParameters: [String: Any] = [
       "id": fullname
     ]
-    session.request(saveUrl, method: .post, parameters: saveParameters, encoding: URLEncoding(destination: .httpBody)).validate().responseData { response in
+    session.request(saveUrl, method: .post, parameters: saveParameters, encoding: URLEncoding(destination: .httpBody)).validate().responseData(queue: queue) { response in
       completion(response.result)
     }
+  }
+
+  func changeSubscription(of subreddits: [Subreddit], isSubscribed: Bool, queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
+    let subscribeUrl = URL(string: "/api/subscribe", relativeTo: baseURL)!
+    let action = isSubscribed ? "sub" : "unsub"
+    let subscribeParameters = [
+      "action": action,
+      "sr": subreddits.map { $0.name }.joined(separator: ",")
+    ]
+
+    session.request(subscribeUrl, method: .post, parameters: subscribeParameters, encoding: URLEncoding(destination: .httpBody)).validate().responseData(queue: queue) { response in
+      completion(response.result)
+    }
+  }
+
+  func changeSubscription(of subreddit: Subreddit, isSubscribed: Bool, queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
+    changeSubscription(of: [subreddit], isSubscribed: isSubscribed, queue: queue, completion: completion)
   }
 }
