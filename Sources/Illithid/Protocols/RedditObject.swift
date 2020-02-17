@@ -36,16 +36,20 @@ public enum Kind: String, Codable {
 }
 
 /// The interval to use when sorting comments or posts by `top`
-public enum TopInterval {
+public enum TopInterval: String, CaseIterable, Identifiable, Hashable {
   case hour
   case day
   case week
   case month
   case year
   case all
+
+  public var id: String {
+    self.rawValue
+  }
 }
 
-public enum Location {
+public enum Location: String, CaseIterable, Identifiable, Hashable {
   case GLOBAL
   case US
   case AR
@@ -129,6 +133,10 @@ public enum Location {
   case US_KY
   case US_OR
   case US_SD
+
+  public var id: String {
+    self.rawValue
+  }
 }
 
 /// The URL parameters which are applicable to all Listing endpoints in the Reddit API

@@ -19,15 +19,8 @@ public extension Illithid {
     var parameters = params.toParameters()
     let postsUrl = URL(string: "/r/\(subreddit.displayName)/\(postSort)", relativeTo: baseURL)!
 
-    // Handle nonsense magic string parameters which apply to specific sorts
-    switch postSort {
-    case .controversial, .top:
-      parameters["t"] = topInterval ?? TopInterval.day
-    case .hot:
-      parameters["g"] = location ?? Location.GLOBAL
-    default:
-      break
-    }
+   if let interval = topInterval { parameters["t"] = interval }
+    if let location = location { parameters["g"] = location }
 
     readListing(url: postsUrl, parameters: parameters, queue: queue) { result in
       completion(result)
@@ -40,15 +33,8 @@ public extension Illithid {
     var parameters = params.toParameters()
     let postsUrl = URL(string: "/user/\(multireddit.owner)/m/\(multireddit.name)/\(postSort)", relativeTo: baseURL)!
 
-    // Handle nonsense magic string parameters which apply to specific sorts
-    switch postSort {
-    case .controversial, .top:
-      parameters["t"] = topInterval ?? TopInterval.day
-    case .hot:
-      parameters["g"] = location ?? Location.GLOBAL
-    default:
-      break
-    }
+    if let interval = topInterval { parameters["t"] = interval }
+    if let location = location { parameters["g"] = location }
 
     readListing(url: postsUrl, parameters: parameters, queue: queue) { result in
       completion(result)
@@ -60,15 +46,9 @@ public extension Illithid {
                   params: ListingParameters = .init(), queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void) {
     let frontPageUrl = try! frontPage.asURL().appendingPathComponent("\(postSort)")
     var parameters = params.toParameters()
-    // Handle nonsense magic string parameters which apply to specific sorts
-    switch postSort {
-    case .controversial, .top:
-      parameters["t"] = topInterval ?? TopInterval.day
-    case .hot:
-      parameters["g"] = location ?? Location.GLOBAL
-    default:
-      break
-    }
+
+    if let interval = topInterval { parameters["t"] = interval }
+    if let location = location { parameters["g"] = location }
 
     readListing(url: frontPageUrl, parameters: parameters, queue: queue) { result in
       completion(result)
