@@ -184,7 +184,12 @@ public final class AccountManager: ObservableObject {
     oauth.accessTokenBasicAuthentification = true
     oauth.client = OAuthSwiftClient(credential: credential)
 
-    return Session(configuration: alamoConfiguration, startRequestsImmediately: true, interceptor: OAuthSwift2RequestInterceptor(oauth))
+    let session = Session(configuration: alamoConfiguration,
+                          rootQueue: DispatchQueue(label: "com.flayware.IllithidUI.AFRootQueue"),
+                          serializationQueue: DispatchQueue(label: "com.flayware.IllithidUI.AFSerializationQueue"),
+                          interceptor: OAuthSwift2RequestInterceptor(oauth))
+
+    return session
   }
 
   // MARK: Saved Account Loading
