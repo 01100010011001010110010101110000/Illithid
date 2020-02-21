@@ -14,9 +14,7 @@ extension Logger {
     return Logger(logLevels: [.all], writers: [consoleWriter],
                   executionMethod: .synchronous(lock: NSRecursiveLock()))
   }
-}
 
-extension Logger {
   public static func releaseLogger(subsystem: String, logLevels: LogLevel = .event) -> Logger {
     let writer = OSLogWriter(subsystem: subsystem,
                              category: "release", modifiers: [LevelLabelModifier(), TimestampModifier()])
