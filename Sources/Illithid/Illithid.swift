@@ -44,7 +44,7 @@ open class Illithid: ObservableObject {
     #if DEBUG
       logger = .debugLogger()
     #else
-      logger = .releaseLogger(subsystem: "com.illithid.illithid")
+      logger = .releaseLogger(subsystem: "com.flayware.illithid")
     #endif
 
     accountManager = AccountManager(logger: logger)
