@@ -11,12 +11,17 @@ import Foundation
 /// A user defined multireddit
 public struct Multireddit: RedditObject {
   public static func == (lhs: Multireddit, rhs: Multireddit) -> Bool {
-    lhs.id == rhs.id
+    lhs.id == rhs.id &&
+      lhs.descriptionMd == rhs.descriptionMd &&
+      lhs.visibility == rhs.visibility &&
+      lhs.subreddits == rhs.subreddits 
   }
 
   /// A `Multireddit`'s different possible visibility levels
   public enum Visibility: String, Codable {
     case `private`
+    case `public`
+    case hidden
   }
 
   public func hash(into hasher: inout Hasher) {
@@ -109,11 +114,11 @@ public struct Multireddit: RedditObject {
   }
 
   /// Trivial class for deserializing the list of member `Subreddits` returned from the `Multireddit` API
-  public struct MultiSubreddit: Codable, Identifiable {
+  public struct MultiSubreddit: Codable, Identifiable, Equatable {
     public var id: String {
       name
     }
 
     public let name: String
   }
-}
+} 
