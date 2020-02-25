@@ -8,7 +8,7 @@ import Foundation
 
 import Alamofire
 
-public enum SearchType: String {
+public enum SearchType: String, CaseIterable {
   case subreddit = "sr"
   case post = "link"
   case user
