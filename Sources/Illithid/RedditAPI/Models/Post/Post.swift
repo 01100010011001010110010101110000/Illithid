@@ -81,7 +81,8 @@ public struct Post: RedditObject {
   public let name: String
 
   public let subreddit: String
-  public let subredditId: String
+  /// The `Fullname` of the subreddit to which this post was submitted
+  public let subredditId: Fullname
   public let subredditNamePrefixed: String
 
   public let selftext: String
