@@ -126,6 +126,7 @@ public struct Post: RedditObject {
 
   public let preview: Preview?
 
+  public let over18: Bool
   public let gilded: Int
   public let isOriginalContent: Bool
   public let isMeta: Bool
