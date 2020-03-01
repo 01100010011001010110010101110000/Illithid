@@ -30,7 +30,9 @@ public extension Illithid {
 }
 
 public extension Illithid {
-  func info(names: [Fullname], queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void) {
+  @discardableResult
+  func info(names: [Fullname], queue: DispatchQueue = .main,
+            completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
     let endpoint = URL(string: "/api/info", relativeTo: baseURL)!
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
     let infoParameters: Parameters = [
@@ -38,15 +40,16 @@ public extension Illithid {
       "raw_json": true,
     ]
 
-    session.request(endpoint, method: .get, parameters: infoParameters, encoding: queryEncoding)
+    return session.request(endpoint, method: .get, parameters: infoParameters, encoding: queryEncoding)
       .validate()
       .responseDecodable(of: Listing.self, queue: queue, decoder: decoder) { response in
         completion(response.result)
     }
   }
 
+  @discardableResult
   func info(name: Fullname, queue: DispatchQueue = .main,
-            completion: @escaping (Result<Listing, AFError>) -> Void) {
-    info(names: [name], queue: queue) { completion($0) }
+            completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+    return info(names: [name], queue: queue) { completion($0) }
   }
 }

@@ -35,7 +35,7 @@ public extension Illithid {
 extension Subreddit: PostsProvider {
   public func posts(sortBy sort: PostSort, location: Location?, topInterval: TopInterval?,
                     parameters: ListingParameters, queue: DispatchQueue = .main,
-                    completion: @escaping (Result<Listing, AFError>) -> Void) {
+                    completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
     Illithid.shared.fetchPosts(for: self, sortBy: sort, location: location, topInterval: topInterval, params: parameters, queue: queue) { result in
       completion(result)
     }

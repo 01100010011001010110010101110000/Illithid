@@ -13,44 +13,50 @@ import Alamofire
 import Willow
 
 public extension Illithid {
+  @discardableResult
   func fetchPosts(for subreddit: Subreddit, sortBy postSort: PostSort,
                   location: Location? = nil, topInterval: TopInterval? = nil,
-                  params: ListingParameters = .init(), queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void) {
+                  params: ListingParameters = .init(), queue: DispatchQueue = .main,
+                  completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
     var parameters = params.toParameters()
     let postsUrl = URL(string: "/r/\(subreddit.displayName)/\(postSort)", relativeTo: baseURL)!
 
    if let interval = topInterval { parameters["t"] = interval }
     if let location = location { parameters["g"] = location }
 
-    readListing(url: postsUrl, parameters: parameters, queue: queue) { result in
+    return readListing(url: postsUrl, parameters: parameters, queue: queue) { result in
       completion(result)
     }
   }
 
+  @discardableResult
   func fetchPosts(for multireddit: Multireddit, sortBy postSort: PostSort,
                   location: Location? = nil, topInterval: TopInterval? = nil,
-                  params: ListingParameters = .init(), queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void) {
+                  params: ListingParameters = .init(), queue: DispatchQueue = .main,
+                  completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
     var parameters = params.toParameters()
     let postsUrl = URL(string: "/user/\(multireddit.owner)/m/\(multireddit.name)/\(postSort)", relativeTo: baseURL)!
 
     if let interval = topInterval { parameters["t"] = interval }
     if let location = location { parameters["g"] = location }
 
-    readListing(url: postsUrl, parameters: parameters, queue: queue) { result in
+    return readListing(url: postsUrl, parameters: parameters, queue: queue) { result in
       completion(result)
     }
   }
 
+  @discardableResult
   func fetchPosts(for frontPage: FrontPage, sortBy postSort: PostSort,
                   location: Location? = nil, topInterval: TopInterval? = nil,
-                  params: ListingParameters = .init(), queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void) {
+                  params: ListingParameters = .init(), queue: DispatchQueue = .main,
+                  completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
     let frontPageUrl = try! frontPage.asURL().appendingPathComponent("\(postSort)")
     var parameters = params.toParameters()
 
     if let interval = topInterval { parameters["t"] = interval }
     if let location = location { parameters["g"] = location }
 
-    readListing(url: frontPageUrl, parameters: parameters, queue: queue) { result in
+    return readListing(url: frontPageUrl, parameters: parameters, queue: queue) { result in
       completion(result)
     }
   }

@@ -85,20 +85,28 @@ public extension Illithid {
 }
 
 public extension Comment {
-  func upvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
+  @discardableResult
+  func upvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
     Illithid.shared.vote(fullname: fullname, direction: .up, queue: queue, completion: completion)
   }
-  func downvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
+
+  @discardableResult
+  func downvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
     Illithid.shared.vote(fullname: fullname, direction: .down, queue: queue, completion: completion)
   }
-  func clearVote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
+
+  @discardableResult
+  func clearVote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
     Illithid.shared.vote(fullname: fullname, direction: .clear, queue: queue, completion: completion)
   }
 
-  func save(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
+  @discardableResult
+  func save(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
     Illithid.shared.save(fullname: fullname, queue: queue, completion: completion)
   }
-  func unsave(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
+
+  @discardableResult
+  func unsave(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
     Illithid.shared.unsave(fullname: fullname, queue: queue, completion: completion)
   }
 }
@@ -115,8 +123,9 @@ public extension Comment {
 }
 
 public extension Comment {
-  static func fetch(name: Fullname, queue: DispatchQueue = .main, completion: @escaping (Result<Comment, Error>) -> Void) {
-    Illithid.shared.info(name: name, queue: queue) { result in
+  @discardableResult
+  static func fetch(name: Fullname, queue: DispatchQueue = .main, completion: @escaping (Result<Comment, Error>) -> Void) -> DataRequest {
+    return Illithid.shared.info(name: name, queue: queue) { result in
       switch result {
       case let .success(listing):
         guard let comment = listing.comments.last else {

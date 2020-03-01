@@ -63,11 +63,12 @@ internal extension Illithid {
   /// - Parameters:
   ///   - url: The `Listing` returning endpoint from which to read a listing
   ///   - completion: The function to call upon fetching a `Listing`
+  @discardableResult
   func readListing(url: Alamofire.URLConvertible, parameters: Parameters = .init(),
-                   queue: DispatchQueue = .main, _ completion: @escaping (Result<Listing, AFError>) -> Void) {
+                   queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
 
-    session.request(url, method: .get, parameters: parameters, encoding: queryEncoding).validate()
+    return session.request(url, method: .get, parameters: parameters, encoding: queryEncoding).validate()
       .responseDecodable(of: Listing.self, queue: queue, decoder: decoder) { request in
         completion(request.result)
       }

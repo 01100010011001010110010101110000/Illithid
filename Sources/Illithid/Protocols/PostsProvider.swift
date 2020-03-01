@@ -9,6 +9,8 @@ import Alamofire
 import Foundation
 
 public protocol PostsProvider {
+  @discardableResult
   func posts(sortBy sort: PostSort, location: Location?,
-             topInterval: TopInterval?, parameters: ListingParameters, queue: DispatchQueue, completion: @escaping (Result<Listing, AFError>) -> Void)
+             topInterval: TopInterval?, parameters: ListingParameters, queue: DispatchQueue,
+             completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest
 }

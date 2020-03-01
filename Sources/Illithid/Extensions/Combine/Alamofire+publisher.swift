@@ -26,6 +26,7 @@ public extension Session {
                    encoding: encoding, headers: headers).validate().responseData(queue: queue) { response in
                     result(response.result)
       }
-    }.eraseToAnyPublisher()
+    }
+    .eraseToAnyPublisher()
   }
 }

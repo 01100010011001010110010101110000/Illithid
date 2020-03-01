@@ -35,10 +35,11 @@ public extension Illithid {
   /// - Parameter resultTypes: The Reddit types to search for
   /// - Parameter completion: The callback to be executed when the search returns
   /// - Note: The Reddit search API is weird and seems to return results depending on which `resultTypes` combination is chosen. It also seems to ignore the `limit` argument.
+  @discardableResult
   func search(for query: String, subreddit: String? = nil, after: Fullname? = nil, before: Fullname? = nil,
               limit: UInt = 25, showAll: ShowAllPreference = .filtered, sort: SearchSort = .relevance,
               topInterval: TopInterval? = nil, resultTypes: Set<SearchType> = [.subreddit, .post, .user], queue: DispatchQueue = .main,
-              completion: @escaping (Result<[Listing], Error>) -> Void) {
+              completion: @escaping (Result<[Listing], Error>) -> Void) -> DataRequest {
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
     var parameters: Parameters = [
       "q": query,
@@ -62,7 +63,7 @@ public extension Illithid {
 
     // MARK: Submit request
 
-    session.request(endpoint, method: .get, parameters: parameters, encoding: queryEncoding).validate().responseData(queue: queue) { response in
+    return session.request(endpoint, method: .get, parameters: parameters, encoding: queryEncoding).validate().responseData(queue: queue) { response in
       switch response.result {
       case let .success(data):
         do {

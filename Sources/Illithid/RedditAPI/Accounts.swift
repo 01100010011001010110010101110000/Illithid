@@ -57,8 +57,10 @@ private enum AccountRouter: URLRequestConvertible {
 // MARK: Account fetching
 
 public extension Illithid {
-  func fetchAccount(name: String, queue: DispatchQueue = .main, completion: @escaping (Result<Account, AFError>) -> Void) {
-    session.request(AccountRouter.account(username: name))
+  @discardableResult
+  func fetchAccount(name: String, queue: DispatchQueue = .main,
+                    completion: @escaping (Result<Account, AFError>) -> Void) -> DataRequest {
+    return session.request(AccountRouter.account(username: name))
       .validate().responseData(queue: queue) { response in
         switch response.result {
         case let .success(data):
@@ -78,7 +80,8 @@ public extension Illithid {
 // MARK: Subscriptions
 
 public extension Account {
-  func subscribedSubreddits(queue: DispatchQueue = .main, _ completion: @escaping (Result<[Subreddit], AFError>) -> Void) {
+  func subscribedSubreddits(queue: DispatchQueue = .main,
+                            completion: @escaping (Result<[Subreddit], AFError>) -> Void) {
     let illithid: Illithid = .shared
     let subscribedSubredditsUrl = URL(string: "/subreddits/mine/subscriber", relativeTo: illithid.baseURL)!
 
@@ -109,10 +112,12 @@ public extension Account {
     .eraseToAnyPublisher()
   }
 
-  func multireddits(queue: DispatchQueue = .main, _ completion: @escaping (Result<[Multireddit], AFError>) -> Void) {
+  @discardableResult
+  func multireddits(queue: DispatchQueue = .main,
+                    completion: @escaping (Result<[Multireddit], AFError>) -> Void) -> DataRequest {
     let illithid: Illithid = .shared
 
-    illithid.session.request(AccountRouter.multireddits(username: name))
+    return illithid.session.request(AccountRouter.multireddits(username: name))
       // The multireddits endpoint is not a listing
     .validate().responseData(queue: queue) { response in
         switch response.result {
@@ -135,19 +140,23 @@ public extension Account {
     }.eraseToAnyPublisher()
   }
 
-  func overview(queue: DispatchQueue = .main, _ completion: @escaping (Result<Listing, AFError>) -> Void) {
+  @discardableResult
+  func overview(queue: DispatchQueue = .main,
+                completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
     let illithid: Illithid = .shared
 
-    illithid.session.request(AccountRouter.overview(username: name))
+    return illithid.session.request(AccountRouter.overview(username: name))
       .validate().responseDecodable(of: Listing.self, queue: queue, decoder: illithid.decoder) { response in
         completion(response.result)
       }
   }
 
-  func comments(queue: DispatchQueue = .main, _ completion: @escaping (Result<[Comment], AFError>) -> Void) {
+  @discardableResult
+  func comments(queue: DispatchQueue = .main,
+                completion: @escaping (Result<[Comment], AFError>) -> Void) -> DataRequest {
     let illithid: Illithid = .shared
 
-    illithid.session.request(AccountRouter.comments(username: name))
+    return illithid.session.request(AccountRouter.comments(username: name))
       .validate().responseDecodable(of: Listing.self, queue: queue, decoder: illithid.decoder) { response in
         switch response.result {
         case let .success(listing):
@@ -158,10 +167,12 @@ public extension Account {
       }
   }
 
-  func submittedPosts(queue: DispatchQueue = .main, _ completion: @escaping (Result<[Post], AFError>) -> Void) {
+  @discardableResult
+  func submittedPosts(queue: DispatchQueue = .main,
+                      completion: @escaping (Result<[Post], AFError>) -> Void) -> DataRequest {
     let illithid: Illithid = .shared
 
-    illithid.session.request(AccountRouter.posts(username: name))
+    return illithid.session.request(AccountRouter.posts(username: name))
       .validate().responseDecodable(of: Listing.self, queue: queue, decoder: illithid.decoder) { response in
         switch response.result {
         case let .success(listing):
@@ -172,10 +183,12 @@ public extension Account {
       }
   }
 
-  func upvotedPosts(queue: DispatchQueue = .main, _ completion: @escaping (Result<[Post], AFError>) -> Void) {
+  @discardableResult
+  func upvotedPosts(queue: DispatchQueue = .main,
+                    completion: @escaping (Result<[Post], AFError>) -> Void) -> DataRequest {
     let illithid: Illithid = .shared
 
-    illithid.session.request(AccountRouter.upvoted(username: name))
+    return illithid.session.request(AccountRouter.upvoted(username: name))
       .validate().responseDecodable(of: Listing.self, queue: queue, decoder: illithid.decoder) { response in
         switch response.result {
         case let .success(listing):
@@ -186,10 +199,12 @@ public extension Account {
       }
   }
 
-  func downvotedPosts(queue: DispatchQueue = .main, _ completion: @escaping (Result<[Post], AFError>) -> Void) {
+  @discardableResult
+  func downvotedPosts(queue: DispatchQueue = .main,
+                      completion: @escaping (Result<[Post], AFError>) -> Void) -> DataRequest {
     let illithid: Illithid = .shared
 
-    illithid.session.request(AccountRouter.downvoted(username: name))
+    return illithid.session.request(AccountRouter.downvoted(username: name))
       .validate().responseDecodable(of: Listing.self, queue: queue, decoder: illithid.decoder) { response in
         switch response.result {
         case let .success(listing):
@@ -200,10 +215,12 @@ public extension Account {
       }
   }
 
-  func hiddenPosts(queue: DispatchQueue = .main, _ completion: @escaping (Result<[Post], AFError>) -> Void) {
+  @discardableResult
+  func hiddenPosts(queue: DispatchQueue = .main,
+                   completion: @escaping (Result<[Post], AFError>) -> Void) -> DataRequest {
     let illithid: Illithid = .shared
 
-    illithid.session.request(AccountRouter.hidden(username: name))
+    return illithid.session.request(AccountRouter.hidden(username: name))
       .validate().responseDecodable(of: Listing.self, queue: queue, decoder: illithid.decoder) { response in
         switch response.result {
         case let .success(listing):
@@ -214,10 +231,12 @@ public extension Account {
       }
   }
 
-  func savedContent(queue: DispatchQueue = .main, _ completion: @escaping (Result<Listing, AFError>) -> Void) {
+  @discardableResult
+  func savedContent(queue: DispatchQueue = .main,
+                    completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
     let illithid: Illithid = .shared
 
-    illithid.session.request(AccountRouter.saved(username: name))
+    return illithid.session.request(AccountRouter.saved(username: name))
       .validate().responseDecodable(of: Listing.self, queue: queue, decoder: illithid.decoder) { response in
         switch response.result {
         case let .success(listing):
@@ -230,8 +249,10 @@ public extension Account {
 }
 
 public extension Account {
-  static func fetch(name: String, queue: DispatchQueue = .main, completion: @escaping (Result<Account, AFError>) -> Void) {
-    Illithid.shared.fetchAccount(name: name, queue: queue) { result in
+  @discardableResult
+  static func fetch(name: String, queue: DispatchQueue = .main,
+                    completion: @escaping (Result<Account, AFError>) -> Void) -> DataRequest {
+    return Illithid.shared.fetchAccount(name: name, queue: queue) { result in
       completion(result)
     }
   }
