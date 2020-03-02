@@ -30,6 +30,23 @@ public extension Illithid {
       completion(result)
     }
   }
+
+  func moderators(for subredditName: String, queue: DispatchQueue = .main, completion: @escaping (Result<[Moderator], AFError>) -> Void) -> DataRequest {
+    let moderatorsUrl = URL(string: "/r/\(subredditName)/about/moderators", relativeTo: baseURL)!
+
+    return session.request(moderatorsUrl, method: .get).validate().responseDecodable(of: UserList.self, queue: queue, decoder: decoder) { response in
+      switch response.result {
+      case let .success(list):
+        completion(.success(list.users))
+      case let .failure(error):
+        completion(.failure(error))
+      }
+    }
+  }
+
+  func moderators(for subreddit: Subreddit, queue: DispatchQueue = .main, completion: @escaping (Result<[Moderator], AFError>) -> Void) -> DataRequest {
+    moderators(for: subreddit.displayName, queue: queue, completion: completion)
+  }
 }
 
 extension Subreddit: PostsProvider {
@@ -49,6 +66,9 @@ public extension Subreddit {
              completion: @escaping (Result<Listing, AFError>) -> Void) {
     Illithid.shared.fetchPosts(for: self, sortBy: postSort, location: location, topInterval: topInterval,
                                params: params, queue: queue, completion: completion)
+  }
+  func moderators(queue: DispatchQueue = .main, completion: @escaping (Result<[Moderator], AFError>) -> Void) -> DataRequest {
+    Illithid.shared.moderators(for: self, queue: queue, completion: completion)
   }
 }
 
