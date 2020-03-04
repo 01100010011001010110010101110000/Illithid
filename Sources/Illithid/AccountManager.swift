@@ -165,6 +165,10 @@ public final class AccountManager: ObservableObject {
 
   internal func makeSession(for account: Account? = nil) -> Session {
     let alamoConfiguration = URLSessionConfiguration.default
+    
+    // TODO: Make this some function of the system's available disk and memory
+    alamoConfiguration.urlCache = URLCache(memoryCapacity: 10_485_760, diskCapacity: 209_715_200)
+
     // Construct Reddit's required UA string
     let osVersion = ProcessInfo().operatingSystemVersion
     let userAgentComponents = [
@@ -184,10 +188,13 @@ public final class AccountManager: ObservableObject {
     oauth.accessTokenBasicAuthentification = true
     oauth.client = OAuthSwiftClient(credential: credential)
 
+    let cacher: ResponseCacher = .cache
     let session = Session(configuration: alamoConfiguration,
-                          rootQueue: DispatchQueue(label: "com.flayware.IllithidUI.AFRootQueue"),
-                          serializationQueue: DispatchQueue(label: "com.flayware.IllithidUI.AFSerializationQueue"),
-                          interceptor: OAuthSwift2RequestInterceptor(oauth))
+                          rootQueue: DispatchQueue(label: "com.flayware.illithid.AFRootQueue"),
+                          serializationQueue: DispatchQueue(label: "com.flayware.illithid.AFSerializationQueue"),
+                          interceptor: OAuthSwift2RequestInterceptor(oauth),
+                          cachedResponseHandler: cacher,
+                          eventMonitors: [FireLogger(logger: logger)])
 
     return session
   }

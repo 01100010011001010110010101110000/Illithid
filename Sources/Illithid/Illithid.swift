@@ -53,7 +53,7 @@ open class Illithid: ObservableObject {
 
   public func configure(configuration: ClientConfiguration) {
     accountManager.configuration = configuration
-    session.session.invalidateAndCancel()
+    session.cancelAllRequests()
     session = accountManager.makeSession(for: accountManager.currentAccount)
   }
 }
