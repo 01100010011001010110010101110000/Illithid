@@ -30,24 +30,9 @@ public extension Illithid {
       completion(result)
     }
   }
-
-  func moderators(for subredditName: String, queue: DispatchQueue = .main, completion: @escaping (Result<[Moderator], AFError>) -> Void) -> DataRequest {
-    let moderatorsUrl = URL(string: "/r/\(subredditName)/about/moderators", relativeTo: baseURL)!
-
-    return session.request(moderatorsUrl, method: .get).validate().responseDecodable(of: UserList.self, queue: queue, decoder: decoder) { response in
-      switch response.result {
-      case let .success(list):
-        completion(.success(list.users))
-      case let .failure(error):
-        completion(.failure(error))
-      }
-    }
-  }
-
-  func moderators(for subreddit: Subreddit, queue: DispatchQueue = .main, completion: @escaping (Result<[Moderator], AFError>) -> Void) -> DataRequest {
-    moderators(for: subreddit.displayName, queue: queue, completion: completion)
-  }
 }
+
+// MARK: Getting posts
 
 extension Subreddit: PostsProvider {
   public func posts(sortBy sort: PostSort, location: Location?, topInterval: TopInterval?,
@@ -66,9 +51,6 @@ public extension Subreddit {
              completion: @escaping (Result<Listing, AFError>) -> Void) {
     Illithid.shared.fetchPosts(for: self, sortBy: postSort, location: location, topInterval: topInterval,
                                params: params, queue: queue, completion: completion)
-  }
-  func moderators(queue: DispatchQueue = .main, completion: @escaping (Result<[Moderator], AFError>) -> Void) -> DataRequest {
-    Illithid.shared.moderators(for: self, queue: queue, completion: completion)
   }
 }
 
@@ -102,6 +84,8 @@ public extension Subreddit {
   }
 }
 
+// MARK: Subscription
+
 public extension Subreddit {
   func subscribe(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
     Illithid.shared.changeSubscription(of: self, isSubscribed: true, queue: queue, completion: completion)
@@ -109,5 +93,37 @@ public extension Subreddit {
 
   func unsubscribe(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
     Illithid.shared.changeSubscription(of: self, isSubscribed: false, queue: queue, completion: completion)
+  }
+}
+
+// MARK: Moderator fetching
+
+extension Illithid {
+  public func moderatorsOf(displayName subredditName: String, queue: DispatchQueue = .main,
+                           completion: @escaping (Result<[Moderator], AFError>) -> Void) -> DataRequest {
+    let moderatorsUrl = URL(string: "/r/\(subredditName)/about/moderators", relativeTo: baseURL)!
+
+    return session.request(moderatorsUrl, method: .get)
+      .validate()
+      .responseDecodable(of: UserList.self, queue: queue, decoder: decoder) { response in
+      switch response.result {
+      case let .success(list):
+        completion(.success(list.users))
+      case let .failure(error):
+        completion(.failure(error))
+      }
+    }
+  }
+
+  public func moderatorsOf(subreddit: Subreddit, queue: DispatchQueue = .main,
+                           completion: @escaping (Result<[Moderator], AFError>) -> Void) -> DataRequest {
+    moderatorsOf(displayName: subreddit.displayName, queue: queue, completion: completion)
+  }
+}
+
+public extension Subreddit {
+  func moderators(queue: DispatchQueue = .main,
+                  completion: @escaping (Result<[Moderator], AFError>) -> Void) -> DataRequest {
+    Illithid.shared.moderatorsOf(subreddit: self, queue: queue, completion: completion)
   }
 }

@@ -139,3 +139,21 @@ public extension Comment {
     }
   }
 }
+
+public extension Comment {
+  func isModComment(queue: DispatchQueue = .main,
+                    completion: @escaping (Result<Bool, AFError>) -> Void) -> DataRequest {
+    Illithid.shared.moderatorsOf(displayName: subreddit, queue: queue) { result in
+      switch result {
+      case let .success(moderators):
+        if moderators.contains(where: { $0.name == self.author}) {
+          completion(.success(true))
+        } else {
+          completion(.success(false))
+        }
+      case let .failure(error):
+        completion(.failure(error))
+      }
+    }
+  }
+}

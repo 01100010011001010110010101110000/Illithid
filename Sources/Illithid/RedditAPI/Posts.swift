@@ -92,7 +92,8 @@ public extension Post {
 }
 
 public extension Post {
-  static func fetch(name: Fullname, queue: DispatchQueue = .main, completion: @escaping (Result<Post, Error>) -> Void) {
+  @discardableResult
+  static func fetch(name: Fullname, queue: DispatchQueue = .main, completion: @escaping (Result<Post, Error>) -> Void) -> DataRequest {
     Illithid.shared.info(name: name, queue: queue) { result in
       switch result {
       case let .success(listing):
@@ -114,8 +115,9 @@ public extension Post {
   ///   - topInterval: The interval in which to search for top `Posts` when `postSort` is `.top`
   ///   - params: Default parameters applicable to every `Listing` returning endpoint on Reddit
   ///   - completion: The callback function to execute when we get the `Post` `Listing` back from Reddit
-  func all(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
-           params: ListingParameters = .init(), queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void) {
+  @discardableResult
+  static func all(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
+           params: ListingParameters = .init(), queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
     Illithid.shared.fetchPosts(for: .all, sortBy: postSort, location: location, topInterval: topInterval,
                                params: params, queue: queue, completion: completion)
   }
@@ -128,8 +130,9 @@ public extension Post {
   ///   - topInterval: The interval in which to search for top `Posts` when `postSort` is `.top`
   ///   - params: Default parameters applicable to every `Listing` returning endpoint on Reddit
   ///   - completion: The callback function to execute when we get the `Post` `Listing` back from Reddit
-  func popular(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
-               params: ListingParameters = .init(), queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void) {
+  @discardableResult
+  static func popular(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
+               params: ListingParameters = .init(), queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
     Illithid.shared.fetchPosts(for: .popular, sortBy: postSort, location: location, topInterval: topInterval,
                                params: params, queue: queue, completion: completion)
   }
@@ -141,9 +144,27 @@ public extension Post {
   ///   - topInterval: The interval in which to search for top `Posts` when `postSort` is `.top`
   ///   - params: Default parameters applicable to every `Listing` returning endpoint on Reddit
   ///   - completion: The callback function to execute when we get the `Post` `Listing` back from Reddit
-  func random(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
-              params: ListingParameters = .init(), queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void) {
+  @discardableResult
+  static func random(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
+              params: ListingParameters = .init(), queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
     Illithid.shared.fetchPosts(for: .random, sortBy: postSort, location: location, topInterval: topInterval,
                                params: params, queue: queue, completion: completion)
+  }
+}
+
+public extension Post {
+  func isModPost(queue: DispatchQueue = .main, completion: @escaping (Result<Bool, AFError>) -> Void) -> DataRequest {
+    Illithid.shared.moderatorsOf(displayName: subreddit, queue: queue) { result in
+      switch result {
+      case let .success(moderators):
+        if moderators.contains(where: { $0.name == self.author}) {
+          completion(.success(true))
+        } else {
+          completion(.success(false))
+        }
+      case let .failure(error):
+        completion(.failure(error))
+      }
+    }
   }
 }
