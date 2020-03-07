@@ -34,7 +34,7 @@ public extension Illithid {
 
 // MARK: Getting posts
 
-extension Subreddit: PostsProvider {
+extension Subreddit: PostProvider {
   public func posts(sortBy sort: PostSort, location: Location?, topInterval: TopInterval?,
                     parameters: ListingParameters, queue: DispatchQueue = .main,
                     completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {

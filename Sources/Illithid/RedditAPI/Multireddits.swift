@@ -8,7 +8,7 @@ import Alamofire
 
 import Foundation
 
-extension Multireddit: PostsProvider {
+extension Multireddit: PostProvider {
   @discardableResult
   public func posts(sortBy sort: PostSort, location: Location?, topInterval: TopInterval?,
                     parameters: ListingParameters, queue: DispatchQueue = .main,

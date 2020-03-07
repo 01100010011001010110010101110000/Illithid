@@ -26,6 +26,6 @@ final class FireLogger: EventMonitor {
   }
 
   func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, willCacheResponse proposedResponse: CachedURLResponse) {
-    logger.debugMessage("Request to \(dataTask.originalRequest?.description) is being cached")
+    logger.debugMessage("Request to \(dataTask.originalRequest?.description ?? "Unknown request") is being cached")
   }
 }

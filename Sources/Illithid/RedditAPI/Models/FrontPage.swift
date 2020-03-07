@@ -32,7 +32,7 @@ public enum FrontPage: String, Codable, URLConvertible {
   }
 }
 
-extension FrontPage: PostsProvider {
+extension FrontPage: PostProvider {
   public func posts(sortBy sort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
                     parameters: ListingParameters, queue: DispatchQueue = .main,
                     completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
