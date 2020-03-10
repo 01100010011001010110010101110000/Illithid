@@ -33,6 +33,9 @@ public enum FrontPage: String, Codable, URLConvertible {
 }
 
 extension FrontPage: PostProvider {
+  public var id: String {
+    try! self.asURL().absoluteString
+  }
   public func posts(sortBy sort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
                     parameters: ListingParameters, queue: DispatchQueue = .main,
                     completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {

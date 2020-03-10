@@ -9,6 +9,8 @@ import Alamofire
 import Foundation
 
 public protocol PostProvider {
+  var id: String { get }
+
   @discardableResult
   func posts(sortBy sort: PostSort, location: Location?,
              topInterval: TopInterval?, parameters: ListingParameters, queue: DispatchQueue,
