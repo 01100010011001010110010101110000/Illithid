@@ -20,7 +20,7 @@ final class IllithidTests: XCTestCase {
   }
 
   func testAccountSingleton() {
-    Account.fetch(name: "Tyler1-66") { result in
+    Account.fetch(username: "Tyler1-66") { result in
       switch result {
       case let .success(account):
         XCTAssertEqual(account.name, "Tyler1-66")

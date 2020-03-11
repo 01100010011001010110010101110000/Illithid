@@ -60,3 +60,17 @@ public extension Multireddit {
     Illithid.shared.addSubreddit(to: self, subreddit: subreddit, completion: completion)
   }
 }
+
+public extension Multireddit {
+  @discardableResult
+  static func fetch(user: String, name: String, queue: DispatchQueue = .main,
+             completion: @escaping (Result<Multireddit, AFError>) -> Void) -> DataRequest {
+    let multiUrl = URL(string: "/api/multi/user/\(user)/m/\(name)",
+      relativeTo: Illithid.shared.baseURL)!
+    return Illithid.shared.session.request(multiUrl, method: .get)
+      .validate()
+      .responseDecodable(of: Multireddit.self, queue: queue, decoder: Illithid.shared.decoder) { response in
+        completion(response.result)
+    }
+  }
+}

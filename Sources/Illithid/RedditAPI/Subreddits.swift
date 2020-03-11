@@ -82,6 +82,17 @@ public extension Subreddit {
       }
     }
   }
+
+  /// Load a `Subreddit` by its `displayName`
+  static func fetch(displayName: String, queue: DispatchQueue = .main,
+                    completion: @escaping (Result<Subreddit, AFError>) -> Void) {
+    let aboutUrl = URL(string: "/r/\(displayName)/about", relativeTo: Illithid.shared.baseURL)!
+    Illithid.shared.session.request(aboutUrl, method: .get)
+    .validate()
+      .responseDecodable(of: Subreddit.self, queue: queue, decoder: Illithid.shared.decoder) { response in
+        completion(response.result)
+    }
+  }
 }
 
 // MARK: Subscription

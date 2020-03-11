@@ -250,9 +250,9 @@ public extension Account {
 
 public extension Account {
   @discardableResult
-  static func fetch(name: String, queue: DispatchQueue = .main,
+  static func fetch(username: String, queue: DispatchQueue = .main,
                     completion: @escaping (Result<Account, AFError>) -> Void) -> DataRequest {
-    return Illithid.shared.fetchAccount(name: name, queue: queue) { result in
+    Illithid.shared.fetchAccount(name: username, queue: queue) { result in
       completion(result)
     }
   }
