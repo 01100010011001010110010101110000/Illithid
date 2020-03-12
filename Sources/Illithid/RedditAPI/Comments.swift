@@ -32,7 +32,7 @@ public extension Illithid {
    */
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
   func comments(for post: Post, parameters: ListingParameters,
-                by sort: CommentsSort = .confidence, focusOn comment: Comment? = nil, context: Int? = nil,
+                by sort: CommentsSort = .confidence, focusOn comment: ID36? = nil, context: Int? = nil,
                 depth: Int = 0, showEdits: Bool = true, showMore: Bool = true,
                 threaded: Bool = true, truncate: Int = 0, queue: DispatchQueue = .main) -> AnyPublisher<Listing, Error> {
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
