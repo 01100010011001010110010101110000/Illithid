@@ -100,6 +100,9 @@ public struct Post: RedditObject {
 
   public let authorFlairTextColor: String?
   public let authorFlairText: String?
+  public let linkFlairText: String?
+  public let linkFlairType: String?
+  public let linkFlairTextColor: String?
 
   /// The string value returned by the Reddit API for the URL attribute
   private let url: String
