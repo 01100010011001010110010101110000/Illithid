@@ -161,6 +161,7 @@ public struct Post: RedditObject {
   public let numReports: Int?
   public let removalReason: String?
   public let sendReplies: Bool
+  public let distinguished: String?
   public let contestMode: Bool
   public let createdUtc: Date
   public let isVideo: Bool
