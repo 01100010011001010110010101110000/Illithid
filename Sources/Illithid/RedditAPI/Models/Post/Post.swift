@@ -45,7 +45,6 @@ public enum PostHint: String, Codable {
   }
 
   public init(from decoder: Decoder) throws {
-    // TODO: figure out if this is necessary, coding keys should handle this but it currently seems otherwise
     let value = try decoder.singleValueContainer().decode(String.self)
     switch value {
     case "rich:video":
