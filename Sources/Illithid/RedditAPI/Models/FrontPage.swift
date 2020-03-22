@@ -1,7 +1,7 @@
 //
 // FrontPage.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 12/24/19
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
 //
 
 import Foundation
@@ -34,8 +34,9 @@ public enum FrontPage: String, Codable, URLConvertible {
 
 extension FrontPage: PostProvider {
   public var id: String {
-    try! self.asURL().absoluteString
+    try! asURL().absoluteString
   }
+
   public func posts(sortBy sort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
                     parameters: ListingParameters, queue: DispatchQueue = .main,
                     completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {

@@ -1,7 +1,7 @@
 --allman false
 --binarygrouping 4,8
 --closingparen balanced
---commas always
+--commas inline
 --conflictmarkers reject
 --decimalgrouping 3,6
 --elseposition same-line
@@ -26,7 +26,7 @@
 --selfrequired 
 --semicolons inline
 --stripunusedargs always
---trailingclosures 
+--trailingclosures
 --trimwhitespace always
 --wraparguments preserve
 --wrapcollections preserve

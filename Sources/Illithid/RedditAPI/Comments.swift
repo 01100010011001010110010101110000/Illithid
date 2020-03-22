@@ -1,7 +1,7 @@
 //
 // Comments.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 12/24/19
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
 //
 
 #if canImport(Combine)
@@ -47,7 +47,7 @@ public extension Illithid {
       "showmore": showMore,
       "sort": sort.rawValue,
       "threaded": threaded,
-      "truncate": truncate,
+      "truncate": truncate
     ]
     encodedParameters.merge(commentsParameters) { current, _ in current }
 
@@ -125,7 +125,7 @@ public extension Comment {
 public extension Comment {
   @discardableResult
   static func fetch(name: Fullname, queue: DispatchQueue = .main, completion: @escaping (Result<Comment, Error>) -> Void) -> DataRequest {
-    return Illithid.shared.info(name: name, queue: queue) { result in
+    Illithid.shared.info(name: name, queue: queue) { result in
       switch result {
       case let .success(listing):
         guard let comment = listing.comments.last else {
@@ -146,7 +146,7 @@ public extension Comment {
     Illithid.shared.moderatorsOf(displayName: subreddit, queue: queue) { result in
       switch result {
       case let .success(moderators):
-        if moderators.contains(where: { $0.name == self.author}) {
+        if moderators.contains(where: { $0.name == self.author }) {
           completion(.success(true))
         } else {
           completion(.success(false))

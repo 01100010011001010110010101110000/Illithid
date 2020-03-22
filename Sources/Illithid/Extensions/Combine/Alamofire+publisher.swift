@@ -1,7 +1,7 @@
 //
 // Alamofire+publisher.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 12/24/19
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
 //
 
 #if canImport(Combine)
@@ -24,7 +24,7 @@ public extension Session {
     Future { result in
       self.request(url, method: method, parameters: parameters,
                    encoding: encoding, headers: headers).validate().responseData(queue: queue) { response in
-                    result(response.result)
+        result(response.result)
       }
     }
     .eraseToAnyPublisher()

@@ -1,7 +1,7 @@
 //
 // Comment.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 12/24/19
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
 //
 
 import Combine
@@ -25,7 +25,7 @@ public enum CommentWrapper: Identifiable, Equatable {
   case more(More)
 
   public var parentId: Fullname {
-    switch self{
+    switch self {
     case let .comment(comment):
       return comment.parentId
     case let .more(more):
@@ -73,6 +73,7 @@ public struct Comment: RedditObject {
   public var fullname: Fullname {
     "\(Kind.comment.rawValue)_\(id)"
   }
+
   public let bannedAtUtc: Date?
   public let modReasonTitle: String?
   public let gilded: Int

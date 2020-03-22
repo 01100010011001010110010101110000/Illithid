@@ -1,7 +1,7 @@
 //
-// {file}
+// Ulithari.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on {created}
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
 //
 
 #if canImport(Combine)
@@ -20,8 +20,8 @@ open class Ulithari {
 
   internal var imgurAuthorizationHeader: HTTPHeaders = []
 
-  fileprivate let imgurDecoder = JSONDecoder()
-  fileprivate let gfycatDecoder = JSONDecoder()
+  private let imgurDecoder = JSONDecoder()
+  private let gfycatDecoder = JSONDecoder()
 
   private init() {
     let alamoConfiguration = URLSessionConfiguration.default
@@ -30,11 +30,11 @@ open class Ulithari {
     let osVersion = ProcessInfo().operatingSystemVersion
     let userAgentComponents = [
       "Ulithari/1",
-      "macOS \(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion)",
+      "macOS \(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion)"
     ]
     let headers: HTTPHeaders = [
       .userAgent(userAgentComponents.joined(separator: ":")),
-      .accept("application/json"),
+      .accept("application/json")
     ]
     alamoConfiguration.httpAdditionalHeaders = headers.dictionary
 

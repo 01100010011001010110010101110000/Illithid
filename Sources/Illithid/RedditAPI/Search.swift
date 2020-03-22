@@ -1,7 +1,7 @@
 //
 // Search.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 12/24/19
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
 //
 
 import Foundation
@@ -43,7 +43,7 @@ public extension Illithid {
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
     var parameters: Parameters = [
       "q": query,
-      "raw_json": true,
+      "raw_json": true
     ]
 
     // If a subreddit is supplied, restrict results to that subreddit

@@ -1,7 +1,7 @@
 //
 // Listing.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 12/24/19
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
 //
 
 import Foundation
@@ -75,7 +75,7 @@ public extension Listing {
     }
   }
 
-  var comments: [Comment] { items(kind: .comment)}
+  var comments: [Comment] { items(kind: .comment) }
 
   var accounts: [Account] { items(kind: .account) }
 
@@ -167,8 +167,8 @@ public extension Listing {
         try container.encode(account, forKey: .data)
       case let .post(post):
         try container.encode(post, forKey: .data)
-  //    case .message:
-  //      break
+      //    case .message:
+      //      break
       case let .subreddit(subreddit):
         try container.encode(subreddit, forKey: .data)
       case let .award(award):

@@ -6,19 +6,19 @@ import PackageDescription
 let package = Package(
   name: "Illithid",
   platforms: [
-    .macOS("10.15"),
+    .macOS("10.15")
   ],
   products: [
     .library(
       name: "Illithid",
       targets: ["Illithid", "Ulithari"]
-    ),
+    )
   ],
   dependencies: [
     .package(url: "https://github.com/Alamofire/Alamofire.git", from: .init(5, 0, 4)),
     .package(url: "https://github.com/OAuthSwift/OAuthSwift.git", from: .init(2, 1, 0)),
     .package(url: "https://github.com/Nike-Inc/Willow.git", from: .init(6, 0, 0)),
-    .package(url: "https://github.com/kishikawakatsumi/KeychainAccess.git", from: .init(4, 1, 0)),
+    .package(url: "https://github.com/kishikawakatsumi/KeychainAccess.git", from: .init(4, 1, 0))
   ],
   targets: [
     .target(
@@ -27,7 +27,7 @@ let package = Package(
         .product(name: "Alamofire"),
         .product(name: "OAuthSwift"),
         .product(name: "Willow"),
-        .product(name: "KeychainAccess"),
+        .product(name: "KeychainAccess")
       ]
     ),
     .testTarget(
@@ -35,8 +35,8 @@ let package = Package(
       dependencies: ["Illithid"]
     ),
     .target(name: "Ulithari", dependencies: [
-      .product(name: "Alamofire"),
-    ]),
+      .product(name: "Alamofire")
+    ])
   ],
   swiftLanguageVersions: [.v5]
 )

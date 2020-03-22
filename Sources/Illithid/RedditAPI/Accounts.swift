@@ -1,7 +1,7 @@
 //
 // Accounts.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 12/24/19
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
 //
 
 #if canImport(Combine)
@@ -60,7 +60,7 @@ public extension Illithid {
   @discardableResult
   func fetchAccount(name: String, queue: DispatchQueue = .main,
                     completion: @escaping (Result<Account, AFError>) -> Void) -> DataRequest {
-    return session.request(AccountRouter.account(username: name))
+    session.request(AccountRouter.account(username: name))
       .validate().responseData(queue: queue) { response in
         switch response.result {
         case let .success(data):
@@ -119,7 +119,7 @@ public extension Account {
 
     return illithid.session.request(AccountRouter.multireddits(username: name))
       // The multireddits endpoint is not a listing
-    .validate().responseData(queue: queue) { response in
+      .validate().responseData(queue: queue) { response in
         switch response.result {
         case let .success(data):
           let multis = try! illithid.decoder.decode([Multireddit].self, from: data)

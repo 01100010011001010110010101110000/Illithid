@@ -1,7 +1,7 @@
 //
 // Info.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 12/24/19
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
 //
 
 #if canImport(Combine)
@@ -18,7 +18,7 @@ public extension Illithid {
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
     let infoParameters: Parameters = [
       "id": names.joined(separator: ","),
-      "raw_json": true,
+      "raw_json": true
     ]
 
     return session.requestPublisher(url: endpoint, method: .get, parameters: infoParameters, encoding: queryEncoding, queue: queue)
@@ -37,19 +37,19 @@ public extension Illithid {
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
     let infoParameters: Parameters = [
       "id": names.joined(separator: ","),
-      "raw_json": true,
+      "raw_json": true
     ]
 
     return session.request(endpoint, method: .get, parameters: infoParameters, encoding: queryEncoding)
       .validate()
       .responseDecodable(of: Listing.self, queue: queue, decoder: decoder) { response in
         completion(response.result)
-    }
+      }
   }
 
   @discardableResult
   func info(name: Fullname, queue: DispatchQueue = .main,
             completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
-    return info(names: [name], queue: queue) { completion($0) }
+    info(names: [name], queue: queue) { completion($0) }
   }
 }

@@ -1,7 +1,7 @@
 //
 // AccountManager.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 12/24/19
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
 //
 
 import AuthenticationServices
@@ -165,7 +165,7 @@ public final class AccountManager: ObservableObject {
 
   internal func makeSession(for account: Account? = nil) -> Session {
     let alamoConfiguration = URLSessionConfiguration.default
-    
+
     // TODO: Make this some function of the system's available disk and memory
     alamoConfiguration.urlCache = URLCache(memoryCapacity: 10_485_760, diskCapacity: 209_715_200)
 
@@ -174,7 +174,7 @@ public final class AccountManager: ObservableObject {
     let userAgentComponents = [
       "macOS \(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion)",
       "\(configuration.consumerKey)",
-      "\(configuration.version) (by \(configuration.author))",
+      "\(configuration.version) (by \(configuration.author))"
     ]
     let headers: HTTPHeaders = [
       .userAgent(userAgentComponents.joined(separator: ":")),

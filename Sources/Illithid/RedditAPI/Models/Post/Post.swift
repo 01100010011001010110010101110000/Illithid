@@ -1,7 +1,7 @@
 //
 // Post.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 12/24/19
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
 //
 
 import Combine
@@ -17,9 +17,9 @@ public enum VoteDirection: Int {
 
 public enum PostSort: String, Codable, CaseIterable, Identifiable, Hashable {
   public var id: String {
-    self.rawValue
+    rawValue
   }
-  
+
   case hot
   case best
   case new
@@ -77,6 +77,7 @@ public struct Post: RedditObject {
   public var fullname: Fullname {
     "\(Kind.post.rawValue)_\(id)"
   }
+
   public let name: String
 
   public let subreddit: String

@@ -1,7 +1,7 @@
 //
 // Subreddits.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 12/24/19
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
 //
 
 #if canImport(Combine)
@@ -88,10 +88,10 @@ public extension Subreddit {
                     completion: @escaping (Result<Subreddit, AFError>) -> Void) {
     let aboutUrl = URL(string: "/r/\(displayName)/about", relativeTo: Illithid.shared.baseURL)!
     Illithid.shared.session.request(aboutUrl, method: .get)
-    .validate()
+      .validate()
       .responseDecodable(of: Subreddit.self, queue: queue, decoder: Illithid.shared.decoder) { response in
         completion(response.result)
-    }
+      }
   }
 }
 
@@ -117,13 +117,13 @@ extension Illithid {
     return session.request(moderatorsUrl, method: .get)
       .validate()
       .responseDecodable(of: UserList.self, queue: queue, decoder: decoder) { response in
-      switch response.result {
-      case let .success(list):
-        completion(.success(list.users))
-      case let .failure(error):
-        completion(.failure(error))
+        switch response.result {
+        case let .success(list):
+          completion(.success(list.users))
+        case let .failure(error):
+          completion(.failure(error))
+        }
       }
-    }
   }
 
   public func moderatorsOf(subreddit: Subreddit, queue: DispatchQueue = .main,

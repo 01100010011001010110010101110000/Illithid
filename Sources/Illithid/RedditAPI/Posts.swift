@@ -1,7 +1,7 @@
 //
 // Posts.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 12/24/19
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
 //
 
 #if canImport(Combine)
@@ -21,7 +21,7 @@ public extension Illithid {
     var parameters = params.toParameters()
     let postsUrl = URL(string: "/r/\(subreddit.displayName)/\(postSort)", relativeTo: baseURL)!
 
-   if let interval = topInterval { parameters["t"] = interval }
+    if let interval = topInterval { parameters["t"] = interval }
     if let location = location { parameters["g"] = location }
 
     return readListing(url: postsUrl, parameters: parameters, queue: queue) { result in
@@ -76,9 +76,11 @@ public extension Post {
   func upvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
     Illithid.shared.vote(fullname: fullname, direction: .up, queue: queue, completion: completion)
   }
+
   func downvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
     Illithid.shared.vote(fullname: fullname, direction: .down, queue: queue, completion: completion)
   }
+
   func clearVote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
     Illithid.shared.vote(fullname: fullname, direction: .clear, queue: queue, completion: completion)
   }
@@ -86,6 +88,7 @@ public extension Post {
   func save(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
     Illithid.shared.save(fullname: fullname, queue: queue, completion: completion)
   }
+
   func unsave(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
     Illithid.shared.unsave(fullname: fullname, queue: queue, completion: completion)
   }
@@ -117,7 +120,7 @@ public extension Post {
   ///   - completion: The callback function to execute when we get the `Post` `Listing` back from Reddit
   @discardableResult
   static func all(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
-           params: ListingParameters = .init(), queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+                  params: ListingParameters = .init(), queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
     Illithid.shared.fetchPosts(for: .all, sortBy: postSort, location: location, topInterval: topInterval,
                                params: params, queue: queue, completion: completion)
   }
@@ -132,7 +135,7 @@ public extension Post {
   ///   - completion: The callback function to execute when we get the `Post` `Listing` back from Reddit
   @discardableResult
   static func popular(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
-               params: ListingParameters = .init(), queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+                      params: ListingParameters = .init(), queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
     Illithid.shared.fetchPosts(for: .popular, sortBy: postSort, location: location, topInterval: topInterval,
                                params: params, queue: queue, completion: completion)
   }
@@ -146,7 +149,7 @@ public extension Post {
   ///   - completion: The callback function to execute when we get the `Post` `Listing` back from Reddit
   @discardableResult
   static func random(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
-              params: ListingParameters = .init(), queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+                     params: ListingParameters = .init(), queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
     Illithid.shared.fetchPosts(for: .random, sortBy: postSort, location: location, topInterval: topInterval,
                                params: params, queue: queue, completion: completion)
   }
@@ -157,7 +160,7 @@ public extension Post {
     Illithid.shared.moderatorsOf(displayName: subreddit, queue: queue) { result in
       switch result {
       case let .success(moderators):
-        if moderators.contains(where: { $0.name == self.author}) {
+        if moderators.contains(where: { $0.name == self.author }) {
           completion(.success(true))
         } else {
           completion(.success(false))

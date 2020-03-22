@@ -1,7 +1,7 @@
 //
 // Multireddits.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 12/24/19
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
 //
 
 import Alamofire
@@ -11,7 +11,7 @@ import Foundation
 extension Multireddit: PostProvider {
   @discardableResult
   public func posts(sortBy sort: PostSort, location: Location?, topInterval: TopInterval?,
-                    parameters: ListingParameters, queue: DispatchQueue = .main,
+                    parameters: ListingParameters, queue _: DispatchQueue = .main,
                     completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
     Illithid.shared.fetchPosts(for: self, sortBy: sort, location: location,
                                topInterval: topInterval, params: parameters) { result in
@@ -64,13 +64,13 @@ public extension Multireddit {
 public extension Multireddit {
   @discardableResult
   static func fetch(user: String, name: String, queue: DispatchQueue = .main,
-             completion: @escaping (Result<Multireddit, AFError>) -> Void) -> DataRequest {
+                    completion: @escaping (Result<Multireddit, AFError>) -> Void) -> DataRequest {
     let multiUrl = URL(string: "/api/multi/user/\(user)/m/\(name)",
-      relativeTo: Illithid.shared.baseURL)!
+                       relativeTo: Illithid.shared.baseURL)!
     return Illithid.shared.session.request(multiUrl, method: .get)
       .validate()
       .responseDecodable(of: Multireddit.self, queue: queue, decoder: Illithid.shared.decoder) { response in
         completion(response.result)
-    }
+      }
   }
 }

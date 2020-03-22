@@ -1,7 +1,7 @@
 //
 // OrderedSet.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 12/24/19
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
 //
 
 /// A data structure which guarantees unique membership and preserves lement ordering
@@ -33,16 +33,12 @@ public struct OrderedSet<E: Hashable>: RandomAccessCollection, Equatable, Hashab
 
   /// The number of elements in the ordered set
   public var count: Int {
-    get {
-      set.count
-    }
+    array.count
   }
 
   /// Whether the oredered set is empty
   public var isEmpty: Bool {
-    get {
-      set.isEmpty
-    }
+    array.isEmpty
   }
 
   /// A copy of the contents of the ordered set as an array

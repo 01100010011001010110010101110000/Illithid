@@ -1,7 +1,7 @@
 //
 // Actions.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 02/02/2020
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
 //
 
 import Foundation
@@ -15,7 +15,7 @@ internal extension Illithid {
     let voteUrl = URL(string: "/api/vote", relativeTo: baseURL)!
     let voteParameters: [String: Any] = [
       "id": fullname,
-      "dir": direction.rawValue,
+      "dir": direction.rawValue
     ]
 
     return session.request(voteUrl, method: .post, parameters: voteParameters, encoding: URLEncoding(destination: .httpBody)).validate().responseData(queue: queue) { response in
@@ -66,7 +66,7 @@ internal extension Illithid {
 
   @discardableResult
   func changeSubscription(of subreddit: Subreddit, isSubscribed: Bool, queue: DispatchQueue = .main,
-                          completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest{
-    return changeSubscription(of: [subreddit], isSubscribed: isSubscribed, queue: queue, completion: completion)
+                          completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
+    changeSubscription(of: [subreddit], isSubscribed: isSubscribed, queue: queue, completion: completion)
   }
 }

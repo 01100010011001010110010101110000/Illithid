@@ -1,7 +1,7 @@
 //
-// Multireddit.swift
+// MultiReddit.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 12/24/19
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
 //
 
 import Foundation
@@ -14,7 +14,7 @@ public struct Multireddit: RedditObject {
     lhs.id == rhs.id &&
       lhs.descriptionMd == rhs.descriptionMd &&
       lhs.visibility == rhs.visibility &&
-      lhs.subreddits == rhs.subreddits 
+      lhs.subreddits == rhs.subreddits
   }
 
   /// A `Multireddit`'s different possible visibility levels
@@ -121,4 +121,4 @@ public struct Multireddit: RedditObject {
 
     public let name: String
   }
-} 
+}
