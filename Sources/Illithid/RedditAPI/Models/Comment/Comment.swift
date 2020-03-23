@@ -122,6 +122,9 @@ public struct Comment: RedditObject {
   public let modReports: [String]
   public let modNote: String?
   public let distinguished: String?
+  public var isAdminComment: Bool {
+    distinguished?.contains("admin") ?? false
+  }
 
   public let previousVisits: [Date]?
   public let contentCategories: [String]?
@@ -259,8 +262,8 @@ public struct Comment: RedditObject {
     depth = try container.decodeIfPresent(Int.self, forKey: .depth)
     authorFlairBackgroundColor = try container.decodeIfPresent(String.self, forKey: .authorFlairBackgroundColor)
     modReports = try container.decode([String].self, forKey: .modReports)
-    modNote = try container.decode(String?.self, forKey: .modNote)
-    distinguished = try container.decode(String?.self, forKey: .distinguished)
+    modNote = try container.decodeIfPresent(String.self, forKey: .modNote)
+    distinguished = try container.decodeIfPresent(String.self, forKey: .distinguished)
 
     previousVisits = try container.decodeIfPresent([Date].self, forKey: .previousVisits)
     contentCategories = try container.decodeIfPresent([String].self, forKey: .contentCategories)

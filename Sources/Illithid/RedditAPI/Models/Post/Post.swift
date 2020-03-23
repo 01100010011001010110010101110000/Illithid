@@ -165,6 +165,10 @@ public struct Post: RedditObject {
   public let removalReason: String?
   public let sendReplies: Bool
   public let distinguished: String?
+  public var isAdminPost: Bool {
+    distinguished?.contains("admin") ?? false
+  }
+
   public let contestMode: Bool
   public let createdUtc: Date
   public let isVideo: Bool
