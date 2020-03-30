@@ -33,6 +33,10 @@ public enum FrontPage: String, Codable, URLConvertible {
 }
 
 extension FrontPage: PostProvider {
+  public var isNsfw: Bool {
+    false
+  }
+
   public var id: String {
     try! asURL().absoluteString
   }

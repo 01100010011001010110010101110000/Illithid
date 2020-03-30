@@ -83,7 +83,7 @@ public struct GfyItem: Codable, Hashable, Equatable {
   public let createDate: Date
   public let md5: String?
   public let source: Int
-  public let contentUrls: [String: Content]
+  public let contentUrls: [String: GfyContent]
 
   enum CodingKeys: String, CodingKey {
     case tags
@@ -137,7 +137,7 @@ public struct GfyItem: Codable, Hashable, Equatable {
 
 // MARK: - ContentURL
 
-public struct Content: Codable, Hashable {
+public struct GfyContent: Codable, Hashable {
   public let url: URL
   public let size: Int
   public let height: Int

@@ -35,6 +35,10 @@ public extension Illithid {
 // MARK: Getting posts
 
 extension Subreddit: PostProvider {
+  public var isNsfw: Bool {
+    over18 ?? false
+  }
+
   public func posts(sortBy sort: PostSort, location: Location?, topInterval: TopInterval?,
                     parameters: ListingParameters, queue: DispatchQueue = .main,
                     completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {

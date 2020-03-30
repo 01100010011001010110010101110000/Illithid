@@ -9,6 +9,10 @@ import Alamofire
 import Foundation
 
 extension Multireddit: PostProvider {
+  public var isNsfw: Bool {
+    over18 ?? false
+  }
+
   @discardableResult
   public func posts(sortBy sort: PostSort, location: Location?, topInterval: TopInterval?,
                     parameters: ListingParameters, queue _: DispatchQueue = .main,

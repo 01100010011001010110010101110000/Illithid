@@ -10,6 +10,7 @@ import Foundation
 
 public protocol PostProvider {
   var id: String { get }
+  var isNsfw: Bool { get }
 
   @discardableResult
   func posts(sortBy sort: PostSort, location: Location?,
