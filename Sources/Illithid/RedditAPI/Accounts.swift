@@ -49,8 +49,9 @@ private enum AccountRouter: URLRequestConvertible {
   }
 
   func asURLRequest() throws -> URLRequest {
-    try URLRequest(url: URL(string: path, relativeTo: Illithid.shared.baseURL)!,
-                   method: .get)
+    let request = try URLRequest(url: URL(string: path, relativeTo: Illithid.shared.baseURL)!,
+                                 method: .get)
+    return try URLEncoding.queryString.encode(request, with: ["raw_json": true])
   }
 }
 
