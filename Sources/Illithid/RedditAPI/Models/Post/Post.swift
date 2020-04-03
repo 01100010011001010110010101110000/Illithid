@@ -1,7 +1,7 @@
 //
 // Post.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/22/20
 //
 
 import Combine
@@ -180,12 +180,12 @@ public struct Post: RedditObject {
 
 public extension Post {
   var imagePreviews: [Preview.Source] {
-    guard thumbnail != nil, thumbnail?.scheme != nil else { return [] }
-
     var previews: [Preview.Source] = []
     previews.reserveCapacity((preview?.images.first?.resolutions.count ?? 0) + 2)
     // Add thumbnail URL as a fallback
-    previews.append(Preview.Source(url: thumbnail!, width: thumbnailWidth!, height: thumbnailHeight!))
+    if thumbnail != nil, thumbnail?.scheme != nil {
+      previews.append(Preview.Source(url: thumbnail!, width: thumbnailWidth!, height: thumbnailHeight!))
+    }
     // Add regular preview images
     if let preview = self.preview?.images.first {
       previews.append(contentsOf: preview.resolutions)
