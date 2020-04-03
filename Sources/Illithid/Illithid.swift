@@ -80,7 +80,6 @@ internal extension Illithid {
   ///   - completion: The function to call upon fetching all `Listings`
   /// - Warning: If this method is called on a large endpoint, like the endpoint for fetching all subreddits, this method may take a very long time to terminate or not terminate at all
   func readAllListings(url: Alamofire.URLConvertible, queue: DispatchQueue = .main, completion: @escaping (Result<[Listing], AFError>) -> Void) {
-    let queryEncoding = URLEncoding(boolEncoding: .numeric)
     var results: [Listing] = []
     var parameters: Parameters = ["after": ""] {
       didSet {

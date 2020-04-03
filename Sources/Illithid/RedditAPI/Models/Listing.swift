@@ -35,7 +35,7 @@ public struct Listing: Codable {
   public var modhash: String? { data.modhash }
   public var isEmpty: Bool { data.children.isEmpty }
 
-  internal var children: [Content] { data.children }
+  public var children: [Content] { data.children }
 }
 
 private extension Listing {
@@ -94,7 +94,7 @@ public extension Listing {
 
   var more: More? { items(kind: .more).first }
 
-  internal enum Content: Codable {
+  enum Content: Codable, Identifiable {
     case comment(Comment)
     case account(Account)
     case post(Post)
@@ -102,6 +102,23 @@ public extension Listing {
     case subreddit(Subreddit)
     case award(Award)
     case more(More)
+
+    public var id: String {
+      switch self {
+      case let .account(account):
+        return account.id
+      case let .award(award):
+        return award.id
+      case let .comment(comment):
+        return comment.id
+      case let .post(post):
+        return post.id
+      case let .subreddit(subreddit):
+        return subreddit.id
+      case let .more(more):
+        return more.id
+      }
+    }
 
     public var kind: Kind {
       switch self {
