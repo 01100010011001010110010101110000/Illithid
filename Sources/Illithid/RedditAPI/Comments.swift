@@ -12,6 +12,20 @@ import Foundation
 import Alamofire
 import Willow
 
+enum CommentRouter: URLConvertible {
+  case comments(for: Post)
+  case moreComments
+
+  func asURL() throws -> URL {
+    switch self {
+    case let .comments(post):
+      return URL(string: "/r/\(post.subreddit)/comments/\(post.id)", relativeTo: Illithid.shared.baseURL)!
+    case .moreComments:
+      return URL(string: "/api/morechildren", relativeTo: Illithid.shared.baseURL)!
+    }
+  }
+}
+
 public extension Illithid {
   /**
    Fetch comments for a particular `Post`
@@ -36,7 +50,6 @@ public extension Illithid {
                 depth: Int = 0, showEdits: Bool = true, showMore: Bool = true,
                 threaded: Bool = true, truncate: Int = 0, queue: DispatchQueue = .main) -> AnyPublisher<Listing, Error> {
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
-    let commentsListingURL = URL(string: "/r/\(post.subreddit)/comments/\(post.id)", relativeTo: baseURL)!
 
     var encodedParameters = parameters.toParameters()
     let commentsParameters: Parameters = [
@@ -51,7 +64,7 @@ public extension Illithid {
     ]
     encodedParameters.merge(commentsParameters) { current, _ in current }
 
-    return session.requestPublisher(url: commentsListingURL, method: .get, parameters: encodedParameters,
+    return session.requestPublisher(url: CommentRouter.comments(for: post), method: .get, parameters: encodedParameters,
                                     encoding: queryEncoding, queue: queue)
       .decode(type: [Listing].self, decoder: decoder)
       .mapError { (error) -> Error in
@@ -66,7 +79,6 @@ public extension Illithid {
 
   func moreComments(for more: More, in post: Post, depth: Int? = nil,
                     limitChildren: Bool = false, sortBy: CommentsSort = .confidence, queue: DispatchQueue = .main) -> AnyPublisher<[CommentWrapper], Error> {
-    let moreUrl: URL = URL(string: "/api/morechildren", relativeTo: baseURL)!
     var parameters: Parameters = [
       "api_type": "json",
       "children": more.children.joined(separator: ","),
@@ -76,7 +88,7 @@ public extension Illithid {
     ]
     if let depth = depth { parameters["depth"] = depth }
 
-    return session.requestPublisher(url: moreUrl, method: .post, parameters: parameters,
+    return session.requestPublisher(url: CommentRouter.moreComments, method: .post, parameters: parameters,
                                     encoding: URLEncoding(destination: .httpBody, boolEncoding: .numeric), queue: queue)
       .decode(type: MoreChildren.self, decoder: decoder)
       .map { $0.allComments }

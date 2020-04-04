@@ -1,7 +1,7 @@
 //
 // Info.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 4/4/20
 //
 
 #if canImport(Combine)
@@ -15,10 +15,9 @@ import Alamofire
 public extension Illithid {
   func info(names: [Fullname], queue: DispatchQueue = .main) -> AnyPublisher<Listing, Error> {
     let endpoint = URL(string: "/api/info", relativeTo: baseURL)!
-    let queryEncoding = URLEncoding(boolEncoding: .numeric)
     let infoParameters: Parameters = ["id": names.joined(separator: ",")]
 
-    return session.requestPublisher(url: endpoint, method: .get, parameters: infoParameters, encoding: queryEncoding, queue: queue)
+    return session.requestPublisher(url: endpoint, method: .get, parameters: infoParameters, queue: queue)
       .decode(type: Listing.self, decoder: decoder)
       .eraseToAnyPublisher()
   }
@@ -31,10 +30,9 @@ public extension Illithid {
   func info(names: [Fullname], queue: DispatchQueue = .main,
             completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
     let endpoint = URL(string: "/api/info", relativeTo: baseURL)!
-    let queryEncoding = URLEncoding(boolEncoding: .numeric)
     let infoParameters: Parameters = ["id": names.joined(separator: ",")]
 
-    return session.request(endpoint, method: .get, parameters: infoParameters, encoding: queryEncoding)
+    return session.request(endpoint, method: .get, parameters: infoParameters)
       .validate()
       .responseDecodable(of: Listing.self, queue: queue, decoder: decoder) { response in
         completion(response.result)
