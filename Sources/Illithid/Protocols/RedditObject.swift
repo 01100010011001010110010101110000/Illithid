@@ -1,7 +1,7 @@
 //
 // RedditObject.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 4/4/20
 //
 
 import Foundation
@@ -144,21 +144,17 @@ public enum Location: String, CaseIterable, Identifiable, Hashable {
 ///     - after: The [`fullname`](https://www.reddit.com/dev/api#fullnames) of the Reddit Object to use as an anchor to fetch the next slice of the listing
 ///     - before: The [`fullname`](https://www.reddit.com/dev/api#fullnames) of the Reddit Object to use as an anchor to fetch the previous slice of the listing
 ///     - limit: The number of objects to fetch from the listing
-///     - show: Whether to bypass filters such as hiding previously visited posts; defaults to filtered
 /// - SeeAlso: [Reddit's Listing documentation](https://www.reddit.com/dev/api#listings)
 public struct ListingParameters {
   public var after: String
   public var before: String
   public var limit: Int
-  public var show: ShowAllPreference
 
   public init(after: String = "", before: String = "",
-              limit: Int = 25, show: ShowAllPreference = .filtered) {
+              limit: Int = 25) {
     self.after = after
     self.before = before
-    includeCategories = includeCategories
     self.limit = limit
-    self.show = show
   }
 
   public func toParameters() -> Parameters {

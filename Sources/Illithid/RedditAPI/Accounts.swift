@@ -1,7 +1,7 @@
 //
 // Accounts.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 4/2/20
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 4/4/20
 //
 
 #if canImport(Combine)
@@ -22,45 +22,31 @@ public enum AccountContentSort: String, Codable, CaseIterable, Identifiable {
   case controversial
 }
 
-private enum AccountRouter: URLRequestConvertible {
+private enum AccountRouter: URLRequestConvertible, MirrorableEnum {
   case account(username: String)
   case multireddits(username: String)
   case subscriptions
 
-  private var mirror: (route: String, parameters: Parameters) {
-    let reflection = Mirror(reflecting: self)
-    guard reflection.displayStyle == .enum, let associated = reflection.children.first else {
-      return ("\(self)", [:])
-    }
-    let values = Mirror(reflecting: associated.value).children
-    var params: Parameters = [:]
-    for case let param in values {
-      guard let label = param.label else { continue }
-      params[label] = param.value
-    }
-    return ("\(self)", params)
-  }
-
   case overview(username: String,
-                sort: AccountContentSort = .new, topInterval: TopInterval = .day, context: Int = 2,
+                sort: AccountContentSort = .new, t: TopInterval = .day, context: Int = 2,
                 listingParameters: ListingParameters = .init())
   case submissions(username: String,
-                   sort: AccountContentSort = .new, topInterval: TopInterval = .day,
+                   sort: AccountContentSort = .new, t: TopInterval = .day,
                    listingParameters: ListingParameters = .init())
   case comments(username: String,
-                sort: AccountContentSort = .new, topInterval: TopInterval = .day, context: Int = 2,
+                sort: AccountContentSort = .new, t: TopInterval = .day, context: Int = 2,
                 listingParameters: ListingParameters = .init())
   case upvoted(username: String,
-               sort: AccountContentSort = .new, topInterval: TopInterval = .day,
+               sort: AccountContentSort = .new, t: TopInterval = .day,
                listingParameters: ListingParameters = .init())
   case downvoted(username: String,
-                 sort: AccountContentSort = .new, topInterval: TopInterval = .day,
+                 sort: AccountContentSort = .new, t: TopInterval = .day,
                  listingParameters: ListingParameters = .init())
   case saved(username: String,
-             sort: AccountContentSort = .new, topInterval: TopInterval = .day, context: Int = 2,
+             sort: AccountContentSort = .new, t: TopInterval = .day, context: Int = 2,
              listingParameters: ListingParameters = .init())
   case hidden(username: String,
-              sort: AccountContentSort = .new, topInterval: TopInterval = .day,
+              sort: AccountContentSort = .new, t: TopInterval = .day,
               listingParameters: ListingParameters = .init())
 
   var path: String {
@@ -89,7 +75,12 @@ private enum AccountRouter: URLRequestConvertible {
   }
 
   var parameters: Parameters {
-    mirror.parameters.filter { $0.key != "username" }
+    var _params = mirror.parameters.filter { $0.key != "username" }
+    if let listingParams = _params.removeValue(forKey: "listingParameters") as? ListingParameters {
+      _params.merge(listingParams.toParameters(), uniquingKeysWith: { $1 })
+    }
+
+    return _params
   }
 
   func asURLRequest() throws -> URLRequest {
@@ -173,7 +164,7 @@ public extension Account {
                 parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
                 completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
     let illithid: Illithid = .shared
-    let request = AccountRouter.overview(username: name, sort: sort, topInterval: topInterval,
+    let request = AccountRouter.overview(username: name, sort: sort, t: topInterval,
                                          context: context, listingParameters: parameters)
 
     return illithid.readListing(request: request, queue: queue, completion: completion)
@@ -184,7 +175,7 @@ public extension Account {
                 parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
                 completion: @escaping (Result<[Comment], AFError>) -> Void) -> DataRequest {
     let illithid: Illithid = .shared
-    let request = AccountRouter.comments(username: name, sort: sort, topInterval: topInterval,
+    let request = AccountRouter.comments(username: name, sort: sort, t: topInterval,
                                          context: context, listingParameters: parameters)
 
     return illithid.readListing(request: request, queue: queue) { result in
@@ -202,7 +193,7 @@ public extension Account {
                    parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
                    completion: @escaping (Result<[Post], AFError>) -> Void) -> DataRequest {
     let illithid: Illithid = .shared
-    let request = AccountRouter.submissions(username: name, sort: sort, topInterval: topInterval,
+    let request = AccountRouter.submissions(username: name, sort: sort, t: topInterval,
                                             listingParameters: parameters)
 
     return illithid.readListing(request: request, queue: queue) { result in
@@ -220,7 +211,7 @@ public extension Account {
                     parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
                     completion: @escaping (Result<[Post], AFError>) -> Void) -> DataRequest {
     let illithid: Illithid = .shared
-    let request = AccountRouter.upvoted(username: name, sort: sort, topInterval: topInterval,
+    let request = AccountRouter.upvoted(username: name, sort: sort, t: topInterval,
                                         listingParameters: parameters)
 
     return illithid.readListing(request: request, queue: queue) { result in
@@ -238,7 +229,7 @@ public extension Account {
                       parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
                       completion: @escaping (Result<[Post], AFError>) -> Void) -> DataRequest {
     let illithid: Illithid = .shared
-    let request = AccountRouter.downvoted(username: name, sort: sort, topInterval: topInterval,
+    let request = AccountRouter.downvoted(username: name, sort: sort, t: topInterval,
                                           listingParameters: parameters)
 
     return illithid.readListing(request: request, queue: queue) { result in
@@ -256,7 +247,7 @@ public extension Account {
                    parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
                    completion: @escaping (Result<[Post], AFError>) -> Void) -> DataRequest {
     let illithid: Illithid = .shared
-    let request = AccountRouter.hidden(username: name, sort: sort, topInterval: topInterval,
+    let request = AccountRouter.hidden(username: name, sort: sort, t: topInterval,
                                        listingParameters: parameters)
 
     return illithid.readListing(request: request, queue: queue) { result in
@@ -274,7 +265,7 @@ public extension Account {
                     parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
                     completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
     let illithid: Illithid = .shared
-    let request = AccountRouter.saved(username: name, sort: sort, topInterval: topInterval,
+    let request = AccountRouter.saved(username: name, sort: sort, t: topInterval,
                                       context: context, listingParameters: parameters)
 
     return illithid.readListing(request: request, queue: queue, completion: completion)
