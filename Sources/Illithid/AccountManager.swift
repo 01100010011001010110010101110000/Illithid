@@ -192,7 +192,7 @@ public final class AccountManager: ObservableObject {
     let session = Session(configuration: alamoConfiguration,
                           rootQueue: DispatchQueue(label: "com.flayware.illithid.AFRootQueue"),
                           serializationQueue: DispatchQueue(label: "com.flayware.illithid.AFSerializationQueue"),
-                          interceptor: OAuthSwift2RequestInterceptor(oauth),
+                          interceptor: IllithidRedditRequestInterceptor(oauth),
                           cachedResponseHandler: cacher,
                           eventMonitors: [FireLogger(logger: logger)])
 

@@ -8,6 +8,25 @@ import Alamofire
 import Foundation
 import OAuthSwift
 
+final class IllithidRedditRequestInterceptor: OAuthSwift2RequestInterceptor {
+  override func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, Error>) -> Void) {
+    super.adapt(urlRequest, for: session) { result in
+      switch result {
+      case let .success(request):
+        do {
+          // Without this some API responses come back URL encoded
+          let request = try URLEncoding.queryString.encode(request, with: ["raw_json": true])
+          completion(.success(request))
+        } catch {
+          completion(.failure(error))
+        }
+      case let .failure(error):
+        completion(.failure(error))
+      }
+    }
+  }
+}
+
 /// Add authentification headers from OAuthSwift to Alamofire request
 open class OAuthSwiftRequestInterceptor: RequestInterceptor {
   fileprivate let oauthSwift: OAuthSwift
