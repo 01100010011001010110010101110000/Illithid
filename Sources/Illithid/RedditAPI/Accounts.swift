@@ -1,7 +1,7 @@
 //
 // Accounts.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 4/2/20
 //
 
 #if canImport(Combine)
@@ -11,47 +11,90 @@ import Foundation
 
 import Alamofire
 
+public enum AccountContentSort: String, Codable, CaseIterable, Identifiable {
+  public var id: String {
+    rawValue
+  }
+
+  case hot
+  case new
+  case top
+  case controversial
+}
+
 private enum AccountRouter: URLRequestConvertible {
   case account(username: String)
-  case comments(username: String)
-  case downvoted(username: String)
-  case hidden(username: String)
   case multireddits(username: String)
-  case overview(username: String)
-  case posts(username: String)
-  case saved(username: String)
   case subscriptions
-  case upvoted(username: String)
+
+  private var mirror: (route: String, parameters: Parameters) {
+    let reflection = Mirror(reflecting: self)
+    guard reflection.displayStyle == .enum, let associated = reflection.children.first else {
+      return ("\(self)", [:])
+    }
+    let values = Mirror(reflecting: associated.value).children
+    var params: Parameters = [:]
+    for case let param in values {
+      guard let label = param.label else { continue }
+      params[label] = param.value
+    }
+    return ("\(self)", params)
+  }
+
+  case overview(username: String,
+                sort: AccountContentSort = .new, topInterval: TopInterval = .day, context: Int = 2,
+                listingParameters: ListingParameters = .init())
+  case submissions(username: String,
+                   sort: AccountContentSort = .new, topInterval: TopInterval = .day,
+                   listingParameters: ListingParameters = .init())
+  case comments(username: String,
+                sort: AccountContentSort = .new, topInterval: TopInterval = .day, context: Int = 2,
+                listingParameters: ListingParameters = .init())
+  case upvoted(username: String,
+               sort: AccountContentSort = .new, topInterval: TopInterval = .day,
+               listingParameters: ListingParameters = .init())
+  case downvoted(username: String,
+                 sort: AccountContentSort = .new, topInterval: TopInterval = .day,
+                 listingParameters: ListingParameters = .init())
+  case saved(username: String,
+             sort: AccountContentSort = .new, topInterval: TopInterval = .day, context: Int = 2,
+             listingParameters: ListingParameters = .init())
+  case hidden(username: String,
+              sort: AccountContentSort = .new, topInterval: TopInterval = .day,
+              listingParameters: ListingParameters = .init())
 
   var path: String {
     switch self {
     case let .account(username):
       return "/user/\(username)/about"
-    case let .comments(username):
+    case let .comments(username, _, _, _, _):
       return "/user/\(username)/comments"
-    case let .downvoted(username):
+    case let .downvoted(username, _, _, _):
       return "/user/\(username)/downvoted"
-    case let .hidden(username):
+    case let .hidden(username, _, _, _):
       return "/user/\(username)/hidden"
     case let .multireddits(username):
       return "/api/multi/user/\(username)"
-    case let .overview(username):
+    case let .overview(username, _, _, _, _):
       return "/user/\(username)/overview"
-    case let .posts(username):
+    case let .submissions(username, _, _, _):
       return "/user/\(username)/submitted"
-    case let .saved(username):
+    case let .saved(username, _, _, _, _):
       return "/user/\(username)/saved"
     case .subscriptions:
       return "/subreddits/mine/subscriber"
-    case let .upvoted(username):
+    case let .upvoted(username, _, _, _):
       return "/user/\(username)/upvoted"
     }
   }
 
+  var parameters: Parameters {
+    mirror.parameters.filter { $0.key != "username" }
+  }
+
   func asURLRequest() throws -> URLRequest {
-    let request = try URLRequest(url: URL(string: path, relativeTo: Illithid.shared.baseURL)!,
-                                 method: .get)
-    return try URLEncoding.queryString.encode(request, with: ["raw_json": true])
+    let request = try URLRequest(url: URL(string: path, relativeTo: Illithid.shared.baseURL)!, method: .get)
+    return try URLEncoding.queryString.encode(request, with: parameters)
   }
 }
 
@@ -62,18 +105,9 @@ public extension Illithid {
   func fetchAccount(name: String, queue: DispatchQueue = .main,
                     completion: @escaping (Result<Account, AFError>) -> Void) -> DataRequest {
     session.request(AccountRouter.account(username: name))
-      .validate().responseData(queue: queue) { response in
-        switch response.result {
-        case let .success(data):
-          do {
-            let account = try self.decoder.decode(Account.self, from: data)
-            completion(.success(account))
-          } catch {
-            completion(.failure(AFError.responseSerializationFailed(reason: .decodingFailed(error: error))))
-          }
-        case let .failure(error):
-          completion(.failure(error))
-        }
+      .validate()
+      .responseDecodable(of: Account.self, queue: queue, decoder: decoder) { response in
+        completion(response.result)
       }
   }
 }
@@ -120,15 +154,8 @@ public extension Account {
 
     return illithid.session.request(AccountRouter.multireddits(username: name))
       // The multireddits endpoint is not a listing
-      .validate().responseData(queue: queue) { response in
-        switch response.result {
-        case let .success(data):
-          let multis = try! illithid.decoder.decode([Multireddit].self, from: data)
-          completion(.success(multis))
-        case let .failure(error):
-          illithid.logger.errorMessage("Failed to load multireddits: \(error)")
-          completion(.failure(error))
-        }
+      .validate().responseDecodable(of: [Multireddit].self, queue: queue, decoder: illithid.decoder) { response in
+        completion(response.result)
       }
   }
 
@@ -142,110 +169,115 @@ public extension Account {
   }
 
   @discardableResult
-  func overview(queue: DispatchQueue = .main,
+  func overview(sort: AccountContentSort = .new, topInterval: TopInterval = .day, context: Int = 2,
+                parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
                 completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
     let illithid: Illithid = .shared
+    let request = AccountRouter.overview(username: name, sort: sort, topInterval: topInterval,
+                                         context: context, listingParameters: parameters)
 
-    return illithid.session.request(AccountRouter.overview(username: name))
-      .validate().responseDecodable(of: Listing.self, queue: queue, decoder: illithid.decoder) { response in
-        completion(response.result)
-      }
+    return illithid.readListing(request: request, queue: queue, completion: completion)
   }
 
   @discardableResult
-  func comments(queue: DispatchQueue = .main,
+  func comments(sort: AccountContentSort = .new, topInterval: TopInterval = .day, context: Int = 2,
+                parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
                 completion: @escaping (Result<[Comment], AFError>) -> Void) -> DataRequest {
     let illithid: Illithid = .shared
+    let request = AccountRouter.comments(username: name, sort: sort, topInterval: topInterval,
+                                         context: context, listingParameters: parameters)
 
-    return illithid.session.request(AccountRouter.comments(username: name))
-      .validate().responseDecodable(of: Listing.self, queue: queue, decoder: illithid.decoder) { response in
-        switch response.result {
-        case let .success(listing):
-          return completion(.success(listing.comments))
-        case let .failure(error):
-          completion(.failure(error))
-        }
+    return illithid.readListing(request: request, queue: queue) { result in
+      switch result {
+      case let .success(listing):
+        completion(.success(listing.comments))
+      case let .failure(error):
+        completion(.failure(error))
       }
+    }
   }
 
   @discardableResult
-  func submittedPosts(queue: DispatchQueue = .main,
-                      completion: @escaping (Result<[Post], AFError>) -> Void) -> DataRequest {
-    let illithid: Illithid = .shared
-
-    return illithid.session.request(AccountRouter.posts(username: name))
-      .validate().responseDecodable(of: Listing.self, queue: queue, decoder: illithid.decoder) { response in
-        switch response.result {
-        case let .success(listing):
-          return completion(.success(listing.posts))
-        case let .failure(error):
-          completion(.failure(error))
-        }
-      }
-  }
-
-  @discardableResult
-  func upvotedPosts(queue: DispatchQueue = .main,
-                    completion: @escaping (Result<[Post], AFError>) -> Void) -> DataRequest {
-    let illithid: Illithid = .shared
-
-    return illithid.session.request(AccountRouter.upvoted(username: name))
-      .validate().responseDecodable(of: Listing.self, queue: queue, decoder: illithid.decoder) { response in
-        switch response.result {
-        case let .success(listing):
-          return completion(.success(listing.posts))
-        case let .failure(error):
-          completion(.failure(error))
-        }
-      }
-  }
-
-  @discardableResult
-  func downvotedPosts(queue: DispatchQueue = .main,
-                      completion: @escaping (Result<[Post], AFError>) -> Void) -> DataRequest {
-    let illithid: Illithid = .shared
-
-    return illithid.session.request(AccountRouter.downvoted(username: name))
-      .validate().responseDecodable(of: Listing.self, queue: queue, decoder: illithid.decoder) { response in
-        switch response.result {
-        case let .success(listing):
-          return completion(.success(listing.posts))
-        case let .failure(error):
-          completion(.failure(error))
-        }
-      }
-  }
-
-  @discardableResult
-  func hiddenPosts(queue: DispatchQueue = .main,
+  func submissions(sort: AccountContentSort = .new, topInterval: TopInterval = .day,
+                   parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
                    completion: @escaping (Result<[Post], AFError>) -> Void) -> DataRequest {
     let illithid: Illithid = .shared
+    let request = AccountRouter.submissions(username: name, sort: sort, topInterval: topInterval,
+                                            listingParameters: parameters)
 
-    return illithid.session.request(AccountRouter.hidden(username: name))
-      .validate().responseDecodable(of: Listing.self, queue: queue, decoder: illithid.decoder) { response in
-        switch response.result {
-        case let .success(listing):
-          return completion(.success(listing.posts))
-        case let .failure(error):
-          completion(.failure(error))
-        }
+    return illithid.readListing(request: request, queue: queue) { result in
+      switch result {
+      case let .success(listing):
+        completion(.success(listing.posts))
+      case let .failure(error):
+        completion(.failure(error))
       }
+    }
   }
 
   @discardableResult
-  func savedContent(queue: DispatchQueue = .main,
+  func upvotedPosts(sort: AccountContentSort = .new, topInterval: TopInterval = .day,
+                    parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
+                    completion: @escaping (Result<[Post], AFError>) -> Void) -> DataRequest {
+    let illithid: Illithid = .shared
+    let request = AccountRouter.upvoted(username: name, sort: sort, topInterval: topInterval,
+                                        listingParameters: parameters)
+
+    return illithid.readListing(request: request, queue: queue) { result in
+      switch result {
+      case let .success(listing):
+        completion(.success(listing.posts))
+      case let .failure(error):
+        completion(.failure(error))
+      }
+    }
+  }
+
+  @discardableResult
+  func downvotedPosts(sort: AccountContentSort = .new, topInterval: TopInterval = .day,
+                      parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
+                      completion: @escaping (Result<[Post], AFError>) -> Void) -> DataRequest {
+    let illithid: Illithid = .shared
+    let request = AccountRouter.downvoted(username: name, sort: sort, topInterval: topInterval,
+                                          listingParameters: parameters)
+
+    return illithid.readListing(request: request, queue: queue) { result in
+      switch result {
+      case let .success(listing):
+        completion(.success(listing.posts))
+      case let .failure(error):
+        completion(.failure(error))
+      }
+    }
+  }
+
+  @discardableResult
+  func hiddenPosts(sort: AccountContentSort = .new, topInterval: TopInterval = .day,
+                   parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
+                   completion: @escaping (Result<[Post], AFError>) -> Void) -> DataRequest {
+    let illithid: Illithid = .shared
+    let request = AccountRouter.hidden(username: name, sort: sort, topInterval: topInterval,
+                                       listingParameters: parameters)
+
+    return illithid.readListing(request: request, queue: queue) { result in
+      switch result {
+      case let .success(listing):
+        completion(.success(listing.posts))
+      case let .failure(error):
+        completion(.failure(error))
+      }
+    }
+  }
+
+  @discardableResult
+  func savedContent(sort: AccountContentSort = .new, topInterval: TopInterval = .day, context: Int = 2,
+                    parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
                     completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
     let illithid: Illithid = .shared
+    let request = AccountRouter.saved(username: name, sort: sort, topInterval: topInterval,
+                                      context: context, listingParameters: parameters)
 
-    return illithid.session.request(AccountRouter.saved(username: name))
-      .validate().responseDecodable(of: Listing.self, queue: queue, decoder: illithid.decoder) { response in
-        switch response.result {
-        case let .success(listing):
-          return completion(.success(listing))
-        case let .failure(error):
-          completion(.failure(error))
-        }
-      }
+    return illithid.readListing(request: request, queue: queue, completion: completion)
   }
 }
 

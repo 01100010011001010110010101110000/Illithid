@@ -16,10 +16,7 @@ public extension Illithid {
   func info(names: [Fullname], queue: DispatchQueue = .main) -> AnyPublisher<Listing, Error> {
     let endpoint = URL(string: "/api/info", relativeTo: baseURL)!
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
-    let infoParameters: Parameters = [
-      "id": names.joined(separator: ","),
-      "raw_json": true
-    ]
+    let infoParameters: Parameters = ["id": names.joined(separator: ",")]
 
     return session.requestPublisher(url: endpoint, method: .get, parameters: infoParameters, encoding: queryEncoding, queue: queue)
       .decode(type: Listing.self, decoder: decoder)
@@ -35,10 +32,7 @@ public extension Illithid {
             completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
     let endpoint = URL(string: "/api/info", relativeTo: baseURL)!
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
-    let infoParameters: Parameters = [
-      "id": names.joined(separator: ","),
-      "raw_json": true
-    ]
+    let infoParameters: Parameters = ["id": names.joined(separator: ",")]
 
     return session.request(endpoint, method: .get, parameters: infoParameters, encoding: queryEncoding)
       .validate()

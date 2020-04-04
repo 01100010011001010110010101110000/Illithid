@@ -65,7 +65,7 @@ open class OAuthSwift2RequestInterceptor: OAuthSwiftRequestInterceptor {
     super.init(oauthSwift)
   }
 
-  fileprivate var oauth2Swift: OAuth2Swift { oauthSwift as! OAuth2Swift } // swiftlint:disable:this force_cast
+  fileprivate var oauth2Swift: OAuth2Swift { oauthSwift as! OAuth2Swift }
 
   private let lock = NSLock() // lock required to manage requestToRetry access
   private var isRefreshing = false

@@ -143,31 +143,26 @@ public enum Location: String, CaseIterable, Identifiable, Hashable {
 /// - Parameters:
 ///     - after: The [`fullname`](https://www.reddit.com/dev/api#fullnames) of the Reddit Object to use as an anchor to fetch the next slice of the listing
 ///     - before: The [`fullname`](https://www.reddit.com/dev/api#fullnames) of the Reddit Object to use as an anchor to fetch the previous slice of the listing
-///     - include_categories: If `true`, include category information on the returned objects
 ///     - limit: The number of objects to fetch from the listing
 ///     - show: Whether to bypass filters such as hiding previously visited posts; defaults to filtered
-///     - raw_json: If false, HTML escape `<`, `>`, and `&`. [This is forbackwards compatability](https://www.reddit.com/dev/api#response_body_encoding)
 /// - SeeAlso: [Reddit's Listing documentation](https://www.reddit.com/dev/api#listings)
 public struct ListingParameters {
   public var after: String
   public var before: String
-  public var includeCategories: Bool
   public var limit: Int
   public var show: ShowAllPreference
-  public var rawJSON: Bool
 
-  public init(after: String = "", before: String = "", includeCategories: Bool = true,
-              limit: Int = 25, show: ShowAllPreference = .filtered, rawJSON: Bool = true) {
+  public init(after: String = "", before: String = "",
+              limit: Int = 25, show: ShowAllPreference = .filtered) {
     self.after = after
     self.before = before
-    self.includeCategories = includeCategories
+    includeCategories = includeCategories
     self.limit = limit
     self.show = show
-    self.rawJSON = rawJSON
   }
 
   public func toParameters() -> Parameters {
-    var result: [String: Any] = [:]
+    var result: Parameters = [:]
     let mirror = Mirror(reflecting: self)
     for (property, value) in mirror.children {
       guard let property = property else { continue }
@@ -179,15 +174,15 @@ public struct ListingParameters {
 }
 
 /// The base36, non-kind qualified, ID of a Reddit object. IDs are guaranteed to be unique within a `Kind` type
-/// - SeeAlso: [Reddit's type fullnames documentation](https://www.reddit.com/dev/api#fullnames)
+/// - SeeAlso: [Reddit's `fullname` documentation](https://www.reddit.com/dev/api#fullnames)
 public typealias ID36 = String
 /// The ID36 of an object fully qualifies by prepending it with its type, e.g. `t3_15bfi0`
-/// - SeeAlso: [Reddit's type fullnames documentation](https://www.reddit.com/dev/api#fullnames)
+/// - SeeAlso: [Reddit's `fullname` documentation](https://www.reddit.com/dev/api#fullnames)
 public typealias Fullname = String
 /// The base class for all user-generated content on Reddit
 public protocol RedditObject: Codable, Identifiable, Hashable {
   /// The object's unique identifier
-  var id: String { get } // swiftlint:disable:this identifier_name
+  var id: String { get }
 
   /// The object's full name
   var name: String { get }

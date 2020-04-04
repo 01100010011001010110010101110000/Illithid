@@ -64,22 +64,37 @@ internal extension Illithid {
   ///   - url: The `Listing` returning endpoint from which to read a listing
   ///   - completion: The function to call upon fetching a `Listing`
   @discardableResult
-  func readListing(url: Alamofire.URLConvertible, parameters: Parameters = .init(),
-                   queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+  func readListing(url: Alamofire.URLConvertible, queryParameters: Parameters? = nil,
+                   listingParameters: ListingParameters = .init(), queue: DispatchQueue = .main,
+                   completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
 
-    return session.request(url, method: .get, parameters: parameters, encoding: queryEncoding).validate()
+    let _parameters = listingParameters.toParameters()
+      .merging(queryParameters ?? [:], uniquingKeysWith: { $1 })
+
+    return session.request(url, method: .get, parameters: _parameters, encoding: queryEncoding)
+      .validate()
       .responseDecodable(of: Listing.self, queue: queue, decoder: decoder) { request in
         completion(request.result)
       }
   }
 
+  @discardableResult
+  func readListing(request: Alamofire.URLRequestConvertible, queue: DispatchQueue = .main,
+                   completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+    session.request(request)
+      .validate()
+      .responseDecodable(of: Listing.self, queue: queue, decoder: decoder) { completion($0.result) }
+  }
+
   /// Reads all `Listings` from `url`
   /// - Parameters:
   ///   - url: The `Listing` returning endpoint from which to read a listing
+  ///   - queue: The `DispatchQueue` in which `completion` will run
   ///   - completion: The function to call upon fetching all `Listings`
-  /// - Warning: If this method is called on a large endpoint, like the endpoint for fetching all subreddits, this method may take a very long time to terminate or not terminate at all
-  func readAllListings(url: Alamofire.URLConvertible, queue: DispatchQueue = .main, completion: @escaping (Result<[Listing], AFError>) -> Void) {
+  /// - Warning: If this method is called on a large endpoint, like the endpoint for fetching subreddits, this method may take a very long time to terminate or not terminate at all
+  func readAllListings(url: Alamofire.URLConvertible, queue: DispatchQueue = .main,
+                       completion: @escaping (Result<[Listing], AFError>) -> Void) {
     var results: [Listing] = []
     var parameters: Parameters = ["after": ""] {
       didSet {
@@ -87,7 +102,7 @@ internal extension Illithid {
           completion(.success(results))
           return
         }
-        readListing(url: url, parameters: parameters, queue: queue) { result in
+        readListing(url: url, queryParameters: parameters, queue: queue) { result in
           switch result {
           case let .success(listing):
             results.append(listing)

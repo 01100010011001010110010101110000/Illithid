@@ -41,10 +41,7 @@ public extension Illithid {
               topInterval: TopInterval? = nil, resultTypes: Set<SearchType> = [.subreddit, .post, .user], queue: DispatchQueue = .main,
               completion: @escaping (Result<[Listing], Error>) -> Void) -> DataRequest {
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
-    var parameters: Parameters = [
-      "q": query,
-      "raw_json": true
-    ]
+    var parameters: Parameters = ["q": query]
 
     // If a subreddit is supplied, restrict results to that subreddit
     let endpoint = subreddit != nil ? URL(string: "/r/\(subreddit!)/search", relativeTo: baseURL)! :

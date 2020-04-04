@@ -24,7 +24,7 @@ public extension Illithid {
     if let interval = topInterval { parameters["t"] = interval }
     if let location = location { parameters["g"] = location }
 
-    return readListing(url: postsUrl, parameters: parameters, queue: queue) { result in
+    return readListing(url: postsUrl, queryParameters: parameters, queue: queue) { result in
       completion(result)
     }
   }
@@ -40,7 +40,7 @@ public extension Illithid {
     if let interval = topInterval { parameters["t"] = interval }
     if let location = location { parameters["g"] = location }
 
-    return readListing(url: postsUrl, parameters: parameters, queue: queue) { result in
+    return readListing(url: postsUrl, queryParameters: parameters, queue: queue) { result in
       completion(result)
     }
   }
@@ -56,7 +56,7 @@ public extension Illithid {
     if let interval = topInterval { parameters["t"] = interval }
     if let location = location { parameters["g"] = location }
 
-    return readListing(url: frontPageUrl, parameters: parameters, queue: queue) { result in
+    return readListing(url: frontPageUrl, queryParameters: parameters, queue: queue) { result in
       completion(result)
     }
   }

@@ -26,7 +26,7 @@ public extension Illithid {
     let parameters = params.toParameters()
     let subredditsListUrl = URL(string: "/subreddits/\(subredditSort)", relativeTo: baseURL)!
 
-    readListing(url: subredditsListUrl, parameters: parameters, queue: queue) { result in
+    readListing(url: subredditsListUrl, queryParameters: parameters, queue: queue) { result in
       completion(result)
     }
   }

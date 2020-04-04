@@ -6,22 +6,6 @@
 
 import Foundation
 
-// public struct Account: RedditObject, Codable {
-//  public static func == (lhs: Account, rhs: Account) -> Bool {
-//    lhs.name == rhs.name
-//  }
-//
-//  public var id: String // swiftlint:disable:this identifier_name
-//  public var name: String
-//
-//  public var isEmployee: Bool
-//  public var prefNoProfanity: Bool?
-//
-//  enum CodingKeys: String, CodingKey {
-//    case id
-//  }
-// }
-
 public struct Account: RedditObject, Codable {
   public let isEmployee: Bool
   public let seenLayoutSwitch: Bool?

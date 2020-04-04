@@ -22,7 +22,7 @@ public struct Subreddit: RedditObject {
     lhs.name == rhs.name
   }
 
-  public let id: ID36 // swiftlint:disable:this identifier_name
+  public let id: ID36
   public let name: Fullname
   public let publicDescription: String
   public let publicDescriptionHtml: String?
@@ -60,7 +60,7 @@ public struct Subreddit: RedditObject {
   }
 
   private enum CodingKeys: String, CodingKey {
-    case id // swiftlint:disable:this identifier_name
+    case id
     case name
     case publicDescription
     case publicDescriptionHtml
