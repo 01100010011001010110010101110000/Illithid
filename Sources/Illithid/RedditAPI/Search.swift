@@ -1,7 +1,7 @@
 //
 // Search.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 4/4/20
 //
 
 import Foundation
@@ -37,7 +37,7 @@ public extension Illithid {
   /// - Note: The Reddit search API is weird and seems to return results depending on which `resultTypes` combination is chosen. It also seems to ignore the `limit` argument.
   @discardableResult
   func search(for query: String, subreddit: String? = nil, after: Fullname? = nil, before: Fullname? = nil,
-              limit: UInt = 25, showAll: ShowAllPreference = .filtered, sort: SearchSort = .relevance,
+              limit: UInt = 25, show: ShowAllPreference = .filtered, sort: SearchSort = .relevance,
               topInterval: TopInterval? = nil, resultTypes: Set<SearchType> = [.subreddit, .post, .user], queue: DispatchQueue = .main,
               completion: @escaping (Result<[Listing], Error>) -> Void) -> DataRequest {
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
@@ -49,34 +49,36 @@ public extension Illithid {
 
     // MARK: Build parameters dictionary
 
-    if before == nil, let afterAnchor = after { parameters["after"] = afterAnchor }
-    if let beforeAnchor = before, after == nil { parameters["before"] = beforeAnchor }
-    if limit != 25 { parameters["limit"] = limit }
-    if subreddit != nil { parameters["restrict_sr"] = true }
-    if showAll == .all { parameters["show"] = showAll }
-    if sort != .relevance { parameters["sort"] = sort }
-    if sort == .top, let interval = topInterval { parameters["t"] = interval }
-    if !resultTypes.isEmpty { parameters["type"] = resultTypes.map { $0.rawValue }.joined(separator: ",") }
+    if let afterAnchor = after { parameters["after"] = afterAnchor }
+    if let beforeAnchor = before { parameters["before"] = beforeAnchor }
+    parameters["limit"] = limit
+    parameters["restrict_sr"] = subreddit != nil
+    parameters["show"] = show
+    parameters["sort"] = sort
+    if let interval = topInterval { parameters["t"] = interval }
+    parameters["type"] = resultTypes.map { $0.rawValue }.joined(separator: ",")
 
     // MARK: Submit request
 
-    return session.request(endpoint, method: .get, parameters: parameters, encoding: queryEncoding).validate().responseData(queue: queue) { response in
-      switch response.result {
-      case let .success(data):
-        do {
-          let listing = try self.decoder.decode(Listing.self, from: data)
-          completion(.success([listing]))
-        } catch {
+    return session.request(endpoint, method: .get, parameters: parameters, encoding: queryEncoding)
+      .validate()
+      .responseData(queue: queue) { response in
+        switch response.result {
+        case let .success(data):
           do {
-            let listings = try self.decoder.decode([Listing].self, from: data)
-            completion(.success(listings))
-          } catch let innerError {
-            completion(.failure(innerError))
+            let listing = try self.decoder.decode(Listing.self, from: data)
+            completion(.success([listing]))
+          } catch {
+            do {
+              let listings = try self.decoder.decode([Listing].self, from: data)
+              completion(.success(listings))
+            } catch let innerError {
+              completion(.failure(innerError))
+            }
           }
+        case let .failure(error):
+          completion(.failure(error))
         }
-      case let .failure(error):
-        completion(.failure(error))
       }
-    }
   }
 }
