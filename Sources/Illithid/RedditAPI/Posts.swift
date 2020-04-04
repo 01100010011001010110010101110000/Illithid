@@ -12,19 +12,39 @@ import Foundation
 import Alamofire
 import Willow
 
+enum PostRouter: URLConvertible {
+  case subreddit(displayName: String, sort: PostSort)
+  case userMultireddit(username: String, multiName: String, sort: PostSort)
+  case frontPage(page: FrontPage, sort: PostSort)
+
+  private var baseUrl: URL {
+    Illithid.shared.baseURL
+  }
+
+  func asURL() throws -> URL {
+    switch self {
+    case let .subreddit(displayName, sort):
+      return URL(string: "/r/\(displayName)/\(sort)", relativeTo: baseUrl)!
+    case let .userMultireddit(username, multiName, sort):
+      return URL(string: "/user/\(username)/m/\(multiName)/\(sort)", relativeTo: baseUrl)!
+    case let .frontPage(page, sort):
+      return try page.asURL().appendingPathComponent("\(sort)")
+    }
+  }
+}
+
 public extension Illithid {
   @discardableResult
   func fetchPosts(for subreddit: Subreddit, sortBy postSort: PostSort,
                   location: Location? = nil, topInterval: TopInterval? = nil,
                   params: ListingParameters = .init(), queue: DispatchQueue = .main,
                   completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+    let url = PostRouter.subreddit(displayName: subreddit.displayName, sort: postSort)
     var parameters = params.toParameters()
-    let postsUrl = URL(string: "/r/\(subreddit.displayName)/\(postSort)", relativeTo: baseURL)!
-
     if let interval = topInterval { parameters["t"] = interval }
     if let location = location { parameters["g"] = location }
 
-    return readListing(url: postsUrl, queryParameters: parameters, queue: queue) { result in
+    return readListing(url: url, queryParameters: parameters, queue: queue) { result in
       completion(result)
     }
   }
@@ -34,13 +54,12 @@ public extension Illithid {
                   location: Location? = nil, topInterval: TopInterval? = nil,
                   params: ListingParameters = .init(), queue: DispatchQueue = .main,
                   completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+    let url = PostRouter.userMultireddit(username: multireddit.owner, multiName: multireddit.name, sort: postSort)
     var parameters = params.toParameters()
-    let postsUrl = URL(string: "/user/\(multireddit.owner)/m/\(multireddit.name)/\(postSort)", relativeTo: baseURL)!
-
     if let interval = topInterval { parameters["t"] = interval }
     if let location = location { parameters["g"] = location }
 
-    return readListing(url: postsUrl, queryParameters: parameters, queue: queue) { result in
+    return readListing(url: url, queryParameters: parameters, queue: queue) { result in
       completion(result)
     }
   }
@@ -50,13 +69,13 @@ public extension Illithid {
                   location: Location? = nil, topInterval: TopInterval? = nil,
                   params: ListingParameters = .init(), queue: DispatchQueue = .main,
                   completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
-    let frontPageUrl = try! frontPage.asURL().appendingPathComponent("\(postSort)")
+    let url = PostRouter.frontPage(page: frontPage, sort: postSort)
     var parameters = params.toParameters()
 
     if let interval = topInterval { parameters["t"] = interval }
     if let location = location { parameters["g"] = location }
 
-    return readListing(url: frontPageUrl, queryParameters: parameters, queue: queue) { result in
+    return readListing(url: url, queryParameters: parameters, queue: queue) { result in
       completion(result)
     }
   }
