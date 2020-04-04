@@ -11,6 +11,24 @@ import Foundation
 
 import Alamofire
 
+enum SubredditRouter: URLConvertible {
+  case subreddits(sort: SubredditSort)
+  case moderators(subredditDisplayName: String)
+
+  private var baseUrl: URL {
+    Illithid.shared.baseURL
+  }
+
+  func asURL() throws -> URL {
+    switch self {
+    case let .subreddits(sort):
+      return URL(string: "/subreddits/\(sort)", relativeTo: baseUrl)!
+    case let .moderators(displayName):
+      return URL(string: "/r/\(displayName)/about/moderators", relativeTo: baseUrl)!
+    }
+  }
+}
+
 public extension Illithid {
   /**
    Loads subreddits from the Reddit API
@@ -20,13 +38,12 @@ public extension Illithid {
      - params: Standard listing parameters object
      - completion: Completion handler, is passed the listable as an argument
    */
-  func subreddits(sortBy subredditSort: SubredditSort = .popular,
+  func subreddits(sortBy sort: SubredditSort = .popular,
                   params: ListingParameters = .init(), queue: DispatchQueue = .main,
                   completion: @escaping (Result<Listing, AFError>) -> Void) {
     let parameters = params.toParameters()
-    let subredditsListUrl = URL(string: "/subreddits/\(subredditSort)", relativeTo: baseURL)!
-
-    readListing(url: subredditsListUrl, queryParameters: parameters, queue: queue) { result in
+    readListing(url: SubredditRouter.subreddits(sort: sort),
+                queryParameters: parameters, queue: queue) { result in
       completion(result)
     }
   }
@@ -42,7 +59,8 @@ extension Subreddit: PostProvider {
   public func posts(sortBy sort: PostSort, location: Location?, topInterval: TopInterval?,
                     parameters: ListingParameters, queue: DispatchQueue = .main,
                     completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
-    Illithid.shared.fetchPosts(for: self, sortBy: sort, location: location, topInterval: topInterval, params: parameters, queue: queue) { result in
+    Illithid.shared.fetchPosts(for: self, sortBy: sort, location: location,
+                               topInterval: topInterval, params: parameters, queue: queue) { result in
       completion(result)
     }
   }
@@ -114,11 +132,9 @@ public extension Subreddit {
 // MARK: Moderator fetching
 
 extension Illithid {
-  public func moderatorsOf(displayName subredditName: String, queue: DispatchQueue = .main,
+  public func moderatorsOf(displayName name: String, queue: DispatchQueue = .main,
                            completion: @escaping (Result<[Moderator], AFError>) -> Void) -> DataRequest {
-    let moderatorsUrl = URL(string: "/r/\(subredditName)/about/moderators", relativeTo: baseURL)!
-
-    return session.request(moderatorsUrl, method: .get)
+    session.request(SubredditRouter.moderators(subredditDisplayName: name), method: .get)
       .validate()
       .responseDecodable(of: UserList.self, queue: queue, decoder: decoder) { response in
         switch response.result {
