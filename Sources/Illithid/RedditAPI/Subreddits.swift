@@ -103,11 +103,11 @@ public extension Subreddit {
 
 public extension Subreddit {
   func subscribe(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
-    Illithid.shared.changeSubscription(of: self, isSubscribed: true, queue: queue, completion: completion)
+    Illithid.shared.changeSubscription(of: self, action: .subscribe, queue: queue, completion: completion)
   }
 
   func unsubscribe(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
-    Illithid.shared.changeSubscription(of: self, isSubscribed: false, queue: queue, completion: completion)
+    Illithid.shared.changeSubscription(of: self, action: .unsubscribe, queue: queue, completion: completion)
   }
 }
 
