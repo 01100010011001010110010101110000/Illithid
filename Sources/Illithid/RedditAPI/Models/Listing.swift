@@ -94,7 +94,12 @@ public extension Listing {
 
   var more: More? { items(kind: .more).first }
 
-  enum Content: Codable, Identifiable {
+  enum Content: Codable, Identifiable, Equatable {
+    public static func == (lhs: Listing.Content, rhs: Listing.Content) -> Bool {
+      if lhs.kind != rhs.kind { return false }
+      return lhs.id == rhs.id
+    }
+
     case comment(Comment)
     case account(Account)
     case post(Post)
