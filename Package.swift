@@ -15,7 +15,7 @@ let package = Package(
     )
   ],
   dependencies: [
-    .package(name: "Alamofire", url: "https://github.com/Alamofire/Alamofire.git", from: .init(5, 0, 5)),
+    .package(name: "Alamofire", url: "https://github.com/Alamofire/Alamofire.git", from: .init(5, 1, 0)),
     .package(name: "OAuthSwift", url: "https://github.com/OAuthSwift/OAuthSwift.git", from: .init(2, 1, 0)),
     .package(name: "Willow", url: "https://github.com/Nike-Inc/Willow.git", from: .init(6, 0, 0)),
     .package(name: "KeychainAccess", url: "https://github.com/kishikawakatsumi/KeychainAccess.git", from: .init(4, 1, 0))
