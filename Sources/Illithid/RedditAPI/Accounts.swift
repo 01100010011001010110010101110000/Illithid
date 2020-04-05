@@ -11,6 +11,16 @@ import Foundation
 
 import Alamofire
 
+public enum AccountContent: String, CaseIterable {
+  case overview
+  case submissions
+  case comments
+  case upvoted
+  case downvoted
+  case saved
+  case hidden
+}
+
 public enum AccountContentSort: String, Codable, CaseIterable, Identifiable {
   public var id: String {
     rawValue
@@ -28,13 +38,13 @@ private enum AccountRouter: URLRequestConvertible, MirrorableEnum {
   case subscriptions
 
   case overview(username: String,
-                sort: AccountContentSort = .new, t: TopInterval = .day, context: Int = 2,
+                sort: AccountContentSort = .new, t: TopInterval = .day,
                 listingParameters: ListingParameters = .init())
   case submissions(username: String,
                    sort: AccountContentSort = .new, t: TopInterval = .day,
                    listingParameters: ListingParameters = .init())
   case comments(username: String,
-                sort: AccountContentSort = .new, t: TopInterval = .day, context: Int = 2,
+                sort: AccountContentSort = .new, t: TopInterval = .day,
                 listingParameters: ListingParameters = .init())
   case upvoted(username: String,
                sort: AccountContentSort = .new, t: TopInterval = .day,
@@ -43,7 +53,7 @@ private enum AccountRouter: URLRequestConvertible, MirrorableEnum {
                  sort: AccountContentSort = .new, t: TopInterval = .day,
                  listingParameters: ListingParameters = .init())
   case saved(username: String,
-             sort: AccountContentSort = .new, t: TopInterval = .day, context: Int = 2,
+             sort: AccountContentSort = .new, t: TopInterval = .day,
              listingParameters: ListingParameters = .init())
   case hidden(username: String,
               sort: AccountContentSort = .new, t: TopInterval = .day,
@@ -53,7 +63,7 @@ private enum AccountRouter: URLRequestConvertible, MirrorableEnum {
     switch self {
     case let .account(username):
       return "/user/\(username)/about"
-    case let .comments(username, _, _, _, _):
+    case let .comments(username, _, _, _):
       return "/user/\(username)/comments"
     case let .downvoted(username, _, _, _):
       return "/user/\(username)/downvoted"
@@ -61,11 +71,11 @@ private enum AccountRouter: URLRequestConvertible, MirrorableEnum {
       return "/user/\(username)/hidden"
     case let .multireddits(username):
       return "/api/multi/user/\(username)"
-    case let .overview(username, _, _, _, _):
+    case let .overview(username, _, _, _):
       return "/user/\(username)/overview"
     case let .submissions(username, _, _, _):
       return "/user/\(username)/submitted"
-    case let .saved(username, _, _, _, _):
+    case let .saved(username, _, _, _):
       return "/user/\(username)/saved"
     case .subscriptions:
       return "/subreddits/mine/subscriber"
@@ -160,113 +170,100 @@ public extension Account {
   }
 
   @discardableResult
-  func overview(sort: AccountContentSort = .new, topInterval: TopInterval = .day, context: Int = 2,
+  func content(content: AccountContent, sort: AccountContentSort = .new, topInterval: TopInterval = .day,
+               parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
+               completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+    switch content {
+    case .overview:
+      return overview(sort: sort, topInterval: topInterval, parameters: parameters, queue: queue, completion: completion)
+    case .saved:
+      return savedContent(sort: sort, topInterval: topInterval, parameters: parameters, queue: queue, completion: completion)
+    case .submissions:
+      return submissions(sort: sort, topInterval: topInterval, parameters: parameters, queue: queue, completion: completion)
+    case .comments:
+      return comments(sort: sort, topInterval: topInterval, parameters: parameters, queue: queue, completion: completion)
+    case .upvoted:
+      return upvotedPosts(sort: sort, topInterval: topInterval, parameters: parameters, queue: queue, completion: completion)
+    case .downvoted:
+      return downvotedPosts(sort: sort, topInterval: topInterval, parameters: parameters, queue: queue, completion: completion)
+    case .hidden:
+      return hiddenPosts(sort: sort, topInterval: topInterval, parameters: parameters, queue: queue, completion: completion)
+    }
+  }
+
+  @discardableResult
+  func overview(sort: AccountContentSort = .new, topInterval: TopInterval = .day,
                 parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
                 completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
     let illithid: Illithid = .shared
     let request = AccountRouter.overview(username: name, sort: sort, t: topInterval,
-                                         context: context, listingParameters: parameters)
+                                         listingParameters: parameters)
 
     return illithid.readListing(request: request, queue: queue, completion: completion)
   }
 
   @discardableResult
-  func comments(sort: AccountContentSort = .new, topInterval: TopInterval = .day, context: Int = 2,
+  func comments(sort: AccountContentSort = .new, topInterval: TopInterval = .day,
                 parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
-                completion: @escaping (Result<[Comment], AFError>) -> Void) -> DataRequest {
+                completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
     let illithid: Illithid = .shared
     let request = AccountRouter.comments(username: name, sort: sort, t: topInterval,
-                                         context: context, listingParameters: parameters)
+                                         listingParameters: parameters)
 
-    return illithid.readListing(request: request, queue: queue) { result in
-      switch result {
-      case let .success(listing):
-        completion(.success(listing.comments))
-      case let .failure(error):
-        completion(.failure(error))
-      }
-    }
+    return illithid.readListing(request: request, queue: queue, completion: completion)
   }
 
   @discardableResult
   func submissions(sort: AccountContentSort = .new, topInterval: TopInterval = .day,
                    parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
-                   completion: @escaping (Result<[Post], AFError>) -> Void) -> DataRequest {
+                   completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
     let illithid: Illithid = .shared
     let request = AccountRouter.submissions(username: name, sort: sort, t: topInterval,
                                             listingParameters: parameters)
 
-    return illithid.readListing(request: request, queue: queue) { result in
-      switch result {
-      case let .success(listing):
-        completion(.success(listing.posts))
-      case let .failure(error):
-        completion(.failure(error))
-      }
-    }
+    return illithid.readListing(request: request, queue: queue, completion: completion)
   }
 
   @discardableResult
   func upvotedPosts(sort: AccountContentSort = .new, topInterval: TopInterval = .day,
                     parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
-                    completion: @escaping (Result<[Post], AFError>) -> Void) -> DataRequest {
+                    completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
     let illithid: Illithid = .shared
     let request = AccountRouter.upvoted(username: name, sort: sort, t: topInterval,
                                         listingParameters: parameters)
 
-    return illithid.readListing(request: request, queue: queue) { result in
-      switch result {
-      case let .success(listing):
-        completion(.success(listing.posts))
-      case let .failure(error):
-        completion(.failure(error))
-      }
-    }
+    return illithid.readListing(request: request, queue: queue, completion: completion)
   }
 
   @discardableResult
   func downvotedPosts(sort: AccountContentSort = .new, topInterval: TopInterval = .day,
                       parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
-                      completion: @escaping (Result<[Post], AFError>) -> Void) -> DataRequest {
+                      completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
     let illithid: Illithid = .shared
     let request = AccountRouter.downvoted(username: name, sort: sort, t: topInterval,
                                           listingParameters: parameters)
 
-    return illithid.readListing(request: request, queue: queue) { result in
-      switch result {
-      case let .success(listing):
-        completion(.success(listing.posts))
-      case let .failure(error):
-        completion(.failure(error))
-      }
-    }
+    return illithid.readListing(request: request, queue: queue, completion: completion)
   }
 
   @discardableResult
   func hiddenPosts(sort: AccountContentSort = .new, topInterval: TopInterval = .day,
                    parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
-                   completion: @escaping (Result<[Post], AFError>) -> Void) -> DataRequest {
+                   completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
     let illithid: Illithid = .shared
     let request = AccountRouter.hidden(username: name, sort: sort, t: topInterval,
                                        listingParameters: parameters)
 
-    return illithid.readListing(request: request, queue: queue) { result in
-      switch result {
-      case let .success(listing):
-        completion(.success(listing.posts))
-      case let .failure(error):
-        completion(.failure(error))
-      }
-    }
+    return illithid.readListing(request: request, queue: queue, completion: completion)
   }
 
   @discardableResult
-  func savedContent(sort: AccountContentSort = .new, topInterval: TopInterval = .day, context: Int = 2,
+  func savedContent(sort: AccountContentSort = .new, topInterval: TopInterval = .day, context _: Int = 2,
                     parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
                     completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
     let illithid: Illithid = .shared
     let request = AccountRouter.saved(username: name, sort: sort, t: topInterval,
-                                      context: context, listingParameters: parameters)
+                                      listingParameters: parameters)
 
     return illithid.readListing(request: request, queue: queue, completion: completion)
   }
