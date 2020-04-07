@@ -1,7 +1,7 @@
 //
 // Post.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/22/20
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 4/3/20
 //
 
 import Combine
@@ -200,6 +200,19 @@ public extension Post {
       results.append(contentsOf: previews.resolutions)
       results.append(previews.source)
       return results
-    } else { return [] }
+    } else {
+      return []
+    }
+  }
+
+  var mp4Previews: [Preview.Source] {
+    if let previews = preview?.images.first?.variants?.mp4 {
+      var results: [Preview.Source] = []
+      results.append(contentsOf: previews.resolutions)
+      results.append(previews.source)
+      return results
+    } else {
+      return []
+    }
   }
 }
