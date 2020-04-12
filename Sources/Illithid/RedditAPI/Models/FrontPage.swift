@@ -9,7 +9,7 @@ import Foundation
 import Alamofire
 
 /// Contains cases for the different front page types
-public enum FrontPage: String, Codable, URLConvertible {
+public enum FrontPage: String, Codable, URLConvertible, Identifiable, CaseIterable {
   // Drawn from the user's subscribed Subreddits
   case home
 
@@ -21,6 +21,10 @@ public enum FrontPage: String, Codable, URLConvertible {
   case all
   /// Posts from a random `Subreddit`
   case random
+
+  public var title: String {
+    rawValue.capitalized
+  }
 
   public func asURL() throws -> URL {
     switch self {
