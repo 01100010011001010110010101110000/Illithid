@@ -7,7 +7,9 @@
 import XCTest
 
 import IllithidTests
+import UlithariTests
 
 var tests = [XCTestCaseEntry]()
 tests += IllithidTests.allTests()
+tests += UlithariTests.allTests()
 XCTMain(tests)

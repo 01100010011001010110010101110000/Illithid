@@ -34,6 +34,10 @@ let package = Package(
       name: "IllithidTests",
       dependencies: ["Illithid"]
     ),
+    .testTarget(
+      name: "UlithariTests",
+      dependencies: ["Ulithari"]
+    ),
     .target(name: "Ulithari", dependencies: [
       .product(name: "Alamofire", package: "Alamofire")
     ])

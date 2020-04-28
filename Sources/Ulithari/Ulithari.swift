@@ -70,7 +70,81 @@ public extension Ulithari {
 }
 
 public extension Ulithari {
-  func fetchImgurImage(id: String, queue: DispatchQueue = .main, completion: @escaping (Result<ImgurImage, AFError>) -> Void) {
+  enum ImgurLinkType: Equatable {
+    case image(id: String)
+    case gallery(id: String)
+    case album(id: String)
+  }
+
+  enum ImgurGallerySection: String, Codable {
+    case hot
+    case top
+    case user
+  }
+
+  enum ImgurGallerySort: String, Codable {
+    case viral
+    case top
+    case time
+    case rising
+  }
+
+  enum ImgurTopWindow: String, Codable {
+    case day
+    case week
+    case month
+    case year
+    case all
+  }
+
+  func imgurLinkType(_ link: URL) -> ImgurLinkType? {
+    // Drop first '/' from the path to avoid an empty element in the array
+    let splitPath = link.path.dropFirst().components(separatedBy: "/")
+    guard !splitPath.isEmpty else { return nil }
+
+    if splitPath.count == 1 {
+      // We are an image, which has no type identifier prefix in the URL
+      guard let id = splitPath.last?.components(separatedBy: ".").first else { return nil }
+      return .image(id: id)
+    } else {
+      // We are a gallery or album, which has a type identifier prefix in the URL
+      guard let type = splitPath.first, let id = splitPath.last else { return nil }
+      if type == "a" { return .album(id: id) }
+      else if type == "gallery" { return .gallery(id: id) }
+      else { return nil }
+    }
+  }
+
+  // TODO: Implement gallery methods
+
+//  @discardableResult
+//  func fetchImgurGallery(id: String, section: ImgurGallerySection = .hot, sort: ImgurGallerySort = .viral,
+//                         page: Int, window: ImgurTopWindow = .day, showViral: Bool = true,
+//                         showMature: Bool = false, queue: DispatchQueue = .main,
+//                         completion: @escaping (Result<[ImgurImage], AFError>) -> Void) -> DataRequest {
+//    session.request(URL(string: "image/\(id)", relativeTo: Self.imgurBaseUrl)!, headers: imgurAuthorizationHeader).validate()
+//    .responseDecodable(of: [ImgurImage].self, queue: queue, decoder: imgurDecoder) { response in
+//      completion(response.result)
+//    }
+//  }
+//
+//  @discardableResult
+//  func fetchImgurSubredditGallery() -> DataRequest {
+//
+//  }
+
+  @discardableResult
+  func fetchImgurAlbum(id: String, queue: DispatchQueue = .main,
+                       completion: @escaping (Result<[ImgurImage], AFError>) -> Void) -> DataRequest {
+    session.request(URL(string: "album/\(id)/images", relativeTo: Self.imgurBaseUrl)!, headers: imgurAuthorizationHeader).validate()
+      .responseDecodable(of: [ImgurImage].self, queue: queue, decoder: imgurDecoder) { response in
+        completion(response.result)
+      }
+  }
+
+  @discardableResult
+  func fetchImgurImage(id: String, queue: DispatchQueue = .main,
+                       completion: @escaping (Result<ImgurImage, AFError>) -> Void) -> DataRequest {
     session.request(URL(string: "image/\(id)", relativeTo: Self.imgurBaseUrl)!, headers: imgurAuthorizationHeader).validate()
       .responseDecodable(of: ImgurImage.self, queue: queue, decoder: imgurDecoder) { response in
         completion(response.result)
