@@ -9,8 +9,8 @@ import Foundation
 
 // MARK: - ImgurImage
 
-public struct ImgurImage: Codable, Hashable {
-  public let data: DataClass
+internal struct ImgurImageWrapper: Codable, Hashable {
+  public let data: ImgurImage
   public let success: Bool
   public let status: Int
 
@@ -20,7 +20,7 @@ public struct ImgurImage: Codable, Hashable {
     case status
   }
 
-  public init(data: DataClass, success: Bool, status: Int) {
+  public init(data: ImgurImage, success: Bool, status: Int) {
     self.data = data
     self.success = success
     self.status = status
@@ -29,7 +29,7 @@ public struct ImgurImage: Codable, Hashable {
 
 // MARK: - DataClass
 
-public struct DataClass: Codable, Hashable {
+public struct ImgurImage: Codable, Hashable {
   public let id: String
   public let title: String?
   public let dataDescription: String?
@@ -43,7 +43,7 @@ public struct DataClass: Codable, Hashable {
   public let bandwidth: Int
   public let vote: Int?
   public let favorite: Bool
-  public let nsfw: Bool
+  public let nsfw: Bool?
   public let section: String?
   public let accountUrl: URL?
   public let accountId: String?
@@ -61,7 +61,7 @@ public struct DataClass: Codable, Hashable {
   public let gifv: URL?
   public let hls: URL?
   public let processing: Processing?
-  public let adConfig: AdConfig
+  public let adConfig: AdConfig?
 
   enum CodingKeys: String, CodingKey {
     case id

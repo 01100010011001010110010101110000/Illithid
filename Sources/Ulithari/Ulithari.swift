@@ -1,7 +1,7 @@
 //
 // Ulithari.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 4/27/20
 //
 
 #if canImport(Combine)
@@ -135,10 +135,15 @@ public extension Ulithari {
 
   @discardableResult
   func fetchImgurAlbum(id: String, queue: DispatchQueue = .main,
-                       completion: @escaping (Result<[ImgurImage], AFError>) -> Void) -> DataRequest {
-    session.request(URL(string: "album/\(id)/images", relativeTo: Self.imgurBaseUrl)!, headers: imgurAuthorizationHeader).validate()
-      .responseDecodable(of: [ImgurImage].self, queue: queue, decoder: imgurDecoder) { response in
-        completion(response.result)
+                       completion: @escaping (Result<ImgurAlbum, AFError>) -> Void) -> DataRequest {
+    session.request(URL(string: "album/\(id)", relativeTo: Self.imgurBaseUrl)!, headers: imgurAuthorizationHeader).validate()
+      .responseDecodable(of: ImgurAlbumWrapper.self, queue: queue, decoder: imgurDecoder) { response in
+        switch response.result {
+        case let .success(wrapper):
+          completion(.success(wrapper.data))
+        case let .failure(error):
+          completion(.failure(error))
+        }
       }
   }
 
@@ -146,8 +151,13 @@ public extension Ulithari {
   func fetchImgurImage(id: String, queue: DispatchQueue = .main,
                        completion: @escaping (Result<ImgurImage, AFError>) -> Void) -> DataRequest {
     session.request(URL(string: "image/\(id)", relativeTo: Self.imgurBaseUrl)!, headers: imgurAuthorizationHeader).validate()
-      .responseDecodable(of: ImgurImage.self, queue: queue, decoder: imgurDecoder) { response in
-        completion(response.result)
+      .responseDecodable(of: ImgurImageWrapper.self, queue: queue, decoder: imgurDecoder) { response in
+        switch response.result {
+        case let .success(wrapper):
+          completion(.success(wrapper.data))
+        case let .failure(error):
+          completion(.failure(error))
+        }
       }
   }
 }
