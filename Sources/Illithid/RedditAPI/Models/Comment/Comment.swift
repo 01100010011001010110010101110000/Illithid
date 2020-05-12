@@ -59,7 +59,7 @@ public struct Comment: RedditObject {
   public let ups: Int
   public let modReasonBy: String?
   public let bannedBy: String?
-  public let authorFlairType: String?
+  public let authorFlairType: FlairType?
   public let removalReason: String?
   /// The `Fullname` of this comment's post
   public let linkId: Fullname
@@ -96,7 +96,7 @@ public struct Comment: RedditObject {
   public let authorFlairCssClass: String?
   public let isSubmitter: Bool
   public let downs: Int
-  public let authorFlairRichtext: [[String: String]]?
+  public let authorFlairRichtext: [FlairRichtext]?
   public let collapsedReason: String?
   public let bodyHtml: String
   public let stickied: Bool
@@ -207,7 +207,7 @@ public struct Comment: RedditObject {
     ups = try container.decode(Int.self, forKey: .ups)
     modReasonBy = try container.decodeIfPresent(String.self, forKey: .modReasonBy)
     bannedBy = try container.decodeIfPresent(String.self, forKey: .bannedBy)
-    authorFlairType = try container.decodeIfPresent(String.self, forKey: .authorFlairType)
+    authorFlairType = try container.decodeIfPresent(FlairType.self, forKey: .authorFlairType)
     removalReason = try container.decodeIfPresent(String.self, forKey: .removalReason)
     linkId = try container.decode(String.self, forKey: .linkId)
     authorFlairTemplateId = try container.decodeIfPresent(String.self, forKey: .authorFlairTemplateId)
@@ -235,7 +235,7 @@ public struct Comment: RedditObject {
     authorFlairCssClass = try container.decodeIfPresent(String.self, forKey: .authorFlairCssClass)
     isSubmitter = try container.decode(Bool.self, forKey: .isSubmitter)
     downs = try container.decode(Int.self, forKey: .downs)
-    authorFlairRichtext = try container.decodeIfPresent([[String: String]].self, forKey: .authorFlairRichtext)
+    authorFlairRichtext = try container.decodeIfPresent([FlairRichtext].self, forKey: .authorFlairRichtext)
     collapsedReason = try? container.decodeIfPresent(String.self, forKey: .collapsedReason)
     bodyHtml = try container.decode(String.self, forKey: .bodyHtml)
     stickied = try container.decode(Bool.self, forKey: .stickied)

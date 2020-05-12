@@ -1,7 +1,7 @@
 //
 // Post.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 4/7/20
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 5/10/20
 //
 
 import Combine
@@ -100,8 +100,11 @@ public struct Post: RedditObject {
 
   public let authorFlairTextColor: String?
   public let authorFlairText: String?
+  public let authorFlairType: FlairType?
+  public let authorFlairRichtext: [FlairRichtext]?
   public let linkFlairText: String?
-  public let linkFlairType: String?
+  public let linkFlairType: FlairType?
+  public let linkFlairRichtext: [FlairRichtext]?
   public let linkFlairTextColor: String?
 
   /// The string value returned by the Reddit API for the URL attribute
@@ -160,6 +163,7 @@ public struct Post: RedditObject {
   public let canGild: Bool
   public let spoiler: Bool
   public let locked: Bool
+  /// Whether the user has visited the submission already
   public let visited: Bool
   public let numReports: Int?
   public let removalReason: String?
