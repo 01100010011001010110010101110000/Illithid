@@ -1,7 +1,7 @@
 //
 // Post.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 5/10/20
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 5/11/20
 //
 
 import Combine
@@ -9,7 +9,7 @@ import Foundation
 
 import Alamofire
 
-public enum VoteDirection: Int {
+public enum VoteDirection: Int, Codable {
   case down = -1
   case clear = 0
   case up = 1

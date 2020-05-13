@@ -202,7 +202,7 @@ public struct AccountSubreddit: Codable, Hashable, Identifiable {
   public let restrictPosting: Bool
   public let userIsBanned: Bool
   public let freeFormReports: Bool
-  public let communityIcon: String
+  public let communityIcon: String?
   public let showMedia: Bool
   public let iconColor: String
   public let userIsMuted: Bool

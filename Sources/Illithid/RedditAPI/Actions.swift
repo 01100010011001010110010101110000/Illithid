@@ -1,7 +1,7 @@
 //
 // Actions.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 4/4/20
 //
 
 import Foundation
@@ -28,7 +28,20 @@ enum ActionRouter: URLRequestConvertible, MirrorableEnum {
   }
 
   var parameters: Parameters {
-    mirror.parameters
+    switch self {
+    case let .vote(id, dir):
+      return [
+        "id": id,
+        "dir": dir.rawValue
+      ]
+    case let .changeSubscription(sr, action):
+      return [
+        "sr": sr.map { $0.name }.joined(separator: ","),
+        "action": action.rawValue
+      ]
+    default:
+      return mirror.parameters
+    }
   }
 
   func asURLRequest() throws -> URLRequest {
