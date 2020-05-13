@@ -1,7 +1,7 @@
 //
 // Post.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 5/11/20
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 5/12/20
 //
 
 import Combine
@@ -142,6 +142,7 @@ public struct Post: RedditObject {
   public let downs: Int
   public var likes: Bool?
   public let score: Int
+  public let subredditSubscribers: Int
   public let clicked: Bool
   public let created: Date
   public let numComments: Int
@@ -162,8 +163,9 @@ public struct Post: RedditObject {
   public let mediaOnly: Bool
   public let canGild: Bool
   public let spoiler: Bool
+  public let stickied: Bool
   public let locked: Bool
-  /// Whether the user has visited the submission already
+  /// Whether the user has visited the submission already; requires a Reddit premium subscription
   public let visited: Bool
   public let numReports: Int?
   public let removalReason: String?
