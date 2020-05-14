@@ -139,7 +139,7 @@ public struct GfyItem: Codable, Hashable, Equatable {
 
 public struct GfyContent: Codable, Hashable {
   public let url: URL
-  public let size: Int
+  public let size: Int?
   public let height: Int
   public let width: Int
 
