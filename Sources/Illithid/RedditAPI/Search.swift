@@ -4,6 +4,9 @@
 // Created by Tyler Gregory (@01100010011001010110010101110000) on 4/4/20
 //
 
+#if canImport(Combine)
+  import Combine
+#endif
 import Foundation
 
 import Alamofire
@@ -20,6 +23,60 @@ public enum SearchSort: String, Codable {
   case top
   case new
   case comments
+}
+
+private enum SearchRouter: URLConvertible, URLRequestConvertible, MirrorableEnum {
+  case search(subreddit: Subreddit?)
+  case completeSubredditName(query: String, exact: Bool, over_18: Bool, include_unadvertisable: Bool)
+  case completeSubreddit(query: String, limit: Int, exact: Bool, include_over_18: Bool, include_profiles: Bool)
+  case searchSubreddit(query: String, exact: Bool, over_18: Bool, include_unadvertisable: Bool)
+
+  var method: HTTPMethod {
+    switch self {
+    case .completeSubredditName, .searchSubreddit:
+      return .post
+    default:
+      return .get
+    }
+  }
+
+  var path: String {
+    switch self {
+    case let .search(subreddit):
+      if let subreddit = subreddit {
+        return "/r/\(subreddit.displayName)/search"
+      } else {
+        return "/search"
+      }
+    case .completeSubredditName:
+      return "/api/search_reddit_names"
+    case .completeSubreddit:
+      return "/api/subreddit_autocomplete_v2"
+    case .searchSubreddit:
+      return "/api/search_subreddits"
+    }
+  }
+
+  var parameters: Parameters {
+    switch self {
+    default:
+      return mirror.parameters
+    }
+  }
+
+  func asURL() throws -> URL {
+    URL(string: path, relativeTo: Illithid.shared.baseURL)!
+  }
+
+  func asURLRequest() throws -> URLRequest {
+    let request = try URLRequest(url: self, method: self.method)
+    switch self {
+    case .completeSubredditName:
+      return try URLEncoding.httpBody.encode(request, with: parameters)
+    default:
+      return try URLEncoding.queryString.encode(request, with: parameters)
+    }
+  }
 }
 
 public extension Illithid {
@@ -80,5 +137,180 @@ public extension Illithid {
           completion(.failure(error))
         }
       }
+  }
+}
+
+public extension Illithid {
+  /// Returns the names of subreddits beginning with `startsWith`
+  /// - Parameters:
+  ///   - startsWith: The string to search for, up to fifty characters long
+  ///   - exact: If `true` only return exact matches
+  ///   - includeNsfw: If `false`, do not suggest NSFW subreddits
+  ///   - includeUnadvertisable: If `false`, excludes subreddits with `hide_ads` set to `true` or
+  ///                            which are on the `anti_ads_subreddits` list
+  ///   - queue: The `DispatchQueue` on which `completion` is executed
+  ///   - completion: Called with either an `AFError` or a `[String]` containing the names suggested by autocomplete
+  /// - Returns: The generated `DataRequest`
+  @discardableResult
+  func completeSubredditNames(startsWith query: String,
+                              exact: Bool = false,
+                              includeNsfw: Bool = true,
+                              includeUnadvertisable: Bool = true,
+                              queue: DispatchQueue = .main,
+                              completion: @escaping (Result<[String], AFError>) -> Void) -> DataRequest {
+    assert(query.count <= 50, "Query must be no more than 50 characters")
+    return session.request(SearchRouter.completeSubredditName(query: query, exact: exact, over_18: includeNsfw,
+                                                              include_unadvertisable: includeUnadvertisable))
+      .validate()
+      .responseDecodable(of: CompletedSubredditNames.self, queue: queue, decoder: decoder) { response in
+        switch response.result {
+        case let .success(names):
+          completion(.success(names.names))
+        case let .failure(error):
+          completion(.failure(error))
+        }
+      }
+  }
+
+  /// Returns the names of subreddits beginning with `startsWith`
+  /// - Parameters:
+  ///   - startsWith: The string to search for, up to fifty characters long
+  ///   - exact: If `true` only return exact matches
+  ///   - includeNsfw: If `false`, do not suggest NSFW subreddits
+  ///   - includeUnadvertisable: If `false`, excludes subreddits with `hide_ads` set to `true` or
+  ///                            which are on the `anti_ads_subreddits` list
+  ///   - queue: The `DispatchQueue` on which the result will be published is executed
+  /// - Returns: The generated `AnyPublisher<[String, AFError]>` containing either an `AFError` or a `[String]` containing the names suggested by autocomplete
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+  func completeSubredditNames(startsWith query: String,
+                              exact: Bool = false,
+                              includeNsfw: Bool = true,
+                              includeUnadvertisable: Bool = true,
+                              queue: DispatchQueue = .main) -> AnyPublisher<[String], AFError> {
+    assert(query.count <= 50, "Query must be less than 50 characters")
+    return session.request(SearchRouter.completeSubredditName(query: query, exact: exact, over_18: includeNsfw,
+                                                              include_unadvertisable: includeUnadvertisable))
+      .validate()
+      .publishDecodable(type: CompletedSubredditNames.self, queue: queue, decoder: decoder)
+      .value()
+      .map { $0.names }
+      .eraseToAnyPublisher()
+  }
+
+  /// Returns the full `Subreddit` objects of subreddits beginning with `startsWith`
+  /// - Parameters:
+  ///   - startsWith: The string to search for, up to twenty-five characters long
+  ///   - exact: If `true` only return exact matches
+  ///   - limit: The maximum number of results to return. Must be between one and ten
+  ///   - includeNsfw: If `false`, do not suggest NSFW subreddits
+  ///   - includeProfiles: If `false`, do not suggest user profile subreddits
+  ///   - queue: The `DispatchQueue` on which `completion` will be called
+  ///   - completion: The callback to be performed
+  /// - Returns: The generated `DataRequest`
+  @discardableResult
+  func completeSubreddits(startsWith query: String,
+                          exact: Bool = false,
+                          limit: Int = 5,
+                          includeNsfw: Bool = true,
+                          includeProfiles: Bool = true,
+                          queue: DispatchQueue = .main,
+                          completion: @escaping (Result<[Subreddit], AFError>) -> Void) -> DataRequest {
+    assert(query.count <= 25, "Query must be no more than 25 characters")
+    assert(limit >= 1 && limit <= 10, "Limit must be between 1 and 10, inclusive")
+    return session.request(SearchRouter.completeSubreddit(query: query, limit: limit, exact: exact,
+                                                          include_over_18: includeNsfw,
+                                                          include_profiles: includeProfiles))
+      .validate()
+      .responseDecodable(of: Listing.self, queue: queue, decoder: decoder) { response in
+        switch response.result {
+        case let .success(listing):
+          completion(.success(listing.subreddits))
+        case let .failure(error):
+          completion(.failure(error))
+        }
+      }
+  }
+
+  /// Returns the full `Subreddit` objects of subreddits beginning with `startsWith`
+  /// - Parameters:
+  ///   - startsWith: The string to search for, up to twenty-five characters long
+  ///   - exact: If `true`, only return exact matches
+  ///   - limit: The maximum number of results to return. Must be between one and ten
+  ///   - includeNsfw: If `false`, do not suggest NSFW subreddits
+  ///   - includeProfiles: If `false`, do not suggest user profile subreddits
+  ///   - queue: The `DispatchQueue` on which the result will be posted
+  /// - Returns: The generated `AnyPublisher` containing either an `AFError` or a `[Subreddit]` with the suggested subreddits
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+  func completeSubreddits(startsWith query: String,
+                          exact: Bool = false,
+                          limit: Int = 5,
+                          includeNsfw: Bool = true,
+                          includeProfiles: Bool = true,
+                          queue: DispatchQueue = .main) -> AnyPublisher<[Subreddit], AFError> {
+    assert(query.count <= 25, "Query must be no more than 25 characters")
+    assert(limit >= 1 && limit <= 10, "Limit must be between 1 and 10, inclusive")
+    return session.request(SearchRouter.completeSubreddit(query: query, limit: limit, exact: exact,
+                                                          include_over_18: includeNsfw,
+                                                          include_profiles: includeProfiles))
+      .validate()
+      .publishDecodable(type: Listing.self, queue: queue, decoder: decoder)
+      .value()
+      .map { $0.subreddits }
+      .eraseToAnyPublisher()
+  }
+
+  /// Returns `SubredditSuggestion` objects for subreddits beginning with `startsWith`
+  /// - Parameters:
+  ///   - startsWith: The string to search for, up to fifty characters long
+  ///   - exact: If `true`, only return exact matches
+  ///   - includeNsfw: If `false`, do not suggest NSFW subreddits
+  ///   - includeUnadvertisable: If `false`, excludes subreddits with `hide_ads` set to `true` or
+  ///                            which are on the `anti_ads_subreddits` list
+  ///   - queue: The `DispatchQueue` on which `completion` will be called
+  ///   - completion: The callback that will be called with the result
+  /// - Returns: The generated `DataRequest`
+  func searchSubreddits(startsWith query: String,
+                        exact: Bool = false,
+                        includeNsfw: Bool = true,
+                        includeUnadvertisable: Bool = true,
+                        queue: DispatchQueue = .main,
+                        completion: @escaping (Result<[SubredditSuggestion], AFError>) -> Void) -> DataRequest {
+    assert(query.count <= 50, "Query must be no more than 50 characters")
+    return session.request(SearchRouter.searchSubreddit(query: query, exact: exact, over_18: includeNsfw,
+                                                        include_unadvertisable: includeUnadvertisable))
+      .validate()
+      .responseDecodable(of: SubredditSuggestions.self, queue: queue, decoder: decoder) { response in
+        switch response.result {
+        case let .success(suggestions):
+          completion(.success(suggestions.subreddits))
+        case let .failure(error):
+          completion(.failure(error))
+        }
+      }
+  }
+
+  /// Returns `SubredditSuggestion` objects for subreddits beginning with `startsWith`
+  /// - Parameters:
+  ///   - startsWith: The string to search for, up to fifty characters long
+  ///   - exact: If `true`, only return exact matches
+  ///   - includeNsfw: If `false`, do not suggest NSFW subreddits
+  ///   - includeUnadvertisable: If `false`, excludes subreddits with `hide_ads` set to `true` or
+  ///                            which are on the `anti_ads_subreddits` list
+  ///   - queue: The `DispatchQueue` on which `completion` will be called
+  /// - Returns: The generated `AnyPublisher`
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+  func searchSubreddits(startsWith query: String,
+                        exact: Bool = false,
+                        includeNsfw: Bool = true,
+                        includeUnadvertisable: Bool = true,
+                        queue: DispatchQueue = .main) -> AnyPublisher<[SubredditSuggestion], AFError> {
+    assert(query.count <= 50, "Query must be no more than 50 characters")
+    return session.request(SearchRouter.searchSubreddit(query: query, exact: exact, over_18: includeNsfw,
+                                                        include_unadvertisable: includeUnadvertisable))
+      .validate()
+      .publishDecodable(type: SubredditSuggestions.self, queue: queue, decoder: decoder)
+      .value()
+      .map { $0.subreddits }
+      .eraseToAnyPublisher()
   }
 }
