@@ -1,7 +1,7 @@
 //
 // Post.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 6/26/20
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 6/27/20
 //
 
 import Combine
@@ -240,7 +240,7 @@ public struct Post: RedditObject {
     case removalReason = "removal_reason"
     case sendReplies = "send_replies"
     case distinguished
-    case contestMode = "contest_mods"
+    case contestMode = "contest_mode"
     case createdUtc = "created_utc"
     case isVideo = "is_video"
   }

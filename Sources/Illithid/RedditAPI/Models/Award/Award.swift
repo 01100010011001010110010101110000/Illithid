@@ -43,4 +43,22 @@ public struct Award: Codable {
     public let width: Int
     public let height: Int
   }
+
+  private enum CodingKeys: String, CodingKey {
+    case isEnabled = "is_enabled"
+    case count
+    case subredditId = "subreddit_id"
+    case description
+    case coinReward = "coin_reward"
+    case iconWidth = "icon_width"
+    case iconHeight = "icon_height"
+    case iconUrl = "icon_url"
+    case daysOfPremium = "days_of_premium"
+    case daysOfDripExtension = "days_of_drip_extension"
+    case awardType = "award_type"
+    case coinPrice = "coin_price"
+    case id
+    case name
+    case resizedIcons = "resized_icons"
+  }
 }

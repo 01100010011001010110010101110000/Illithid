@@ -9,7 +9,7 @@ import Foundation
 import Alamofire
 
 public struct Listing: Codable {
-  public let kind: Kind = .listing
+  public let kind: Kind
   private let data: ListingData
 
   fileprivate struct ListingData: Codable {

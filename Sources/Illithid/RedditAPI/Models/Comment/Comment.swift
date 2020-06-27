@@ -130,67 +130,67 @@ public struct Comment: RedditObject {
   public let contentCategories: [String]?
 
   enum CodingKeys: String, CodingKey {
-    case totalAwardsReceived
-    case approvedAtUtc
+    case totalAwardsReceived = "total_awards_received"
+    case approvedAtUtc = "approved_at_utc"
     case ups
-    case modReasonBy
-    case bannedBy
-    case authorFlairType
-    case removalReason
-    case linkId
-    case authorFlairTemplateId
+    case modReasonBy = "mod_reason_by"
+    case bannedBy = "banned_by"
+    case authorFlairType = "author_flair_type"
+    case removalReason = "removal_reason"
+    case linkId = "link_id"
+    case authorFlairTemplateId = "author_flair_template_id"
     case likes
-    case noFollow
+    case noFollow = "no_follow"
     case replies
-    case userReports
+    case userReports = "user_reports"
     case saved
     case id
-    case bannedAtUtc
-    case modReasonTitle
+    case bannedAtUtc = "banned_at_utc"
+    case modReasonTitle = "mod_reason_title"
     case gilded
     case archived
-    case reportReasons
+    case reportReasons = "report_reasons"
     case author
-    case canModPost
-    case sendReplies
-    case parentId
+    case canModPost = "can_mod_post"
+    case sendReplies = "send_replies"
+    case parentId = "parent_id"
     case score
-    case authorFullname
-    case approvedBy
-    case allAwardings
-    case subredditId
+    case authorFullname = "author_fullname"
+    case approvedBy = "approved_by"
+    case allAwardings = "all_awardings"
+    case subredditId = "subreddit_id"
     case body
     case edited
-    case authorFlairCssClass
-    case isSubmitter
+    case authorFlairCssClass = "author_flair_css_class"
+    case isSubmitter = "is_submitter"
     case downs
-    case authorFlairRichtext
-    case collapsedReason
-    case bodyHtml
+    case authorFlairRichtext = "author_flair_richtext"
+    case collapsedReason = "collapsed_reason"
+    case bodyHtml = "body_html"
     case stickied
-    case subredditType
-    case canGild
+    case subredditType = "subreddit_type"
+    case canGild = "can_gild"
 //    case gildings
-    case authorFlairTextColor
-    case scoreHidden
+    case authorFlairTextColor = "author_flair_text_color"
+    case scoreHidden = "score_hidden"
     case permalink
-    case numReports
+    case numReports = "num_reports"
     case locked
     case name
     case created
     case subreddit
-    case authorFlairText
+    case authorFlairText = "author_flair_text"
     case collapsed
-    case createdUtc
-    case subredditNamePrefixed
+    case createdUtc = "created_utc"
+    case subredditNamePrefixed = "subreddit_name_prefixed"
     case controversiality
     case depth
-    case authorFlairBackgroundColor
-    case modReports
-    case modNote
+    case authorFlairBackgroundColor = "author_flait_background_color"
+    case modReports = "mod_reports"
+    case modNote = "mod_note"
     case distinguished
-    case previousVisits
-    case contentCategories
+    case previousVisits = "previous_visits"
+    case contentCategories = "content_categories"
   }
 
   public init(from decoder: Decoder) throws {

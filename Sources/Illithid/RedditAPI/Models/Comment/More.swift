@@ -13,6 +13,15 @@ public struct More: RedditObject {
   public let parentId: Fullname
   public let depth: Int
   public let children: [ID36]
+
+  private enum CodingKeys: String, CodingKey {
+    case count
+    case name
+    case id
+    case parentId = "parent_id"
+    case depth
+    case children
+  }
 }
 
 /// Data structure returned from `/api/morechildren`
