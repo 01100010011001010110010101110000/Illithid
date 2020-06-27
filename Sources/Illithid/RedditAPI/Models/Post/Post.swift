@@ -1,7 +1,7 @@
 //
 // Post.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 5/12/20
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 6/26/20
 //
 
 import Combine
@@ -74,11 +74,7 @@ public struct Post: RedditObject {
   }
 
   public let id: ID36
-  public var fullname: Fullname {
-    "\(Kind.post.rawValue)_\(id)"
-  }
-
-  public let name: String
+  public let name: Fullname
 
   public let subreddit: String
   /// The `Fullname` of the subreddit to which this post was submitted
@@ -178,6 +174,76 @@ public struct Post: RedditObject {
   public let contestMode: Bool
   public let createdUtc: Date
   public let isVideo: Bool
+
+  private enum CodingKeys: String, CodingKey {
+    case id
+    case name
+    case subreddit
+    case subredditId = "subreddit_id"
+    case subredditNamePrefixed = "subreddit_name_prefixed"
+    case selftext
+    case selftextHtml = "selftext_html"
+    case secureMedia = "secure_media"
+    case media
+    case domain
+    case title
+    case authorFullname = "author_fullname"
+    case author
+    case authorFlairTextColor = "author_flair_text_color"
+    case authorFlairText = "author_flair_text"
+    case authorFlairType = "author_flair_type"
+    case authorFlairRichtext = "author_flair_richtext"
+    case linkFlairText = "link_flair_text"
+    case linkFlairType = "link_flair_type"
+    case linkFlairRichtext = "link_flair_richtext"
+    case linkFlairTextColor = "link_flair_text_color"
+    case url
+    case saved
+    case thumbnailHeight = "thumbnail_height"
+    case thumbnailWidth = "thumbnail_width"
+    case thumbnail
+    case preview
+    case over18 = "over_18"
+    case gilded
+    case isOriginalContent = "is_original_content"
+    case isMeta = "is_meta"
+    case isSelf = "is_self"
+    case edited
+    case ups
+    case downs
+    case likes
+    case score
+    case subredditSubscribers = "subreddit_subscribers"
+    case clicked
+    case created
+    case numComments = "num_comments"
+    case upvoteRatio = "upvote_ratio"
+    case crosspostParent = "crosspost_parent"
+    case crosspostParentList = "crosspost_paent_list"
+    case numCrossposts = "num_crossposts"
+    case permalink
+    case contentCategories = "content_categories"
+    case suggestedSort = "suggested_sort"
+    case postHint = "post_hint"
+    case archived
+    case noFollow = "no_follow"
+    case isCrosspostable = "is_crosspostable"
+    case pinned
+    case allAwardings = "all_awardings"
+    case mediaOnly = "media_only"
+    case canGild = "can_gild"
+    case spoiler
+    case stickied
+    case locked
+    case visited
+    case numReports = "num_reports"
+    case removalReason = "removal_reason"
+    case sendReplies = "send_replies"
+    case distinguished
+    case contestMode = "contest_mods"
+    case createdUtc = "created_utc"
+    case isVideo = "is_video"
+  }
 }
 
 public extension Post {

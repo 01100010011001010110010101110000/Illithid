@@ -83,7 +83,7 @@ public extension Illithid {
       "api_type": "json",
       "children": more.children.joined(separator: ","),
       "limit_children": limitChildren,
-      "link_id": post.fullname,
+      "link_id": post.name,
       "sort": sortBy.rawValue
     ]
     if let depth = depth { parameters["depth"] = depth }

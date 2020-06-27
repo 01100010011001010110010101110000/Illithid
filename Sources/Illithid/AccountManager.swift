@@ -33,7 +33,6 @@ public final class AccountManager: ObservableObject {
     self.logger = logger
 
     decoder.dateDecodingStrategy = .secondsSince1970
-    decoder.keyDecodingStrategy = .convertFromSnakeCase
 
     accounts = .init(loadAccounts())
     currentAccount = loadSelectedAccount()

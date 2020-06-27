@@ -1,7 +1,7 @@
 //
 // Posts.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 4/4/20
 //
 
 #if canImport(Combine)
@@ -93,23 +93,23 @@ public extension Post {
 
 public extension Post {
   func upvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
-    Illithid.shared.vote(fullname: fullname, direction: .up, queue: queue, completion: completion)
+    Illithid.shared.vote(fullname: name, direction: .up, queue: queue, completion: completion)
   }
 
   func downvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
-    Illithid.shared.vote(fullname: fullname, direction: .down, queue: queue, completion: completion)
+    Illithid.shared.vote(fullname: name, direction: .down, queue: queue, completion: completion)
   }
 
   func clearVote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
-    Illithid.shared.vote(fullname: fullname, direction: .clear, queue: queue, completion: completion)
+    Illithid.shared.vote(fullname: name, direction: .clear, queue: queue, completion: completion)
   }
 
   func save(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
-    Illithid.shared.save(fullname: fullname, queue: queue, completion: completion)
+    Illithid.shared.save(fullname: name, queue: queue, completion: completion)
   }
 
   func unsave(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
-    Illithid.shared.unsave(fullname: fullname, queue: queue, completion: completion)
+    Illithid.shared.unsave(fullname: name, queue: queue, completion: completion)
   }
 }
 

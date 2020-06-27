@@ -8,7 +8,7 @@ import Foundation
 
 /// This is a wrapper struct to make decoding URL types from Reddit's API more convenient
 /// Reddit returns the empty string when an object does not have the content it would otherwise link to via a URL
-public struct RedditURL: Codable {
+public struct RedditURL: Codable, Hashable, Equatable {
   public let url: URL?
 
   public init(from decoder: Decoder) throws {

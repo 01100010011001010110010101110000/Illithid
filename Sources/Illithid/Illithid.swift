@@ -1,7 +1,7 @@
 //
 // Illithid.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 4/4/20
 //
 
 import AuthenticationServices
@@ -39,7 +39,6 @@ open class Illithid: ObservableObject {
 
   private init() {
     decoder.dateDecodingStrategy = .secondsSince1970
-    decoder.keyDecodingStrategy = .convertFromSnakeCase
 
     #if DEBUG
       logger = .debugLogger()
@@ -75,6 +74,9 @@ internal extension Illithid {
     return session.request(url, method: .get, parameters: _parameters, encoding: queryEncoding)
       .validate()
       .responseDecodable(of: Listing.self, queue: queue, decoder: decoder) { request in
+        if case let .failure(error) = request.result {
+          print(error)
+        }
         completion(request.result)
       }
   }

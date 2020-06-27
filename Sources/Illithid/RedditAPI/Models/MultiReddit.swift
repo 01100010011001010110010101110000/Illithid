@@ -64,23 +64,25 @@ public struct Multireddit: RedditObject {
   public let isFavorited: Bool
 
   enum CodingKeys: String, CodingKey {
-    case canEdit
-    case displayName
+    case canEdit = "can_edit"
+    case displayName = "display_name"
     case name
-    case descriptionHtml
-    case subscriberCount = "numSubscribers"
-    case copiedFrom
-    case iconUrl
+    case descriptionHtml = "description_html"
+    case subscriberCount = "num_subscribers"
+    case copiedFrom = "copied_from"
+    case iconUrl = "icon_url"
     case subreddits
-    case createdUtc
-    case visibility, created
+    case createdUtc = "created_utc"
+    case visibility
+    case created
     case over18
-    case path, owner
+    case path
+    case owner
 //    case keyColor
-    case isSubscriber
-    case ownerId
-    case descriptionMd
-    case isFavorited
+    case isSubscriber = "is_subscriber"
+    case ownerId = "owner_id"
+    case descriptionMd = "description_md"
+    case isFavorited = "is_favorited"
   }
 
   private enum WrapperKeys: String, CodingKey {
