@@ -1,7 +1,7 @@
 //
 // Subreddit.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 6/26/20
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 6/27/20
 //
 
 import Cocoa
@@ -78,7 +78,7 @@ public struct Subreddit: RedditObject {
   public let publicDescriptionHtml: String?
   public let allowVideos: Bool
   public let isCrosspostableSubreddit: Bool
-  public let notificationLevel: NotificationLevel
+  public let notificationLevel: NotificationLevel?
   public let canAssignLinkFlair: Bool
   public let accountsActiveIsFuzzed: Bool
   public let submitTextLabel: String?
@@ -180,7 +180,7 @@ public struct Subreddit: RedditObject {
     emojisCustomSize = try container.decodeIfPresent([Int].self, forKey: .emojisCustomSize)
     publicDescriptionHtml = try container.decodeIfPresent(String.self, forKey: .publicDescriptionHtml)
     allowVideos = try container.decode(Bool.self, forKey: .allowVideos)
-    notificationLevel = try container.decode(NotificationLevel.self, forKey: .notificationLevel)
+    notificationLevel = try container.decodeIfPresent(NotificationLevel.self, forKey: .notificationLevel)
     canAssignLinkFlair = try container.decode(Bool.self, forKey: .canAssignLinkFlair)
     accountsActiveIsFuzzed = try container.decode(Bool.self, forKey: .accountsActiveIsFuzzed)
     submitTextLabel = try container.decodeIfPresent(String.self, forKey: .submitTextLabel)
