@@ -1,7 +1,7 @@
 //
 // Comment.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 6/27/20
 //
 
 import Combine
@@ -100,7 +100,7 @@ public struct Comment: RedditObject {
   public let collapsedReason: String?
   public let bodyHtml: String
   public let stickied: Bool
-  public let subredditType: String
+  public let subredditType: Subreddit.SubredditType
   public let canGild: Bool
   //  public let gildings: [Any: Any]
   public let authorFlairTextColor: String?
@@ -239,7 +239,7 @@ public struct Comment: RedditObject {
     collapsedReason = try? container.decodeIfPresent(String.self, forKey: .collapsedReason)
     bodyHtml = try container.decode(String.self, forKey: .bodyHtml)
     stickied = try container.decode(Bool.self, forKey: .stickied)
-    subredditType = try container.decode(String.self, forKey: .subredditType)
+    subredditType = try container.decode(Subreddit.SubredditType.self, forKey: .subredditType)
     canGild = try container.decode(Bool.self, forKey: .canGild)
 //    let gildings = try? container.decode([Any = try? container.decode(Any]
     authorFlairTextColor = try container.decodeIfPresent(String.self, forKey: .authorFlairTextColor)

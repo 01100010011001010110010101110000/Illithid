@@ -1,7 +1,7 @@
 //
 // MultiReddit.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 6/27/20
 //
 
 import Foundation
@@ -115,7 +115,7 @@ public struct Multireddit: RedditObject {
     id = path.absoluteString
   }
 
-  /// Trivial class for deserializing the list of member `Subreddits` returned from the `Multireddit` API
+  /// Trivial struct for deserializing the list of member `Subreddits` returned from the `Multireddit` API
   public struct MultiSubreddit: Codable, Identifiable, Equatable {
     public var id: String {
       name
