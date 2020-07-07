@@ -328,6 +328,9 @@ public extension Subreddit {
 
   enum SubredditType: String, Codable {
     case user
+    case goldOnly = "gold_only"
+    case goldRestricted = "gold_restricted"
+    case archived
     case `public`
     case restricted
     case `private`
