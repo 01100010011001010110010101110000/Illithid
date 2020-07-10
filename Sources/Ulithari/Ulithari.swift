@@ -1,7 +1,7 @@
 //
 // Ulithari.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 4/27/20
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 4/28/20
 //
 
 #if canImport(Combine)
@@ -14,6 +14,7 @@ import Alamofire
 open class Ulithari {
   public static let shared = Ulithari()
   public static let gfycatBaseUrl = URL(string: "https://api.gfycat.com/v1/")!
+  public static let redGifsBaseUrl = URL(string: "https://api.redgifs.com/v1/")!
   public static let imgurBaseUrl = URL(string: "https://api.imgur.com/3/")!
 
   internal let session: Session
@@ -51,7 +52,7 @@ open class Ulithari {
 }
 
 public extension Ulithari {
-  func fetchGfycat(id: String, queue: DispatchQueue = .main, completion: @escaping (Result<GfyItem, AFError>) -> Void) {
+  func fetchGfycat(id: String, queue: DispatchQueue = .main, completion: @escaping (Result<GfyItem, AFError>) -> Void) -> DataRequest {
     session.request(URL(string: "gfycats/\(id)", relativeTo: Self.gfycatBaseUrl)!).validate()
       .responseDecodable(of: GfyWrapper.self, queue: queue, decoder: gfycatDecoder) { response in
         switch response.result {
@@ -63,9 +64,26 @@ public extension Ulithari {
       }
   }
 
-  func fetchGfycat(from url: URL, queue: DispatchQueue = .main, completion: @escaping (Result<GfyItem, AFError>) -> Void) {
+  func fetchGfycat(from url: URL, queue: DispatchQueue = .main, completion: @escaping (Result<GfyItem, AFError>) -> Void) -> DataRequest {
     let gfyId = String(url.path.dropFirst())
-    fetchGfycat(id: gfyId, queue: queue, completion: completion)
+    return fetchGfycat(id: gfyId, queue: queue, completion: completion)
+  }
+
+  func fetchRedGif(id: String, queue: DispatchQueue = .main, completion: @escaping (Result<GfyItem, AFError>) -> Void) -> DataRequest {
+    session.request(URL(string: "gfycats/\(id)", relativeTo: Self.redGifsBaseUrl)!).validate()
+      .responseDecodable(of: GfyWrapper.self, queue: queue, decoder: gfycatDecoder) { response in
+        switch response.result {
+        case let .success(wrapper):
+          completion(.success(wrapper.item))
+        case let .failure(error):
+          completion(.failure(error))
+        }
+      }
+  }
+
+  func fetchRedGif(from url: URL, queue: DispatchQueue = .main, completion: @escaping (Result<GfyItem, AFError>) -> Void) -> DataRequest {
+    let redGifId = String(url.path.dropFirst())
+    return fetchRedGif(id: redGifId, queue: queue, completion: completion)
   }
 }
 
