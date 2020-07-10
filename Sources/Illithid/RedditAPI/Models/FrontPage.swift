@@ -1,7 +1,7 @@
 //
 // FrontPage.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 4/12/20
 //
 
 import Foundation
@@ -39,6 +39,10 @@ public enum FrontPage: String, Codable, URLConvertible, Identifiable, CaseIterab
 extension FrontPage: PostProvider {
   public var isNsfw: Bool {
     false
+  }
+
+  public var displayName: String {
+    rawValue.capitalized
   }
 
   public var id: String {
