@@ -7,7 +7,7 @@
 import Foundation
 
 public extension Int {
-  func postAbbreviation(_ significantFigures: Int = 2) -> String {
+  func postAbbreviation(_ significantFigures: Int = 1) -> String {
     guard self >= 1000 else { return description }
     let float_self = Double(self)
     let (divisor, unit) = self >= 1_000_000 ? (1_000_000.0, "M") : (1000.0, "k")
