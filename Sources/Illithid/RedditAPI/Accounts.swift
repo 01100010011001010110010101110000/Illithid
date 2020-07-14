@@ -1,7 +1,7 @@
 //
 // Accounts.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 4/4/20
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 4/5/20
 //
 
 #if canImport(Combine)
@@ -59,6 +59,8 @@ private enum AccountRouter: URLRequestConvertible, MirrorableEnum {
               sort: AccountContentSort = .new, t: TopInterval = .day,
               listingParameters: ListingParameters = .init())
 
+  case moderatedSubreddits(username: String)
+
   var path: String {
     switch self {
     case let .account(username):
@@ -81,6 +83,8 @@ private enum AccountRouter: URLRequestConvertible, MirrorableEnum {
       return "/subreddits/mine/subscriber"
     case let .upvoted(username, _, _, _):
       return "/user/\(username)/upvoted"
+    case let .moderatedSubreddits(username):
+      return "/user/\(username)/moderated_subreddits"
     }
   }
 
@@ -266,6 +270,48 @@ public extension Account {
                                       listingParameters: parameters)
 
     return illithid.readListing(request: request, queue: queue, completion: completion)
+  }
+}
+
+// MARK: Moderation
+
+public extension Illithid {
+  @discardableResult
+  func moderatedSubreddits(username: String, queue: DispatchQueue = .main,
+                           completion: @escaping (Result<[ModeratedSubreddit], AFError>) -> Void) -> DataRequest {
+    session.request(AccountRouter.moderatedSubreddits(username: username))
+      .validate()
+      .responseDecodable(of: ModeratedSubredditsList.self, queue: queue, decoder: decoder) { response in
+        switch response.result {
+        case let .success(list):
+          completion(.success(list.data))
+        case let .failure(error):
+          completion(.failure(error))
+        }
+      }
+  }
+
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+  func moderatedSubreddits(username: String, queue: DispatchQueue = .main) -> AnyPublisher<[ModeratedSubreddit], AFError> {
+    session.request(AccountRouter.moderatedSubreddits(username: username))
+      .validate()
+      .publishDecodable(type: ModeratedSubredditsList.self, queue: queue, decoder: decoder)
+      .value()
+      .map { $0.data }
+      .eraseToAnyPublisher()
+  }
+}
+
+public extension Account {
+  @discardableResult
+  func moderatedSubreddits(queue: DispatchQueue = .main,
+                           completion: @escaping (Result<[ModeratedSubreddit], AFError>) -> Void) -> DataRequest {
+    Illithid.shared.moderatedSubreddits(username: name, queue: queue, completion: completion)
+  }
+
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+  func moderatedSubreddits(queue: DispatchQueue = .main) -> AnyPublisher<[ModeratedSubreddit], AFError> {
+    Illithid.shared.moderatedSubreddits(username: name, queue: queue)
   }
 }
 
