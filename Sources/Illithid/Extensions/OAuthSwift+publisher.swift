@@ -11,6 +11,7 @@ import Foundation
 
 import OAuthSwift
 
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public extension OAuthSwiftClient {
   func requestPublisher(_ url: URLConvertible) -> AnyPublisher<OAuthSwiftResponse, Error> {
     Future { result in
@@ -26,6 +27,7 @@ public extension OAuthSwiftClient {
   }
 }
 
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public extension OAuth2Swift {
   func requestPublisher(_ url: URLConvertible, method: OAuthSwiftHTTPRequest.Method, parameters: OAuthSwift.Parameters,
                         headers: OAuthSwift.Headers? = nil, renewHeaders: OAuthSwift.Headers? = nil,
