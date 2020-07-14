@@ -1,7 +1,7 @@
 //
 // Subreddits.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 4/4/20
 //
 
 #if canImport(Combine)
@@ -79,7 +79,7 @@ public extension Subreddit {
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public extension Subreddit {
   /// Loads a specific `Subreddit` by its `Fullname`
-  static func fetch(name: Fullname, queue: DispatchQueue = .main) -> AnyPublisher<Subreddit, Error> {
+  static func fetch(name: Fullname, queue: DispatchQueue = .main) -> AnyPublisher<Subreddit, AFError> {
     Illithid.shared.info(name: name, queue: queue)
       .compactMap { listing in
         listing.subreddits.last

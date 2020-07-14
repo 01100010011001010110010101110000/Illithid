@@ -1,7 +1,7 @@
 //
 // Comments.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 6/27/20
 //
 
 #if canImport(Combine)
@@ -48,7 +48,7 @@ public extension Illithid {
   func comments(for post: Post, parameters: ListingParameters,
                 by sort: CommentsSort = .confidence, focusOn comment: ID36? = nil, context: Int? = nil,
                 depth: Int = 0, showEdits: Bool = true, showMore: Bool = true,
-                threaded: Bool = true, truncate: Int = 0, queue: DispatchQueue = .main) -> AnyPublisher<Listing, Error> {
+                threaded: Bool = true, truncate: Int = 0, queue: DispatchQueue = .main) -> AnyPublisher<Listing, AFError> {
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
 
     var encodedParameters = parameters.toParameters()
@@ -64,10 +64,11 @@ public extension Illithid {
     ]
     encodedParameters.merge(commentsParameters) { current, _ in current }
 
-    return session.requestPublisher(url: CommentRouter.comments(for: post), method: .get, parameters: encodedParameters,
-                                    encoding: queryEncoding, queue: queue)
-      .decode(type: [Listing].self, decoder: decoder)
-      .mapError { (error) -> Error in
+    return session.request(CommentRouter.comments(for: post), method: .get,
+                           parameters: encodedParameters, encoding: queryEncoding)
+      .publishDecodable(type: [Listing].self, queue: queue, decoder: decoder)
+      .value()
+      .mapError { (error) -> AFError in
         self.logger.errorMessage { "Error fetching comments: \(error)" }
         return error
       }
@@ -78,7 +79,7 @@ public extension Illithid {
   }
 
   func moreComments(for more: More, in post: Post, depth: Int? = nil,
-                    limitChildren: Bool = false, sortBy: CommentsSort = .confidence, queue: DispatchQueue = .main) -> AnyPublisher<[CommentWrapper], Error> {
+                    limitChildren: Bool = false, sortBy: CommentsSort = .confidence, queue: DispatchQueue = .main) -> AnyPublisher<[CommentWrapper], AFError> {
     var parameters: Parameters = [
       "api_type": "json",
       "children": more.children.joined(separator: ","),
@@ -88,9 +89,10 @@ public extension Illithid {
     ]
     if let depth = depth { parameters["depth"] = depth }
 
-    return session.requestPublisher(url: CommentRouter.moreComments, method: .post, parameters: parameters,
-                                    encoding: URLEncoding(destination: .httpBody, boolEncoding: .numeric), queue: queue)
-      .decode(type: MoreChildren.self, decoder: decoder)
+    return session.request(CommentRouter.moreComments, method: .post, parameters: parameters,
+                           encoding: URLEncoding(destination: .httpBody, boolEncoding: .numeric))
+      .publishDecodable(type: MoreChildren.self, queue: queue, decoder: decoder)
+      .value()
       .map { $0.allComments }
       .eraseToAnyPublisher()
   }
@@ -125,7 +127,7 @@ public extension Comment {
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public extension Comment {
-  static func fetch(name: Fullname, queue: DispatchQueue = .main) -> AnyPublisher<Comment, Error> {
+  static func fetch(name: Fullname, queue: DispatchQueue = .main) -> AnyPublisher<Comment, AFError> {
     Illithid.shared.info(name: name, queue: queue)
       .compactMap { listing in
         listing.comments.last

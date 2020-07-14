@@ -13,16 +13,16 @@ import Alamofire
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public extension Illithid {
-  func info(names: [Fullname], queue: DispatchQueue = .main) -> AnyPublisher<Listing, Error> {
+  func info(names: [Fullname], queue: DispatchQueue = .main) -> AnyPublisher<Listing, AFError> {
     let endpoint = URL(string: "/api/info", relativeTo: baseURL)!
     let infoParameters: Parameters = ["id": names.joined(separator: ",")]
 
-    return session.requestPublisher(url: endpoint, method: .get, parameters: infoParameters, queue: queue)
-      .decode(type: Listing.self, decoder: decoder)
-      .eraseToAnyPublisher()
+    return session.request(endpoint, method: .get, parameters: infoParameters)
+      .publishDecodable(type: Listing.self, queue: queue, decoder: decoder)
+      .value()
   }
 
-  func info(name: Fullname, queue: DispatchQueue = .main) -> AnyPublisher<Listing, Error> { info(names: [name], queue: queue) }
+  func info(name: Fullname, queue: DispatchQueue = .main) -> AnyPublisher<Listing, AFError> { info(names: [name], queue: queue) }
 }
 
 public extension Illithid {

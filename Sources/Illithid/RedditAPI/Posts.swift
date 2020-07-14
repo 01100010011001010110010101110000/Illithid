@@ -1,7 +1,7 @@
 //
 // Posts.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 4/4/20
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 6/27/20
 //
 
 #if canImport(Combine)
@@ -83,7 +83,7 @@ public extension Illithid {
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public extension Post {
-  static func fetch(name: Fullname, queue: DispatchQueue = .main) -> AnyPublisher<Post, Error> {
+  static func fetch(name: Fullname, queue: DispatchQueue = .main) -> AnyPublisher<Post, AFError> {
     Illithid.shared.info(name: name, queue: queue)
       .compactMap { listing in
         listing.posts.last
