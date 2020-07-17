@@ -133,6 +133,11 @@ public struct Post: RedditObject {
   public let isOriginalContent: Bool
   public let isMeta: Bool
   public let isSelf: Bool
+  /// Whether the post is a gallery post
+  /// - Note: If the post is **not** a gallery post, this is `nil`
+  public let isGallery: Bool?
+  public let galleryData: GalleryData?
+  public let mediaMetadata: [String: MediaMetadata]?
   public let edited: Edited
   public let ups: Int
   public let downs: Int
@@ -227,6 +232,9 @@ public struct Post: RedditObject {
     case postHint = "post_hint"
     case archived
     case noFollow = "no_follow"
+    case isGallery = "is_gallery"
+    case mediaMetadata = "media_metadata"
+    case galleryData = "gallery_data"
     case isCrosspostable = "is_crosspostable"
     case pinned
     case allAwardings = "all_awardings"
