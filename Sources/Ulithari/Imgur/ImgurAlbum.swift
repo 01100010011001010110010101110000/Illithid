@@ -22,7 +22,7 @@ internal struct ImgurAlbumWrapper: Codable {
 
 // MARK: - AlbumData
 
-public struct ImgurAlbum: Codable {
+public struct ImgurAlbum: Codable, Identifiable {
   public let id: String
   public let title: String?
   public let dataDescription: String?

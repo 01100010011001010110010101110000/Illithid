@@ -6,8 +6,8 @@
 
 import Foundation
 
-/// The object representing the ordered gallery view. The IDs here should be tied back to the post's `MediaMetadata` to get the content for each item
-public struct GalleryDataItem: Codable {
+/// The object representing the ordered gallery view. The Media IDs here should be tied back to the post's `MediaMetadata` to get the content for each item
+public struct GalleryDataItem: Codable, Identifiable {
   public let id: Int
   public let mediaId: String
   public let caption: String?

@@ -29,7 +29,7 @@ internal struct ImgurImageWrapper: Codable, Hashable {
 
 // MARK: - DataClass
 
-public struct ImgurImage: Codable, Hashable {
+public struct ImgurImage: Codable, Hashable, Identifiable {
   public let id: String
   public let title: String?
   public let dataDescription: String?
