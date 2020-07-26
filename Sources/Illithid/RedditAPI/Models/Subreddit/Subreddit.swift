@@ -19,90 +19,181 @@ public enum SubredditSort {
 
 public struct Subreddit: RedditObject {
   public let userFlairBackgroundColor: String?
+  /// The HTML formatted text that appears when submitting a new post to this subreddit
+  /// - Note: `nil` if the subreddit is private and the current user does not have access, or if no submission text has been defined
   public let submitTextHtml: String?
-  public let restrictPosting: Bool
-  public let userIsBanned: Bool
-  public let freeFormReports: Bool
-  public let wikiEnabled: Bool
-  public let userIsMuted: Bool
-  public let userCanFlairInSr: Bool
+  /// Whether posting in the subreddit is restricted to approved users
+  /// - Note: `nil` if the subreddit is private and the current user does not have access
+  public let restrictPosting: Bool?
+  /// Whether the current user is banned from the subreddit
+  /// - Note: `nil` if the subreddit is private and the current user does not have access
+  public let userIsBanned: Bool?
+  /// Whether the subreddit allows custom report messages
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let freeFormReports: Bool?
+  /// Whether the current user can edit the subreddit's wiki
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let wikiEnabled: Bool?
+  /// Whether the current user is muted in the subreddit
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let userIsMuted: Bool?
+  /// Whether the current user can set user flairs in the subreddit
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let userCanFlairInSr: Bool?
   public let displayName: String
   public let headerImg: URL?
   public let title: String
-  public let allowGalleries: Bool
+  /// Whether the subreddit allows image gallery posts
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let allowGalleries: Bool?
   public let iconSize: [Int]?
-  public let primaryColor: String
+  /// The hex triplet color code of the subreddit's primary color
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let primaryColor: String?
   public let activeUserCount: Int?
   public let iconImg: URL?
   public let displayNamePrefixed: String
   public let accountsActive: Int?
-  public let publicTraffic: Bool
-  public let subscribers: Int
+  /// Whether this subreddit exposes its traffic statistics publicly
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let publicTraffic: Bool?
+  /// This subreddit's subscriber count
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let subscribers: Int?
   public let userFlairRichtext: [String]
   public let videostreamLinksCount: Int?
   public let name: Fullname
-  public let quarantine: Bool
-  public let hideAds: Bool
+  /// Whether this subreddit is quarantined
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let quarantine: Bool?
+  /// Whether this subreddit suppresses advertisements
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let hideAds: Bool?
   public let emojisEnabled: Bool
-  public let advertiserCategory: String
+  /// The advertiser category this subreddit falls into, if any
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let advertiserCategory: String?
   public let description: String?
   public let publicDescription: String
-  public let commentScoreHideMins: Int
-  public let userHasFavorited: Bool
+  /// The number of minutes to hide the score of a new comment
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let commentScoreHideMins: Int?
+  /// Whether the current user has favorited the subreddit
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let userHasFavorited: Bool?
   public let userFlairTemplateId: UUID?
   public let communityIcon: URL?
   public let bannerBackgroundImage: URL?
-  public let originalContentTagEnabled: Bool
-  public let submitText: String
+  /// Whether the subreddit allows the use of the original content tag
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let originalContentTagEnabled: Bool?
+  /// The text shown when creating a new submission for this subreddit
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let submitText: String?
   public let descriptionHtml: String?
-  public let spoilersEnabled: Bool
+  /// Whether the subreddit allows tagging posts as containing spoilers
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let spoilersEnabled: Bool?
   public let headerTitle: String?
   public let headerSize: [Int]?
-  public let userFlairPosition: String
-  public let allOriginalContent: Bool
+  /// The subreddit's positioning of user flairs relative to the username
+  /// - Note: Returns the empty string if user flair has not been configured
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let userFlairPosition: String?
+  /// Whether the subreddit marks all submissions as original content
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let allOriginalContent: Bool?
   public let hasMenuWidget: Bool
   public let isEnrolledInNewModmail: Bool?
-  public let keyColor: String
+  /// The hex triplet color code of the subreddit's thematic color
+  /// - Note: Returns the empty string if this is not configured
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let keyColor: String?
   public let canAssignUserFlair: Bool
   public let created: Date
   public let wls: Int?
-  public let showMediaPreview: Bool
-  public let submissionType: SubmissionType
-  public let userIsSubscriber: Bool
-  public let disableContributorRequests: Bool
+  /// Whether the subreddit automatically shows expanded media previews on a submission's comments page
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let showMediaPreview: Bool?
+  /// The types of submissions allowed on the subreddit
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let submissionType: SubmissionType?
+  /// Whether the current user subscribes to the subreddit
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let userIsSubscriber: Bool?
+  /// Whether the subreddit accepts new requests to be able to post in the subreddit.
+  /// This is relevant for subreddits with a `subredditType` of `restricted`
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let disableContributorRequests: Bool?
   public let allowVideogifs: Bool
   public let userFlairType: String
-  public let allowPolls: Bool
-  public let collapseDeletedComments: Bool
+  /// Whether the subreddit allows polls
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let allowPolls: Bool?
+  /// Whether comments pages for posts in this subreddit automatically collapse deleted and removed comments
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let collapseDeletedComments: Bool?
   public let emojisCustomSize: [Int]?
   public let publicDescriptionHtml: String?
   public let allowVideos: Bool
   public let isCrosspostableSubreddit: Bool
   public let notificationLevel: NotificationLevel?
   public let canAssignLinkFlair: Bool
-  public let accountsActiveIsFuzzed: Bool
+  /// Whether the number of active accounts on the subreddit has been altered by Reddit
+  /// - Remark: This is done on subreddits a low number of current active users to prevent leaking users' activity information
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let accountsActiveIsFuzzed: Bool?
+  /// The text presented when a new text post is being made
+  /// - Note: `nil` if no text has been configured
   public let submitTextLabel: String?
   public let linkFlairPosition: String?
-  public let userSrFlairEnabled: Bool
-  public let userFlairEnabledInSr: Bool
-  public let allowDiscovery: Bool
-  public let userSrThemeEnabled: Bool
-  public let linkFlairEnabled: Bool
+  /// Whether the current user has opted to display their user flair in this subreddit
+  /// - Note: `nil` if any of the following are true
+  /// * The current user has no flair
+  /// * The current user has not indicated a display preference
+  /// * The subreddit is private and the current user context does not have access
+  public let userSrFlairEnabled: Bool?
+  /// Whether the subreddit has enabled user flairs
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let userFlairEnabledInSr: Bool?
+  /// Whether the subreddit allows users to be exposed to this subreddit after they have expressed interest via Reddit's onboarding process
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let allowDiscovery: Bool?
+  /// Whether the current user allows this subreddit to show custom CSS
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let userSrThemeEnabled: Bool?
+  /// Whether the subreddit allows post flairs
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let linkFlairEnabled: Bool?
   public let subredditType: SubredditType
   public let suggestedCommentSort: CommentsSort?
   public let bannerImg: URL?
   public let userFlairText: String?
-  public let bannerBackgroundColor: String
-  public let showMedia: Bool
+  /// The hex triplet color code of the subreddit's banner background
+  /// - Note: Returns the empty string if no value has been set
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let bannerBackgroundColor: String?
+  /// Whether the subreddit shows media thumbnails
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let showMedia: Bool?
   public let id: ID36
-  public let userIsModerator: Bool
+  /// Whether the current user moderates the subreddit
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let userIsModerator: Bool?
   public let over18: Bool?
   public let submitLinkLabel: String?
   public let userFlairTextColor: String?
-  public let restrictCommenting: Bool
+  /// Whether approved users have the ability to comment
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let restrictCommenting: Bool?
   public let userFlairCssClass: String?
-  public let allowImages: Bool
-  public let lang: String
+  /// Whether the subreddit allows image posts
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let allowImages: Bool?
+  /// The localization for the subreddit
+  /// - Note: Returns the empty string if no locale is configured
+  /// - Note: `nil` if the subreddit is private and the current user context does not have access
+  public let lang: String?
   public let whitelistStatus: WhitelistStatus?
   public let url: URL
   public let createdUtc: Date
@@ -129,85 +220,85 @@ public struct Subreddit: RedditObject {
 
     userFlairBackgroundColor = try container.decodeIfPresent(String.self, forKey: .userFlairBackgroundColor)
     submitTextHtml = try container.decodeIfPresent(String.self, forKey: .submitTextHtml)
-    restrictPosting = try container.decode(Bool.self, forKey: .restrictPosting)
-    userIsBanned = try container.decode(Bool.self, forKey: .userIsBanned)
-    freeFormReports = try container.decode(Bool.self, forKey: .freeFormReports)
-    userIsMuted = try container.decode(Bool.self, forKey: .userIsMuted)
+    restrictPosting = try container.decodeIfPresent(Bool.self, forKey: .restrictPosting)
+    userIsBanned = try container.decodeIfPresent(Bool.self, forKey: .userIsBanned)
+    freeFormReports = try container.decodeIfPresent(Bool.self, forKey: .freeFormReports)
+    userIsMuted = try container.decodeIfPresent(Bool.self, forKey: .userIsMuted)
     displayName = try container.decode(String.self, forKey: .displayName)
     title = try container.decode(String.self, forKey: .title)
-    allowGalleries = try container.decode(Bool.self, forKey: .allowGalleries)
+    allowGalleries = try container.decodeIfPresent(Bool.self, forKey: .allowGalleries)
     iconSize = try container.decodeIfPresent([Int].self, forKey: .iconSize)
-    primaryColor = try container.decode(String.self, forKey: .primaryColor)
+    primaryColor = try container.decodeIfPresent(String.self, forKey: .primaryColor)
     activeUserCount = try container.decodeIfPresent(Int.self, forKey: .activeUserCount)
     displayNamePrefixed = try container.decode(String.self, forKey: .displayNamePrefixed)
     accountsActive = try container.decodeIfPresent(Int.self, forKey: .accountsActive)
-    publicTraffic = try container.decode(Bool.self, forKey: .publicTraffic)
-    subscribers = try container.decode(Int.self, forKey: .subscribers)
+    publicTraffic = try container.decodeIfPresent(Bool.self, forKey: .publicTraffic)
+    subscribers = try container.decodeIfPresent(Int.self, forKey: .subscribers)
     userFlairRichtext = try container.decode([String].self, forKey: .userFlairRichtext)
     videostreamLinksCount = try container.decodeIfPresent(Int.self, forKey: .videostreamLinksCount)
     name = try container.decode(Fullname.self, forKey: .name)
-    quarantine = try container.decode(Bool.self, forKey: .quarantine)
-    hideAds = try container.decode(Bool.self, forKey: .hideAds)
+    quarantine = try container.decodeIfPresent(Bool.self, forKey: .quarantine)
+    hideAds = try container.decodeIfPresent(Bool.self, forKey: .hideAds)
     emojisEnabled = try container.decode(Bool.self, forKey: .emojisEnabled)
-    advertiserCategory = try container.decode(String.self, forKey: .advertiserCategory)
+    advertiserCategory = try container.decodeIfPresent(String.self, forKey: .advertiserCategory)
     description = try container.decodeIfPresent(String.self, forKey: .description)
     publicDescription = try container.decode(String.self, forKey: .publicDescription)
-    commentScoreHideMins = try container.decode(Int.self, forKey: .commentScoreHideMins)
-    userHasFavorited = try container.decode(Bool.self, forKey: .userHasFavorited)
+    commentScoreHideMins = try container.decodeIfPresent(Int.self, forKey: .commentScoreHideMins)
+    userHasFavorited = try container.decodeIfPresent(Bool.self, forKey: .userHasFavorited)
     userFlairTemplateId = try container.decodeIfPresent(UUID.self, forKey: .userFlairTemplateId)
-    originalContentTagEnabled = try container.decode(Bool.self, forKey: .originalContentTagEnabled)
-    submitText = try container.decode(String.self, forKey: .submitText)
+    originalContentTagEnabled = try container.decodeIfPresent(Bool.self, forKey: .originalContentTagEnabled)
+    submitText = try container.decodeIfPresent(String.self, forKey: .submitText)
     descriptionHtml = try container.decodeIfPresent(String.self, forKey: .descriptionHtml)
-    spoilersEnabled = try container.decode(Bool.self, forKey: .spoilersEnabled)
+    spoilersEnabled = try container.decodeIfPresent(Bool.self, forKey: .spoilersEnabled)
     headerTitle = try container.decodeIfPresent(String.self, forKey: .headerTitle)
     headerSize = try container.decodeIfPresent([Int].self, forKey: .headerSize)
-    userFlairPosition = try container.decode(String.self, forKey: .userFlairPosition)
-    allOriginalContent = try container.decode(Bool.self, forKey: .allOriginalContent)
+    userFlairPosition = try container.decodeIfPresent(String.self, forKey: .userFlairPosition)
+    allOriginalContent = try container.decodeIfPresent(Bool.self, forKey: .allOriginalContent)
     hasMenuWidget = try container.decode(Bool.self, forKey: .hasMenuWidget)
     isEnrolledInNewModmail = try container.decodeIfPresent(Bool.self, forKey: .isEnrolledInNewModmail)
-    keyColor = try container.decode(String.self, forKey: .keyColor)
+    keyColor = try container.decodeIfPresent(String.self, forKey: .keyColor)
     canAssignUserFlair = try container.decode(Bool.self, forKey: .canAssignUserFlair)
     created = try container.decode(Date.self, forKey: .created)
     wls = try container.decodeIfPresent(Int.self, forKey: .wls)
-    showMediaPreview = try container.decode(Bool.self, forKey: .showMediaPreview)
-    submissionType = try container.decode(SubmissionType.self, forKey: .submissionType)
-    userIsSubscriber = try container.decode(Bool.self, forKey: .userIsSubscriber)
-    disableContributorRequests = try container.decode(Bool.self, forKey: .disableContributorRequests)
+    showMediaPreview = try container.decodeIfPresent(Bool.self, forKey: .showMediaPreview)
+    submissionType = try container.decodeIfPresent(SubmissionType.self, forKey: .submissionType)
+    userIsSubscriber = try container.decodeIfPresent(Bool.self, forKey: .userIsSubscriber)
+    disableContributorRequests = try container.decodeIfPresent(Bool.self, forKey: .disableContributorRequests)
     allowVideogifs = try container.decode(Bool.self, forKey: .allowVideogifs)
     userFlairType = try container.decode(String.self, forKey: .userFlairType)
-    allowPolls = try container.decode(Bool.self, forKey: .allowPolls)
-    collapseDeletedComments = try container.decode(Bool.self, forKey: .collapseDeletedComments)
+    allowPolls = try container.decodeIfPresent(Bool.self, forKey: .allowPolls)
+    collapseDeletedComments = try container.decodeIfPresent(Bool.self, forKey: .collapseDeletedComments)
     emojisCustomSize = try container.decodeIfPresent([Int].self, forKey: .emojisCustomSize)
     publicDescriptionHtml = try container.decodeIfPresent(String.self, forKey: .publicDescriptionHtml)
     allowVideos = try container.decode(Bool.self, forKey: .allowVideos)
     notificationLevel = try container.decodeIfPresent(NotificationLevel.self, forKey: .notificationLevel)
     canAssignLinkFlair = try container.decode(Bool.self, forKey: .canAssignLinkFlair)
-    accountsActiveIsFuzzed = try container.decode(Bool.self, forKey: .accountsActiveIsFuzzed)
+    accountsActiveIsFuzzed = try container.decodeIfPresent(Bool.self, forKey: .accountsActiveIsFuzzed)
     submitTextLabel = try container.decodeIfPresent(String.self, forKey: .submitTextLabel)
     linkFlairPosition = try container.decodeIfPresent(String.self, forKey: .linkFlairPosition)
-    userFlairEnabledInSr = try container.decode(Bool.self, forKey: .userFlairEnabledInSr)
-    allowDiscovery = try container.decode(Bool.self, forKey: .allowDiscovery)
-    userSrThemeEnabled = try container.decode(Bool.self, forKey: .userSrThemeEnabled)
-    linkFlairEnabled = try container.decode(Bool.self, forKey: .linkFlairEnabled)
+    userFlairEnabledInSr = try container.decodeIfPresent(Bool.self, forKey: .userFlairEnabledInSr)
+    allowDiscovery = try container.decodeIfPresent(Bool.self, forKey: .allowDiscovery)
+    userSrThemeEnabled = try container.decodeIfPresent(Bool.self, forKey: .userSrThemeEnabled)
+    linkFlairEnabled = try container.decodeIfPresent(Bool.self, forKey: .linkFlairEnabled)
     subredditType = try container.decode(SubredditType.self, forKey: .subredditType)
     suggestedCommentSort = try container.decodeIfPresent(CommentsSort.self, forKey: .suggestedCommentSort)
     userFlairText = try container.decodeIfPresent(String.self, forKey: .userFlairText)
-    bannerBackgroundColor = try container.decode(String.self, forKey: .bannerBackgroundColor)
-    showMedia = try container.decode(Bool.self, forKey: .showMedia)
+    bannerBackgroundColor = try container.decodeIfPresent(String.self, forKey: .bannerBackgroundColor)
+    showMedia = try container.decodeIfPresent(Bool.self, forKey: .showMedia)
     id = try container.decode(ID36.self, forKey: .id)
-    userIsModerator = try container.decode(Bool.self, forKey: .userIsModerator)
-    over18 = try container.decode(Bool.self, forKey: .over18)
+    userIsModerator = try container.decodeIfPresent(Bool.self, forKey: .userIsModerator)
+    over18 = try container.decodeIfPresent(Bool.self, forKey: .over18)
     submitLinkLabel = try container.decodeIfPresent(String.self, forKey: .submitLinkLabel)
     userFlairTextColor = try container.decodeIfPresent(String.self, forKey: .userFlairTextColor)
-    restrictCommenting = try container.decode(Bool.self, forKey: .restrictCommenting)
+    restrictCommenting = try container.decodeIfPresent(Bool.self, forKey: .restrictCommenting)
     userFlairCssClass = try container.decodeIfPresent(String.self, forKey: .userFlairCssClass)
-    allowImages = try container.decode(Bool.self, forKey: .allowImages)
-    lang = try container.decode(String.self, forKey: .lang)
+    allowImages = try container.decodeIfPresent(Bool.self, forKey: .allowImages)
+    lang = try container.decodeIfPresent(String.self, forKey: .lang)
     whitelistStatus = try container.decodeIfPresent(WhitelistStatus.self, forKey: .whitelistStatus)
     url = try container.decode(URL.self, forKey: .url)
     createdUtc = try container.decode(Date.self, forKey: .createdUtc)
     bannerSize = try container.decodeIfPresent([Int].self, forKey: .bannerSize)
-    userIsContributor = try container.decode(Bool.self, forKey: .userIsContributor)
+    userIsContributor = try container.decodeIfPresent(Bool.self, forKey: .userIsContributor)
   }
 
   private enum CodingKeys: String, CodingKey {
