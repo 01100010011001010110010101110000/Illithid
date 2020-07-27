@@ -7,6 +7,10 @@
 import Combine
 import Foundation
 
+#if canImport(SwiftUI)
+  import SwiftUI
+#endif
+
 import Alamofire
 
 public enum VoteDirection: Int, Codable {
@@ -94,14 +98,16 @@ public struct Post: RedditObject {
     "u/\(author)"
   }
 
-  public let authorFlairTextColor: String?
+  public let authorFlairTextColor: FlairTextColor?
   public let authorFlairText: String?
   public let authorFlairType: FlairType?
   public let authorFlairRichtext: [FlairRichtext]?
+  public let authorFlairBackgroundColor: String?
   public let linkFlairText: String?
   public let linkFlairType: FlairType?
   public let linkFlairRichtext: [FlairRichtext]?
-  public let linkFlairTextColor: String?
+  public let linkFlairTextColor: FlairTextColor?
+  public let linkFlairBackgroundColor: String
 
   /// The string value returned by the Reddit API for the URL attribute
   private let url: String
@@ -198,10 +204,12 @@ public struct Post: RedditObject {
     case authorFlairText = "author_flair_text"
     case authorFlairType = "author_flair_type"
     case authorFlairRichtext = "author_flair_richtext"
+    case authorFlairBackgroundColor = "author_flair_background_color"
     case linkFlairText = "link_flair_text"
     case linkFlairType = "link_flair_type"
     case linkFlairRichtext = "link_flair_richtext"
     case linkFlairTextColor = "link_flair_text_color"
+    case linkFlairBackgroundColor = "link_flair_background_color"
     case url
     case saved
     case thumbnailHeight = "thumbnail_height"
@@ -255,6 +263,13 @@ public struct Post: RedditObject {
 }
 
 public extension Post {
+  enum FlairTextColor: String, Codable {
+    case light
+    case dark
+  }
+}
+
+public extension Post {
   var imagePreviews: [Preview.Source] {
     var previews: [Preview.Source] = []
     previews.reserveCapacity((preview?.images.first?.resolutions.count ?? 0) + 2)
@@ -290,5 +305,18 @@ public extension Post {
     } else {
       return []
     }
+  }
+}
+
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+public extension Post {
+  var linkFlairBackgroundSwiftUiColor: Color? {
+    guard !linkFlairBackgroundColor.isEmpty else { return nil }
+    return parseWebColor(hex: linkFlairBackgroundColor)
+  }
+
+  var authorFlairBackgroundSwiftUiColor: Color? {
+    guard let color = authorFlairBackgroundColor, !color.isEmpty else { return nil }
+    return parseWebColor(hex: color)
   }
 }
