@@ -1,7 +1,7 @@
 //
 // Comment.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 6/27/20
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 7/6/20
 //
 
 import Combine
@@ -66,6 +66,11 @@ public struct Comment: RedditObject {
   public let authorFlairTemplateId: String?
   public var likes: Bool?
   public let noFollow: Bool
+
+  public var commentReplies: [Comment] {
+    replies?.comments ?? []
+  }
+
   public var replies: Listing?
   public let userReports: [String]
   public var saved: Bool
