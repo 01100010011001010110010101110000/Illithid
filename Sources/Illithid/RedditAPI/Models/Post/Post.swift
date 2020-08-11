@@ -1,7 +1,7 @@
 //
 // Post.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 6/27/20
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 8/1/20
 //
 
 import Combine
@@ -312,11 +312,11 @@ public extension Post {
 public extension Post {
   var linkFlairBackgroundSwiftUiColor: Color? {
     guard !linkFlairBackgroundColor.isEmpty else { return nil }
-    return parseWebColor(hex: linkFlairBackgroundColor)
+    return Color(hex: linkFlairBackgroundColor)
   }
 
   var authorFlairBackgroundSwiftUiColor: Color? {
     guard let color = authorFlairBackgroundColor, !color.isEmpty else { return nil }
-    return parseWebColor(hex: color)
+    return Color(hex: color)
   }
 }
