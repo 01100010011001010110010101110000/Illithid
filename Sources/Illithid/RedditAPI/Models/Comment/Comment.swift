@@ -1,7 +1,7 @@
 //
 // Comment.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 7/6/20
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 8/1/20
 //
 
 import Combine
@@ -18,29 +18,6 @@ public enum CommentsSort: String, Codable {
   case random
   case qa
   case live
-}
-
-public enum CommentWrapper: Identifiable, Equatable {
-  case comment(Comment)
-  case more(More)
-
-  public var parentId: Fullname {
-    switch self {
-    case let .comment(comment):
-      return comment.parentId
-    case let .more(more):
-      return more.parentId
-    }
-  }
-
-  public var id: ID36 {
-    switch self {
-    case let .comment(comment):
-      return comment.id
-    case let .more(more):
-      return more.id
-    }
-  }
 }
 
 public struct Comment: RedditObject {
@@ -67,11 +44,8 @@ public struct Comment: RedditObject {
   public var likes: Bool?
   public let noFollow: Bool
 
-  public var commentReplies: [Comment] {
-    replies?.comments ?? []
-  }
-
-  public var replies: Listing?
+  public var replies: [Comment]?
+  public var more: More?
   public let userReports: [String]
   public var saved: Bool
   public let id: ID36
@@ -204,7 +178,9 @@ public struct Comment: RedditObject {
     if let emptyString = try? container.decode(String.self, forKey: .replies), emptyString.isEmpty {
       replies = nil
     } else {
-      replies = try container.decode(Listing.self, forKey: .replies)
+      let listing = try container.decode(Listing.self, forKey: .replies)
+      replies = listing.comments
+      more = listing.more
     }
 
     totalAwardsReceived = try container.decode(Int.self, forKey: .totalAwardsReceived)

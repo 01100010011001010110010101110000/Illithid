@@ -1,7 +1,7 @@
 //
 // More.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 8/1/20
 //
 
 import Foundation
@@ -28,12 +28,18 @@ public struct More: RedditObject {
 internal struct MoreChildren: Codable {
   fileprivate let json: Json
 
-  public var allComments: [CommentWrapper] {
-    json.data.things.compactMap { child in
-      if case let Listing.Content.comment(comment) = child { return .comment(comment) }
-      else if case let Listing.Content.more(more) = child { return .more(more) }
+  public var comments: [Comment] {
+    json.data.things.compactMap { thing in
+      if case let Listing.Content.comment(comment) = thing { return comment }
       else { return nil }
     }
+  }
+
+  public var more: More? {
+    for thing in json.data.things {
+      if case let Listing.Content.more(more) = thing { return more }
+    }
+    return nil
   }
 
   fileprivate struct Json: Codable {

@@ -1,7 +1,7 @@
 //
 // Listing.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 8/1/20
 //
 
 import Foundation
@@ -62,19 +62,6 @@ private extension Listing {
 }
 
 public extension Listing {
-  var allComments: [CommentWrapper] {
-    data.children.compactMap { child in
-      switch child {
-      case let .comment(comment):
-        return .comment(comment)
-      case let .more(more):
-        return .more(more)
-      default:
-        return nil
-      }
-    }
-  }
-
   var comments: [Comment] { items(kind: .comment) }
 
   var accounts: [Account] { items(kind: .account) }
@@ -180,7 +167,7 @@ public extension Listing {
     public func encode(to encoder: Encoder) throws {
       var container = encoder.container(keyedBy: CodingKeys.self)
 
-      try container.encode(self.kind, forKey: .kind)
+      try container.encode(kind, forKey: .kind)
 
       switch self {
       case let .comment(comment):
