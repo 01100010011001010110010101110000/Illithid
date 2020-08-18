@@ -1,7 +1,7 @@
 //
 // Comments.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 6/27/20
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 8/1/20
 //
 
 #if canImport(Combine)
@@ -44,11 +44,10 @@ public extension Illithid {
      - truncate: Truncate the listing after `truncate` `Comments` if greater than zero
    - Returns: A one-shot `AnyPublisher` with the `Listing` or an error
    */
-  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-  func comments(for post: Post, parameters: ListingParameters,
-                by sort: CommentsSort = .confidence, focusOn comment: ID36? = nil, context: Int? = nil,
-                depth: Int = 0, showEdits: Bool = true, showMore: Bool = true,
-                threaded: Bool = true, truncate: Int = 0, queue: DispatchQueue = .main) -> AnyPublisher<Listing, AFError> {
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)  func comments(for post: Post, parameters: ListingParameters,
+                                                                              by sort: CommentsSort = .confidence, focusOn comment: ID36? = nil, context: Int? = nil,
+                                                                              depth: Int = 0, showEdits: Bool = true, showMore: Bool = true,
+                                                                              threaded: Bool = true, truncate: Int = 0, queue: DispatchQueue = .main) -> AnyPublisher<Listing, AFError> {
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
 
     var encodedParameters = parameters.toParameters()
@@ -60,7 +59,7 @@ public extension Illithid {
       "showmore": showMore,
       "sort": sort.rawValue,
       "threaded": threaded,
-      "truncate": truncate
+      "truncate": truncate,
     ]
     encodedParameters.merge(commentsParameters) { current, _ in current }
 
@@ -79,13 +78,19 @@ public extension Illithid {
   }
 
   func moreComments(for more: More, in post: Post, depth: Int? = nil,
-                    limitChildren: Bool = false, sortBy: CommentsSort = .confidence, queue: DispatchQueue = .main) -> AnyPublisher<[CommentWrapper], AFError> {
+                    limitChildren: Bool = false, sortBy: CommentsSort = .confidence, queue: DispatchQueue = .main) -> AnyPublisher<(comments: [Comment], more: More?), AFError> {
+    moreComments(for: more, in: post.name, depth: depth,
+                 limitChildren: limitChildren, sortBy: sortBy, queue: queue)
+  }
+
+  func moreComments(for more: More, in postFullname: Fullname, depth: Int? = nil,
+                    limitChildren: Bool = false, sortBy: CommentsSort = .confidence, queue: DispatchQueue = .main) -> AnyPublisher<(comments: [Comment], more: More?), AFError> {
     var parameters: Parameters = [
       "api_type": "json",
       "children": more.children.joined(separator: ","),
       "limit_children": limitChildren,
-      "link_id": post.name,
-      "sort": sortBy.rawValue
+      "link_id": postFullname,
+      "sort": sortBy.rawValue,
     ]
     if let depth = depth { parameters["depth"] = depth }
 
@@ -93,34 +98,29 @@ public extension Illithid {
                            encoding: URLEncoding(destination: .httpBody, boolEncoding: .numeric))
       .publishDecodable(type: MoreChildren.self, queue: queue, decoder: decoder)
       .value()
-      .map { $0.allComments }
+      .map { ($0.comments, $0.more) }
       .eraseToAnyPublisher()
   }
 }
 
 public extension Comment {
-  @discardableResult
-  func upvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
+  @discardableResult  func upvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
     Illithid.shared.vote(fullname: fullname, direction: .up, queue: queue, completion: completion)
   }
 
-  @discardableResult
-  func downvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
+  @discardableResult  func downvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
     Illithid.shared.vote(fullname: fullname, direction: .down, queue: queue, completion: completion)
   }
 
-  @discardableResult
-  func clearVote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
+  @discardableResult  func clearVote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
     Illithid.shared.vote(fullname: fullname, direction: .clear, queue: queue, completion: completion)
   }
 
-  @discardableResult
-  func save(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
+  @discardableResult  func save(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
     Illithid.shared.save(fullname: fullname, queue: queue, completion: completion)
   }
 
-  @discardableResult
-  func unsave(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
+  @discardableResult  func unsave(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
     Illithid.shared.unsave(fullname: fullname, queue: queue, completion: completion)
   }
 }
@@ -137,8 +137,7 @@ public extension Comment {
 }
 
 public extension Comment {
-  @discardableResult
-  static func fetch(name: Fullname, queue: DispatchQueue = .main, completion: @escaping (Result<Comment, Error>) -> Void) -> DataRequest {
+  @discardableResult  static func fetch(name: Fullname, queue: DispatchQueue = .main, completion: @escaping (Result<Comment, Error>) -> Void) -> DataRequest {
     Illithid.shared.info(name: name, queue: queue) { result in
       switch result {
       case let .success(listing):
