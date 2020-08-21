@@ -16,6 +16,16 @@ public struct User: Codable, Identifiable {
   public let relId: String
   public let id: Fullname
   public let authorFlairCssClass: String?
+
+  private enum CodingKeys: String, CodingKey {
+    case name
+    case authorFlairText = "author_flair_text"
+    case modPermissions = "mod_permissions"
+    case date
+    case relId = "rel_id"
+    case id
+    case authorFlairCssClass = "author_flair_css_class"
+  }
 }
 
 internal struct UserList: Codable {

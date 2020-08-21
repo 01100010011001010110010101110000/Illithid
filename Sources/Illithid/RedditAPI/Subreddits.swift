@@ -1,7 +1,7 @@
 //
 // Subreddits.swift
 // Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 4/4/20
+// Created by Tyler Gregory (@01100010011001010110010101110000) on 8/1/20
 //
 
 #if canImport(Combine)
@@ -141,6 +141,7 @@ extension Illithid {
         case let .success(list):
           completion(.success(list.users))
         case let .failure(error):
+          self.logger.errorMessage("Failed loading moderators of \(name): \(error)")
           completion(.failure(error))
         }
       }
