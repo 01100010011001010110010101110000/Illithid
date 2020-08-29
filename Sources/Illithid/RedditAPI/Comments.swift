@@ -1,8 +1,16 @@
+// Copyright (C) 2020 Tyler Gregory (@01100010011001010110010101110000)
 //
-// Comments.swift
-// Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 8/1/20
+// This program is free software: you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later
+// version.
 //
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of  MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with
+// this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #if canImport(Combine)
   import Combine
@@ -44,10 +52,11 @@ public extension Illithid {
      - truncate: Truncate the listing after `truncate` `Comments` if greater than zero
    - Returns: A one-shot `AnyPublisher` with the `Listing` or an error
    */
-  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)  func comments(for post: Post, parameters: ListingParameters,
-                                                                              by sort: CommentsSort = .confidence, focusOn comment: ID36? = nil, context: Int? = nil,
-                                                                              depth: Int = 0, showEdits: Bool = true, showMore: Bool = true,
-                                                                              threaded: Bool = true, truncate: Int = 0, queue: DispatchQueue = .main) -> AnyPublisher<Listing, AFError> {
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+  func comments(for post: Post, parameters: ListingParameters,
+                by sort: CommentsSort = .confidence, focusOn comment: ID36? = nil, context: Int? = nil,
+                depth: Int = 0, showEdits: Bool = true, showMore: Bool = true,
+                threaded: Bool = true, truncate: Int = 0, queue: DispatchQueue = .main) -> AnyPublisher<Listing, AFError> {
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
 
     var encodedParameters = parameters.toParameters()
@@ -104,23 +113,28 @@ public extension Illithid {
 }
 
 public extension Comment {
-  @discardableResult  func upvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
+  @discardableResult
+  func upvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
     Illithid.shared.vote(fullname: fullname, direction: .up, queue: queue, completion: completion)
   }
 
-  @discardableResult  func downvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
+  @discardableResult
+  func downvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
     Illithid.shared.vote(fullname: fullname, direction: .down, queue: queue, completion: completion)
   }
 
-  @discardableResult  func clearVote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
+  @discardableResult
+  func clearVote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
     Illithid.shared.vote(fullname: fullname, direction: .clear, queue: queue, completion: completion)
   }
 
-  @discardableResult  func save(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
+  @discardableResult
+  func save(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
     Illithid.shared.save(fullname: fullname, queue: queue, completion: completion)
   }
 
-  @discardableResult  func unsave(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
+  @discardableResult
+  func unsave(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
     Illithid.shared.unsave(fullname: fullname, queue: queue, completion: completion)
   }
 }
@@ -137,7 +151,10 @@ public extension Comment {
 }
 
 public extension Comment {
-  @discardableResult  static func fetch(name: Fullname, queue: DispatchQueue = .main, completion: @escaping (Result<Comment, Error>) -> Void) -> DataRequest {
+  /// Fetches a comment using its `Fullname` from Reddit's info endpoint
+  /// - Warning: This **will not** return a comment's replies; replies will always be empty. For that, you must use the fetch the comment using its permalink
+  @discardableResult
+  static func fetch(name: Fullname, queue: DispatchQueue = .main, completion: @escaping (Result<Comment, Error>) -> Void) -> DataRequest {
     Illithid.shared.info(name: name, queue: queue) { result in
       switch result {
       case let .success(listing):

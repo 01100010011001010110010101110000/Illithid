@@ -6,19 +6,19 @@ import PackageDescription
 let package = Package(
   name: "Illithid",
   platforms: [
-    .macOS("10.15")
+    .macOS("10.15"),
   ],
   products: [
     .library(
       name: "Illithid",
       targets: ["Illithid", "Ulithari"]
-    )
+    ),
   ],
   dependencies: [
     .package(name: "Alamofire", url: "https://github.com/Alamofire/Alamofire.git", from: .init(5, 1, 0)),
     .package(name: "OAuthSwift", url: "https://github.com/OAuthSwift/OAuthSwift.git", from: .init(2, 1, 2)),
     .package(name: "Willow", url: "https://github.com/Nike-Inc/Willow.git", from: .init(6, 0, 0)),
-    .package(name: "KeychainAccess", url: "https://github.com/kishikawakatsumi/KeychainAccess.git", from: .init(4, 2, 0))
+    .package(name: "KeychainAccess", url: "https://github.com/kishikawakatsumi/KeychainAccess.git", from: .init(4, 2, 0)),
   ],
   targets: [
     .target(
@@ -27,7 +27,7 @@ let package = Package(
         .product(name: "Alamofire", package: "Alamofire"),
         .product(name: "OAuthSwift", package: "OAuthSwift"),
         .product(name: "Willow", package: "Willow"),
-        .product(name: "KeychainAccess", package: "KeychainAccess")
+        .product(name: "KeychainAccess", package: "KeychainAccess"),
       ]
     ),
     .testTarget(
@@ -39,8 +39,8 @@ let package = Package(
       dependencies: ["Ulithari"]
     ),
     .target(name: "Ulithari", dependencies: [
-      .product(name: "Alamofire", package: "Alamofire")
-    ])
+      .product(name: "Alamofire", package: "Alamofire"),
+    ]),
   ],
   swiftLanguageVersions: [.v5]
 )
