@@ -190,6 +190,10 @@ public struct Post: RedditObject {
     distinguished?.contains("admin") ?? false
   }
 
+  public var authorIsDeleted: Bool {
+    author == "[deleted]"
+  }
+
   public let contestMode: Bool
   public let createdUtc: Date
   public let isVideo: Bool

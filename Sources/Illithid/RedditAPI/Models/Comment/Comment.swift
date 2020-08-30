@@ -65,7 +65,7 @@ public struct Comment: RedditObject {
   public let modReasonTitle: String?
   public let gilded: Int
   public let archived: Bool
-  public let reportReasons: String?
+  public let reportReasons: [String]?
   public let author: String
   public let canModPost: Bool
   public let sendReplies: Bool
@@ -115,6 +115,20 @@ public struct Comment: RedditObject {
 
   public let previousVisits: [Date]?
   public let contentCategories: [String]?
+
+  public var authorIsDeleted: Bool {
+    author == "[deleted]"
+  }
+
+  /// Whether the comment has been deleted by its author
+  public var isDeleted: Bool {
+    body == "[deleted]"
+  }
+
+  /// Whether the comment has been removed by a moderator
+  public var isRemoved: Bool {
+    body == "[removed]"
+  }
 
   enum CodingKeys: String, CodingKey {
     case totalAwardsReceived = "total_awards_received"
@@ -209,7 +223,7 @@ public struct Comment: RedditObject {
     modReasonTitle = try container.decodeIfPresent(String.self, forKey: .modReasonTitle)
     gilded = try container.decode(Int.self, forKey: .gilded)
     archived = try container.decode(Bool.self, forKey: .archived)
-    reportReasons = try container.decodeIfPresent(String.self, forKey: .reportReasons)
+    reportReasons = try container.decodeIfPresent([String].self, forKey: .reportReasons)
     author = try container.decode(String.self, forKey: .author)
     canModPost = try container.decode(Bool.self, forKey: .canModPost)
     sendReplies = try container.decode(Bool.self, forKey: .sendReplies)
