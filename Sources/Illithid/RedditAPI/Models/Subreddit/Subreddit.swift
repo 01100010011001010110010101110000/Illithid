@@ -210,7 +210,12 @@ public struct Subreddit: RedditObject {
   public let userIsContributor: Bool?
 
   public init(from decoder: Decoder) throws {
-    let container = try decoder.container(keyedBy: CodingKeys.self)
+    let wrappedContainer = try? decoder.container(keyedBy: WrapperKeys.self)
+    let nestedContainer = try? wrappedContainer?.nestedContainer(keyedBy: CodingKeys.self, forKey: .data)
+
+    let unwrappedContainer = try? decoder.container(keyedBy: CodingKeys.self)
+
+    let container = nestedContainer != nil ? nestedContainer! : unwrappedContainer!
 
     // For certain bool properties, Reddit returns null to indicate false
     wikiEnabled = try container.decodeIfPresent(Bool.self, forKey: .wikiEnabled) ?? false
@@ -307,6 +312,11 @@ public struct Subreddit: RedditObject {
     createdUtc = try container.decode(Date.self, forKey: .createdUtc)
     bannerSize = try container.decodeIfPresent([Int].self, forKey: .bannerSize)
     userIsContributor = try container.decodeIfPresent(Bool.self, forKey: .userIsContributor)
+  }
+
+  private enum WrapperKeys: String, CodingKey {
+    case kind
+    case data
   }
 
   private enum CodingKeys: String, CodingKey {
