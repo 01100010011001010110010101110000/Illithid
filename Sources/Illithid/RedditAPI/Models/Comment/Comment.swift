@@ -104,7 +104,7 @@ public struct Comment: RedditObject {
   public let subredditNamePrefixed: String
   public let controversiality: Int
   /// Depth is present unless fetching a comment from `/api/info` or `/search`
-  public let depth: Int?
+  public internal(set) var depth: Int?
   public let authorFlairBackgroundColor: String?
   public let modReports: [String]
   public let modNote: String?

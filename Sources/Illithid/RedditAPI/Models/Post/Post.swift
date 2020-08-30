@@ -274,6 +274,8 @@ public extension Post {
   enum FlairTextColor: String, Codable {
     case light
     case dark
+    /// This case is for when the API response is `""` instead of `null`
+    case empty = ""
   }
 }
 

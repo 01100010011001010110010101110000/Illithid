@@ -22,6 +22,8 @@ public struct More: RedditObject {
   public let depth: Int
   public let children: [ID36]
 
+  public static let continueThreadId = "_"
+
   private enum CodingKeys: String, CodingKey {
     case count
     case name
