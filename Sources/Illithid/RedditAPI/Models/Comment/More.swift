@@ -24,6 +24,10 @@ public struct More: RedditObject {
 
   public static let continueThreadId = "_"
 
+  public var isThreadContinuation: Bool {
+    id == Self.continueThreadId
+  }
+
   private enum CodingKeys: String, CodingKey {
     case count
     case name

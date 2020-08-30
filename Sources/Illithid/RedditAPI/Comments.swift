@@ -123,7 +123,7 @@ public extension Illithid {
   func moreComments(for more: More, on postFullname: Fullname, in subredit: String, depth: Int? = nil,
                     limitChildren: Bool = false, sortBy: CommentsSort = .confidence,
                     queue: DispatchQueue = .main) -> AnyPublisher<(comments: [Comment], more: More?), AFError> {
-    if more.id == More.continueThreadId {
+    if more.isThreadContinuation {
       // We specify threaded: false to mimic the behavior of /api/morechildren
       return comments(for: postFullname.components(separatedBy: "_").last!, in: subredit,
                       parameters: .init(), by: sortBy, focusOn: more.parentId.components(separatedBy: "_").last!,
