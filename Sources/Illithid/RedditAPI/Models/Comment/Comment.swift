@@ -116,8 +116,10 @@ public struct Comment: RedditObject {
   public let previousVisits: [Date]?
   public let contentCategories: [String]?
 
+  /// Whether the author has deleted their account
   public var authorIsDeleted: Bool {
-    author == "[deleted]"
+    // Removed comments also show [deleted] for the author, so disambiguate
+    author == "[deleted]" && !isRemoved
   }
 
   /// Whether the comment has been deleted by its author
