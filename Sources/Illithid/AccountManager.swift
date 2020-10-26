@@ -24,18 +24,7 @@ import Willow
 
 /// `AccountManager` is the class responsible for Reddit account management, including adding, deleting, and switching accounts
 public final class AccountManager: ObservableObject {
-  var configuration: ClientConfiguration = TestableConfiguration()
-  public let objectWillChange = ObservableObjectPublisher()
-
-  private let logger: Logger
-  private let defaults: UserDefaults = .standard
-
-  private let keychain = Keychain(service: Bundle.main.bundleIdentifier!)
-    .synchronizable(true)
-    .comment("Reddit OAuth2 credential")
-
-  private let decoder: JSONDecoder = .init()
-  private let encoder: JSONEncoder = .init()
+  // MARK: Lifecycle
 
   init(logger: Logger) {
     self.logger = logger
@@ -45,6 +34,10 @@ public final class AccountManager: ObservableObject {
     accounts = .init(loadAccounts())
     currentAccount = loadSelectedAccount()
   }
+
+  // MARK: Public
+
+  public let objectWillChange = ObservableObjectPublisher()
 
   // MARK: Published attributes
 
@@ -91,34 +84,6 @@ public final class AccountManager: ObservableObject {
         self.fetchNewAccount(oauth: oauth, completion: completion)
       case let .failure(error):
         self.logger.errorMessage("Authorization failed: \(error)")
-      }
-    }
-  }
-
-  /**
-   Fetches the account data for a new account when the OAuth2 conversation is complete
-   and persists its data to the keychain and `UserDefaults`
-
-   - Parameter oauth: The account's newly populated OAuth2Swift object
-
-   - Precondition: The `authorize` method must have returned successfully on `oauth` prior to invocation
-
-   */
-  private func fetchNewAccount(oauth: OAuth2Swift, completion: @escaping (_ account: Account) -> Void) {
-    oauth.startAuthorizedRequest("https://oauth.reddit.com/api/v1/me", method: .GET, parameters: oauth.parameters) { result in
-      switch result {
-      case let .success(response):
-        do {
-          let account = try self.decoder.decode(Account.self, from: response.data)
-          self.accounts.append(account)
-          try self.write(token: oauth.client.credential, for: account)
-          self.currentAccount = account
-          completion(account)
-        } catch {
-          self.logger.errorMessage("ERROR decoding new account: \(error)")
-        }
-      case let .failure(error):
-        self.logger.errorMessage("ERROR fetching account data: \(error)")
       }
     }
   }
@@ -170,6 +135,43 @@ public final class AccountManager: ObservableObject {
     }
   }
 
+  // MARK: Account removal
+
+  public func removeAccounts(indexSet: IndexSet) {
+    for index in indexSet {
+      removeAccount(toRemove: accounts[index])
+    }
+  }
+
+  public func removeAll() {
+    do {
+      try keychain.removeAll()
+    } catch {
+      logger.errorMessage("ERROR Removing all keys: \(error)")
+    }
+    accounts.removeAll()
+    setAccount(nil)
+  }
+
+  public func removeAccount(toRemove account: Account) {
+    // Remove account from in memory logged in accounts and from the savedAccounts entry in UserDefaults
+    accounts.remove(account)
+    if account == currentAccount { setAccount(nil) }
+
+    // Remove credentials from the keychain
+    removeToken(for: account)
+  }
+
+  // MARK: OAuth token management
+
+  public func isAuthenticated(_ account: Account) -> Bool {
+    token(for: account) != nil
+  }
+
+  // MARK: Internal
+
+  var configuration: ClientConfiguration = TestableConfiguration()
+
   internal func makeSession(for account: Account? = nil) -> Session {
     let alamoConfiguration = URLSessionConfiguration.default
 
@@ -206,6 +208,46 @@ public final class AccountManager: ObservableObject {
     return session
   }
 
+  // MARK: Private
+
+  private let logger: Logger
+  private let defaults: UserDefaults = .standard
+
+  private let keychain = Keychain(service: Bundle.main.bundleIdentifier!)
+    .synchronizable(true)
+    .comment("Reddit OAuth2 credential")
+
+  private let decoder: JSONDecoder = .init()
+  private let encoder: JSONEncoder = .init()
+
+  /**
+   Fetches the account data for a new account when the OAuth2 conversation is complete
+   and persists its data to the keychain and `UserDefaults`
+
+   - Parameter oauth: The account's newly populated OAuth2Swift object
+
+   - Precondition: The `authorize` method must have returned successfully on `oauth` prior to invocation
+
+   */
+  private func fetchNewAccount(oauth: OAuth2Swift, completion: @escaping (_ account: Account) -> Void) {
+    oauth.startAuthorizedRequest("https://oauth.reddit.com/api/v1/me", method: .GET, parameters: oauth.parameters) { result in
+      switch result {
+      case let .success(response):
+        do {
+          let account = try self.decoder.decode(Account.self, from: response.data)
+          self.accounts.append(account)
+          try self.write(token: oauth.client.credential, for: account)
+          self.currentAccount = account
+          completion(account)
+        } catch {
+          self.logger.errorMessage("ERROR decoding new account: \(error)")
+        }
+      case let .failure(error):
+        self.logger.errorMessage("ERROR fetching account data: \(error)")
+      }
+    }
+  }
+
   // MARK: Saved Account Loading
 
   private func loadSelectedAccount() -> Account? {
@@ -230,39 +272,6 @@ public final class AccountManager: ObservableObject {
       logger.errorMessage("Unable to decode saved accounts: \(error)")
       return []
     }
-  }
-
-  // MARK: Account removal
-
-  public func removeAccounts(indexSet: IndexSet) {
-    for index in indexSet {
-      removeAccount(toRemove: accounts[index])
-    }
-  }
-
-  public func removeAll() {
-    do {
-      try keychain.removeAll()
-    } catch {
-      logger.errorMessage("ERROR Removing all keys: \(error)")
-    }
-    accounts.removeAll()
-    setAccount(nil)
-  }
-
-  public func removeAccount(toRemove account: Account) {
-    // Remove account from in memory logged in accounts and from the savedAccounts entry in UserDefaults
-    accounts.remove(account)
-    if account == currentAccount { setAccount(nil) }
-
-    // Remove credentials from the keychain
-    removeToken(for: account)
-  }
-
-  // MARK: OAuth token management
-
-  public func isAuthenticated(_ account: Account) -> Bool {
-    token(for: account) != nil
   }
 
   private func token(for accountName: String) -> OAuthSwiftCredential? {

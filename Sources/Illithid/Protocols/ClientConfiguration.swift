@@ -16,15 +16,21 @@ import Foundation
 
 import OAuthSwift
 
+// MARK: - OAuthResponseType
+
 public enum OAuthResponseType: String {
   case code
   case token
 }
 
+// MARK: - Duration
+
 public enum Duration: String {
   case temporary
   case permanent
 }
+
+// MARK: - ClientConfiguration
 
 public protocol ClientConfiguration {
   var consumerKey: String { get }

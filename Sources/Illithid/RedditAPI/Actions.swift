@@ -16,24 +16,15 @@ import Foundation
 
 import Alamofire
 
+// MARK: - ActionRouter
+
 enum ActionRouter: URLRequestConvertible, MirrorableEnum {
   case vote(id: Fullname, dir: VoteDirection)
   case save(id: Fullname)
   case unsave(id: Fullname)
   case changeSubscription(sr: [Subreddit], action: SubscribeAction)
 
-  private var path: String {
-    switch self {
-    case .vote:
-      return "/api/vote"
-    case .save:
-      return "/api/save"
-    case .unsave:
-      return "/api/unsave"
-    case .changeSubscription:
-      return "/api/subscribe"
-    }
-  }
+  // MARK: Internal
 
   var parameters: Parameters {
     switch self {
@@ -56,7 +47,24 @@ enum ActionRouter: URLRequestConvertible, MirrorableEnum {
     let request = try URLRequest(url: URL(string: path, relativeTo: Illithid.shared.baseURL)!, method: .post)
     return try URLEncoding.httpBody.encode(request, with: parameters)
   }
+
+  // MARK: Private
+
+  private var path: String {
+    switch self {
+    case .vote:
+      return "/api/vote"
+    case .save:
+      return "/api/save"
+    case .unsave:
+      return "/api/unsave"
+    case .changeSubscription:
+      return "/api/subscribe"
+    }
+  }
 }
+
+// MARK: - SubscribeAction
 
 enum SubscribeAction: String, Codable {
   case subscribe = "sub"
@@ -66,7 +74,8 @@ enum SubscribeAction: String, Codable {
 internal extension Illithid {
   @discardableResult
   func vote(fullname: Fullname, direction: VoteDirection, queue: DispatchQueue = .main,
-            completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
+            completion: @escaping (Result<Data, AFError>) -> Void)
+    -> DataRequest {
     session.request(ActionRouter.vote(id: fullname, dir: direction))
       .validate()
       .responseData(queue: queue) { response in
@@ -76,7 +85,8 @@ internal extension Illithid {
 
   @discardableResult
   func save(fullname: Fullname, queue: DispatchQueue = .main,
-            completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
+            completion: @escaping (Result<Data, AFError>) -> Void)
+    -> DataRequest {
     session.request(ActionRouter.save(id: fullname))
       .validate()
       .responseData(queue: queue) { response in
@@ -86,7 +96,8 @@ internal extension Illithid {
 
   @discardableResult
   func unsave(fullname: Fullname, queue: DispatchQueue = .main,
-              completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
+              completion: @escaping (Result<Data, AFError>) -> Void)
+    -> DataRequest {
     session.request(ActionRouter.unsave(id: fullname))
       .validate()
       .responseData(queue: queue) { response in
@@ -96,7 +107,8 @@ internal extension Illithid {
 
   @discardableResult
   func changeSubscription(of subreddits: [Subreddit], action: SubscribeAction, queue: DispatchQueue = .main,
-                          completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
+                          completion: @escaping (Result<Data, AFError>) -> Void)
+    -> DataRequest {
     session.request(ActionRouter.changeSubscription(sr: subreddits, action: action))
       .validate()
       .responseData(queue: queue) { response in
@@ -106,7 +118,8 @@ internal extension Illithid {
 
   @discardableResult
   func changeSubscription(of subreddit: Subreddit, action: SubscribeAction, queue: DispatchQueue = .main,
-                          completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
+                          completion: @escaping (Result<Data, AFError>) -> Void)
+    -> DataRequest {
     changeSubscription(of: [subreddit], action: action, queue: queue, completion: completion)
   }
 }

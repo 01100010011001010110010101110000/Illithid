@@ -14,7 +14,13 @@
 
 import Foundation
 
+// MARK: - More
+
 public struct More: RedditObject {
+  // MARK: Public
+
+  public static let continueThreadId = "_"
+
   public let count: Int
   public let name: Fullname
   public let id: ID36
@@ -22,11 +28,11 @@ public struct More: RedditObject {
   public let depth: Int
   public let children: [ID36]
 
-  public static let continueThreadId = "_"
-
   public var isThreadContinuation: Bool {
     id == Self.continueThreadId
   }
+
+  // MARK: Private
 
   private enum CodingKeys: String, CodingKey {
     case count
@@ -38,9 +44,11 @@ public struct More: RedditObject {
   }
 }
 
+// MARK: - MoreChildren
+
 /// Data structure returned from `/api/morechildren`
 internal struct MoreChildren: Codable {
-  fileprivate let json: Json
+  // MARK: Public
 
   public var comments: [Comment] {
     json.data.things.compactMap { thing in
@@ -56,12 +64,20 @@ internal struct MoreChildren: Codable {
     return nil
   }
 
+  // MARK: Fileprivate
+
   fileprivate struct Json: Codable {
+    // MARK: Public
+
     public let errors: [String]
     public let data: Data
+
+    // MARK: Fileprivate
 
     fileprivate struct Data: Codable {
       public let things: [Listing.Content]
     }
   }
+
+  fileprivate let json: Json
 }

@@ -15,29 +15,37 @@
 import Alamofire
 import Foundation
 
-// MARK: - ImgurImage
+// MARK: - ImgurImageWrapper
 
 internal struct ImgurImageWrapper: Codable, Hashable {
-  public let data: ImgurImage
-  public let success: Bool
-  public let status: Int
-
-  enum CodingKeys: String, CodingKey {
-    case data
-    case success
-    case status
-  }
+  // MARK: Lifecycle
 
   public init(data: ImgurImage, success: Bool, status: Int) {
     self.data = data
     self.success = success
     self.status = status
   }
+
+  // MARK: Public
+
+  public let data: ImgurImage
+  public let success: Bool
+  public let status: Int
+
+  // MARK: Internal
+
+  enum CodingKeys: String, CodingKey {
+    case data
+    case success
+    case status
+  }
 }
 
-// MARK: - DataClass
+// MARK: - ImgurImage
 
 public struct ImgurImage: Codable, Hashable, Identifiable {
+  // MARK: Public
+
   public let id: String
   public let title: String?
   public let dataDescription: String?
@@ -70,6 +78,8 @@ public struct ImgurImage: Codable, Hashable, Identifiable {
   public let hls: URL?
   public let processing: Processing?
   public let adConfig: AdConfig?
+
+  // MARK: Internal
 
   enum CodingKeys: String, CodingKey {
     case id
@@ -110,19 +120,7 @@ public struct ImgurImage: Codable, Hashable, Identifiable {
 // MARK: - AdConfig
 
 public struct AdConfig: Codable, Hashable {
-  public let safeFlags: [String]
-  public let highRiskFlags: [String]
-  public let unsafeFlags: [String]
-  public let wallUnsafeFlags: [String]
-  public let showsAds: Bool
-
-  enum CodingKeys: String, CodingKey {
-    case safeFlags
-    case highRiskFlags
-    case unsafeFlags
-    case wallUnsafeFlags
-    case showsAds
-  }
+  // MARK: Lifecycle
 
   public init(safeFlags: [String], highRiskFlags: [String], unsafeFlags: [String], wallUnsafeFlags: [String], showsAds: Bool) {
     self.safeFlags = safeFlags
@@ -131,18 +129,42 @@ public struct AdConfig: Codable, Hashable {
     self.wallUnsafeFlags = wallUnsafeFlags
     self.showsAds = showsAds
   }
+
+  // MARK: Public
+
+  public let safeFlags: [String]
+  public let highRiskFlags: [String]
+  public let unsafeFlags: [String]
+  public let wallUnsafeFlags: [String]
+  public let showsAds: Bool
+
+  // MARK: Internal
+
+  enum CodingKeys: String, CodingKey {
+    case safeFlags
+    case highRiskFlags
+    case unsafeFlags
+    case wallUnsafeFlags
+    case showsAds
+  }
 }
 
 // MARK: - Processing
 
 public struct Processing: Codable, Hashable {
-  public let status: String
-
-  enum CodingKeys: String, CodingKey {
-    case status
-  }
+  // MARK: Lifecycle
 
   public init(status: String) {
     self.status = status
+  }
+
+  // MARK: Public
+
+  public let status: String
+
+  // MARK: Internal
+
+  enum CodingKeys: String, CodingKey {
+    case status
   }
 }

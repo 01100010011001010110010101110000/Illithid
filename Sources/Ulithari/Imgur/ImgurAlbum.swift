@@ -14,23 +14,29 @@
 
 import Foundation
 
-// MARK: - ImgurAlbum
+// MARK: - ImgurAlbumWrapper
 
 internal struct ImgurAlbumWrapper: Codable {
-  public let data: ImgurAlbum
-  public let success: Bool
-  public let status: Int
+  // MARK: Lifecycle
 
   public init(data: ImgurAlbum, success: Bool, status: Int) {
     self.data = data
     self.success = success
     self.status = status
   }
+
+  // MARK: Public
+
+  public let data: ImgurAlbum
+  public let success: Bool
+  public let status: Int
 }
 
-// MARK: - AlbumData
+// MARK: - ImgurAlbum
 
 public struct ImgurAlbum: Codable, Identifiable {
+  // MARK: Public
+
   public let id: String
   public let title: String?
   public let dataDescription: String?
@@ -54,6 +60,8 @@ public struct ImgurAlbum: Codable, Identifiable {
   public let includeAlbumAds: Bool
   public let isAlbum: Bool
   public let images: [ImgurImage]
+
+  // MARK: Internal
 
   enum CodingKeys: String, CodingKey {
     case id, title

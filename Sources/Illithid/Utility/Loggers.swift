@@ -16,20 +16,22 @@ import Foundation
 
 import Willow
 
-extension Logger {
-  public static func debugLogger() -> Logger {
+public extension Logger {
+  static func debugLogger() -> Logger {
     let consoleWriter = ConsoleWriter(modifiers: [EmojiModifier(), TimestampModifier()])
     return Logger(logLevels: [.all], writers: [consoleWriter],
                   executionMethod: .synchronous(lock: NSRecursiveLock()))
   }
 
-  public static func releaseLogger(subsystem: String, logLevels: LogLevel = .event) -> Logger {
+  static func releaseLogger(subsystem: String, logLevels: LogLevel = .event) -> Logger {
     let writer = OSLogWriter(subsystem: subsystem,
                              category: "release", modifiers: [LevelLabelModifier(), TimestampModifier()])
     return Logger(logLevels: logLevels, writers: [writer],
                   executionMethod: .asynchronous(queue: DispatchQueue(label: "\(subsystem).log", qos: .utility)))
   }
 }
+
+// MARK: - EmojiModifier
 
 public struct EmojiModifier: LogModifier {
   /**
@@ -56,6 +58,8 @@ public struct EmojiModifier: LogModifier {
     }
   }
 }
+
+// MARK: - LevelLabelModifier
 
 public struct LevelLabelModifier: LogModifier {
   /**

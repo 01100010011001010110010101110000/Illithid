@@ -17,10 +17,6 @@ import Foundation
 // MARK: - Preview
 
 public struct Preview: Codable {
-  public let images: [ImagePreview]
-  public let redditVideoPreview: RedditVideoPreview?
-  public let enabled: Bool
-
   // MARK: - ImagePreview
 
   public struct ImagePreview: Codable, Identifiable {
@@ -62,14 +58,22 @@ public struct Preview: Codable {
   // MARK: - Source
 
   public struct Source: Codable {
+    // MARK: Lifecycle
+
     public init(url: URL, width: Int, height: Int) {
       self.url = url
       self.width = width
       self.height = height
     }
 
+    // MARK: Public
+
     public let url: URL
     public let width: Int
     public let height: Int
   }
+
+  public let images: [ImagePreview]
+  public let redditVideoPreview: RedditVideoPreview?
+  public let enabled: Bool
 }

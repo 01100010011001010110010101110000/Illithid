@@ -19,13 +19,13 @@ import Foundation
 
 import Alamofire
 
+// MARK: - SubredditRouter
+
 enum SubredditRouter: URLConvertible {
   case subreddits(sort: SubredditSort)
   case moderators(subredditDisplayName: String)
 
-  private var baseUrl: URL {
-    Illithid.shared.baseURL
-  }
+  // MARK: Internal
 
   func asURL() throws -> URL {
     switch self {
@@ -34,6 +34,12 @@ enum SubredditRouter: URLConvertible {
     case let .moderators(displayName):
       return URL(string: "/r/\(displayName)/about/moderators", relativeTo: baseUrl)!
     }
+  }
+
+  // MARK: Private
+
+  private var baseUrl: URL {
+    Illithid.shared.baseURL
   }
 }
 
@@ -57,7 +63,7 @@ public extension Illithid {
   }
 }
 
-// MARK: Getting posts
+// MARK: - Subreddit + PostProvider
 
 extension Subreddit: PostProvider {
   public var isNsfw: Bool {
@@ -66,7 +72,8 @@ extension Subreddit: PostProvider {
 
   public func posts(sortBy sort: PostSort, location: Location?, topInterval: TopInterval?,
                     parameters: ListingParameters, queue: DispatchQueue = .main,
-                    completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+                    completion: @escaping (Result<Listing, AFError>) -> Void)
+    -> DataRequest {
     Illithid.shared.fetchPosts(for: self, sortBy: sort, location: location,
                                topInterval: topInterval, params: parameters, queue: queue) { result in
       completion(result)
@@ -139,9 +146,10 @@ public extension Subreddit {
 
 // MARK: Moderator fetching
 
-extension Illithid {
-  public func moderatorsOf(displayName name: String, queue: DispatchQueue = .main,
-                           completion: @escaping (Result<[Moderator], AFError>) -> Void) -> DataRequest {
+public extension Illithid {
+  func moderatorsOf(displayName name: String, queue: DispatchQueue = .main,
+                    completion: @escaping (Result<[Moderator], AFError>) -> Void)
+    -> DataRequest {
     session.request(SubredditRouter.moderators(subredditDisplayName: name), method: .get)
       .validate()
       .responseDecodable(of: UserList.self, queue: queue, decoder: decoder) { response in
@@ -155,15 +163,17 @@ extension Illithid {
       }
   }
 
-  public func moderatorsOf(subreddit: Subreddit, queue: DispatchQueue = .main,
-                           completion: @escaping (Result<[Moderator], AFError>) -> Void) -> DataRequest {
+  func moderatorsOf(subreddit: Subreddit, queue: DispatchQueue = .main,
+                    completion: @escaping (Result<[Moderator], AFError>) -> Void)
+    -> DataRequest {
     moderatorsOf(displayName: subreddit.displayName, queue: queue, completion: completion)
   }
 }
 
 public extension Subreddit {
   func moderators(queue: DispatchQueue = .main,
-                  completion: @escaping (Result<[Moderator], AFError>) -> Void) -> DataRequest {
+                  completion: @escaping (Result<[Moderator], AFError>) -> Void)
+    -> DataRequest {
     Illithid.shared.moderatorsOf(subreddit: self, queue: queue, completion: completion)
   }
 }

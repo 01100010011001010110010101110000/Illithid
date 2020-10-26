@@ -36,7 +36,8 @@ public extension Illithid {
 public extension Illithid {
   @discardableResult
   func info(names: [Fullname], queue: DispatchQueue = .main,
-            completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+            completion: @escaping (Result<Listing, AFError>) -> Void)
+    -> DataRequest {
     let endpoint = URL(string: "/api/info", relativeTo: baseURL)!
     let infoParameters: Parameters = ["id": names.joined(separator: ",")]
 
@@ -49,7 +50,8 @@ public extension Illithid {
 
   @discardableResult
   func info(name: Fullname, queue: DispatchQueue = .main,
-            completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+            completion: @escaping (Result<Listing, AFError>) -> Void)
+    -> DataRequest {
     info(names: [name], queue: queue) { completion($0) }
   }
 }

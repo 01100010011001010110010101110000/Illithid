@@ -15,17 +15,15 @@
 import Foundation
 
 public struct PostMedia: Codable {
-  public let type: String?
-  public let oembed: EmbeddingParameters?
-  public let redditVideo: RedditVideo?
-
-  private enum CodingKeys: String, CodingKey {
-    case type
-    case oembed
-    case redditVideo = "reddit_video"
-  }
+  // MARK: Public
 
   public struct RedditVideo: Codable {
+    // MARK: Public
+
+    public enum TranscodeStatus: String, Codable {
+      case completed
+    }
+
     public let dashUrl: URL
     public let duration: Int
     public let fallbackUrl: URL
@@ -36,9 +34,7 @@ public struct PostMedia: Codable {
     public let transcodingStatus: TranscodeStatus
     public let width: Int
 
-    public enum TranscodeStatus: String, Codable {
-      case completed
-    }
+    // MARK: Private
 
     private enum CodingKeys: String, CodingKey {
       case dashUrl = "dash_url"
@@ -54,6 +50,8 @@ public struct PostMedia: Codable {
   }
 
   public struct EmbeddingParameters: Codable {
+    // MARK: Public
+
     public let providerUrl: URL
     public let title: String?
     public let type: String
@@ -66,6 +64,8 @@ public struct PostMedia: Codable {
     public let authorName: String?
     public let providerName: String
     public let authorUrl: URL?
+
+    // MARK: Private
 
     private enum CodingKeys: String, CodingKey {
       case providerUrl = "provider_url"
@@ -81,5 +81,17 @@ public struct PostMedia: Codable {
       case providerName = "provider_name"
       case authorUrl = "author_url"
     }
+  }
+
+  public let type: String?
+  public let oembed: EmbeddingParameters?
+  public let redditVideo: RedditVideo?
+
+  // MARK: Private
+
+  private enum CodingKeys: String, CodingKey {
+    case type
+    case oembed
+    case redditVideo = "reddit_video"
   }
 }

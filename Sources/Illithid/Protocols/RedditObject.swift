@@ -16,17 +16,23 @@ import Foundation
 
 import Alamofire
 
+// MARK: - ShowAllPreference
+
 public enum ShowAllPreference: CustomStringConvertible {
+  case all
+  case filtered
+
+  // MARK: Public
+
   public var description: String {
     switch self {
     case .all: return "all"
     default: return ""
     }
   }
-
-  case all
-  case filtered
 }
+
+// MARK: - Kind
 
 /// The `Kind` of Reddit object, with additional types which appear in the kind field in certain special cases
 /// - SeeAlso: [Reddit's type prefixes documentation](https://www.reddit.com/dev/api#fullnames)
@@ -43,6 +49,8 @@ public enum Kind: String, Codable {
   case listing = "Listing"
 }
 
+// MARK: - TopInterval
+
 /// The interval to use when sorting comments or posts by `top`
 public enum TopInterval: String, CaseIterable, Identifiable, Hashable {
   case hour
@@ -52,10 +60,14 @@ public enum TopInterval: String, CaseIterable, Identifiable, Hashable {
   case year
   case all
 
+  // MARK: Public
+
   public var id: String {
     rawValue
   }
 }
+
+// MARK: - Location
 
 public enum Location: String, CaseIterable, Identifiable, Hashable {
   case GLOBAL
@@ -142,10 +154,14 @@ public enum Location: String, CaseIterable, Identifiable, Hashable {
   case US_OR
   case US_SD
 
+  // MARK: Public
+
   public var id: String {
     rawValue
   }
 }
+
+// MARK: - ListingParameters
 
 /// The URL parameters which are applicable to all Listing endpoints in the Reddit API
 /// - Parameters:
@@ -154,9 +170,7 @@ public enum Location: String, CaseIterable, Identifiable, Hashable {
 ///     - limit: The number of objects to fetch from the listing
 /// - SeeAlso: [Reddit's Listing documentation](https://www.reddit.com/dev/api#listings)
 public struct ListingParameters {
-  public var after: String
-  public var before: String
-  public var limit: Int
+  // MARK: Lifecycle
 
   public init(after: String = "", before: String = "",
               limit: Int = 25) {
@@ -164,6 +178,12 @@ public struct ListingParameters {
     self.before = before
     self.limit = limit
   }
+
+  // MARK: Public
+
+  public var after: String
+  public var before: String
+  public var limit: Int
 
   public func toParameters() -> Parameters {
     var result: Parameters = [:]
@@ -183,6 +203,9 @@ public typealias ID36 = String
 /// The ID36 of an object fully qualifies by prepending it with its type, e.g. `t3_15bfi0`
 /// - SeeAlso: [Reddit's `fullname` documentation](https://www.reddit.com/dev/api#fullnames)
 public typealias Fullname = String
+
+// MARK: - RedditObject
+
 /// The base class for all user-generated content on Reddit
 public protocol RedditObject: Codable, Identifiable, Hashable {
   /// The object's unique identifier

@@ -17,7 +17,7 @@ import Foundation
 /// This is a wrapper struct to make decoding URL types from Reddit's API more convenient
 /// Reddit returns the empty string when an object does not have the content it would otherwise link to via a URL
 public struct RedditURL: Codable, Hashable, Equatable {
-  public let url: URL?
+  // MARK: Lifecycle
 
   public init(from decoder: Decoder) throws {
     let container = try decoder.singleValueContainer()
@@ -29,6 +29,10 @@ public struct RedditURL: Codable, Hashable, Equatable {
       url = try container.decode(URL.self)
     }
   }
+
+  // MARK: Public
+
+  public let url: URL?
 
   public func encode(to encoder: Encoder) throws {
     var container = encoder.singleValueContainer()

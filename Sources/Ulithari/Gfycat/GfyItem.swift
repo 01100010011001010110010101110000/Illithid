@@ -19,9 +19,11 @@ import Alamofire
 import Alamofire
 import Foundation
 
-// MARK: - GfyItem
+// MARK: - GfyWrapper
 
 public struct GfyWrapper: Codable, Hashable, Equatable {
+  // MARK: Public
+
   public let item: GfyItem
 
   public static func == (lhs: GfyWrapper, rhs: GfyWrapper) -> Bool {
@@ -32,19 +34,17 @@ public struct GfyWrapper: Codable, Hashable, Equatable {
     hasher.combine(item)
   }
 
+  // MARK: Internal
+
   enum CodingKeys: String, CodingKey {
     case item = "gfyItem"
   }
 }
 
-public struct GfyItem: Codable, Hashable, Equatable {
-  public static func == (lhs: GfyItem, rhs: GfyItem) -> Bool {
-    lhs.gfyId == rhs.gfyId
-  }
+// MARK: - GfyItem
 
-  public func hash(into hasher: inout Hasher) {
-    hasher.combine(gfyId)
-  }
+public struct GfyItem: Codable, Hashable, Equatable {
+  // MARK: Public
 
   public let tags: [String]
   public let languageCategories: [String]
@@ -92,6 +92,16 @@ public struct GfyItem: Codable, Hashable, Equatable {
   public let md5: String?
   public let source: Int
   public let contentUrls: [String: GfyContent]
+
+  public static func == (lhs: GfyItem, rhs: GfyItem) -> Bool {
+    lhs.gfyId == rhs.gfyId
+  }
+
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(gfyId)
+  }
+
+  // MARK: Internal
 
   enum CodingKeys: String, CodingKey {
     case tags
@@ -143,13 +153,17 @@ public struct GfyItem: Codable, Hashable, Equatable {
   }
 }
 
-// MARK: - ContentURL
+// MARK: - GfyContent
 
 public struct GfyContent: Codable, Hashable {
+  // MARK: Public
+
   public let url: URL
   public let size: Int?
   public let height: Int
   public let width: Int
+
+  // MARK: Internal
 
   enum CodingKeys: String, CodingKey {
     case url

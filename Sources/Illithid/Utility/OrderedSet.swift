@@ -12,14 +12,11 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
+// MARK: - OrderedSet
+
 /// A data structure which guarantees unique membership and preserves lement ordering
 public struct OrderedSet<E: Hashable>: RandomAccessCollection, Equatable, Hashable {
-  public typealias Element = E
-  public typealias Index = Int
-  public typealias Indices = Range<Int>
-
-  private var set: Set<Element>
-  private var array: [Element]
+  // MARK: Lifecycle
 
   public init() {
     set = .init()
@@ -37,6 +34,12 @@ public struct OrderedSet<E: Hashable>: RandomAccessCollection, Equatable, Hashab
     for element in array { append(element) }
   }
 
+  // MARK: Public
+
+  public typealias Element = E
+  public typealias Index = Int
+  public typealias Indices = Range<Int>
+
   // MARK: Working with OrderedSet
 
   /// The number of elements in the ordered set
@@ -51,6 +54,11 @@ public struct OrderedSet<E: Hashable>: RandomAccessCollection, Equatable, Hashab
 
   /// A copy of the contents of the ordered set as an array
   public var contents: [Element] { array }
+
+  // MARK: RandomAccessCollection compliance
+
+  public var startIndex: Int { array.startIndex }
+  public var endIndex: Int { array.endIndex }
 
   /// Checks whether the ordered set contains a given element
   /// - Parameter member: The element to test for membership
@@ -115,14 +123,17 @@ public struct OrderedSet<E: Hashable>: RandomAccessCollection, Equatable, Hashab
     set.removeAll(keepingCapacity: keepCapacity)
   }
 
-  // MARK: RandomAccessCollection compliance
-
-  public var startIndex: Int { array.startIndex }
-  public var endIndex: Int { array.endIndex }
   public subscript(position: Int) -> Element {
     array[position]
   }
+
+  // MARK: Private
+
+  private var set: Set<Element>
+  private var array: [Element]
 }
+
+// MARK: ExpressibleByArrayLiteral
 
 extension OrderedSet: ExpressibleByArrayLiteral {
   public init(arrayLiteral elements: Element...) {

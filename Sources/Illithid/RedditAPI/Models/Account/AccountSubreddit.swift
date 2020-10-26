@@ -15,51 +15,7 @@
 import Foundation
 
 public struct AccountSubreddit: Codable, Hashable, Identifiable {
-  public static func == (lhs: AccountSubreddit, rhs: AccountSubreddit) -> Bool {
-    lhs.name == rhs.name
-  }
-
-  public func hash(into hasher: inout Hasher) {
-    hasher.combine(name)
-  }
-
-  public let defaultSet: Bool
-  public let userIsContributor: Bool
-  public let bannerImg: URL?
-  public let restrictPosting: Bool
-  public let userIsBanned: Bool
-  public let freeFormReports: Bool
-  public let communityIcon: URL?
-  public let showMedia: Bool
-  public let iconColor: String
-  public let userIsMuted: Bool
-  public let displayName: String
-  public let headerImg: URL?
-  public let title: String
-  public let over18: Bool
-  public let iconSize: [Int]
-  public let primaryColor: String
-  public let iconImg: URL
-  public let submitLinkLabel: String
-  public let headerSize: [Int]?
-  public let restrictCommenting: Bool
-  public let subscribers: Int
-  public let submitTextLabel: String
-  public let isDefaultIcon: Bool
-  public let linkFlairPosition: String
-  public let displayNamePrefixed: String
-  public let keyColor: String
-  public let name: Fullname
-  public let id: ID36
-  public let isDefaultBanner: Bool
-  public let url: URL
-  public let bannerSize: [Int]?
-  public let userIsModerator: Bool
-  public let publicDescription: String
-  public let linkFlairEnabled: Bool
-  public let disableContributorRequests: Bool
-  public let subredditType: Subreddit.SubredditType
-  public let userIsSubscriber: Bool
+  // MARK: Lifecycle
 
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -107,6 +63,56 @@ public struct AccountSubreddit: Codable, Hashable, Identifiable {
     bannerSize = try container.decodeIfPresent([Int].self, forKey: .bannerSize)
     userIsContributor = try container.decode(Bool.self, forKey: .userIsContributor)
   }
+
+  // MARK: Public
+
+  public let defaultSet: Bool
+  public let userIsContributor: Bool
+  public let bannerImg: URL?
+  public let restrictPosting: Bool
+  public let userIsBanned: Bool
+  public let freeFormReports: Bool
+  public let communityIcon: URL?
+  public let showMedia: Bool
+  public let iconColor: String
+  public let userIsMuted: Bool
+  public let displayName: String
+  public let headerImg: URL?
+  public let title: String
+  public let over18: Bool
+  public let iconSize: [Int]
+  public let primaryColor: String
+  public let iconImg: URL
+  public let submitLinkLabel: String
+  public let headerSize: [Int]?
+  public let restrictCommenting: Bool
+  public let subscribers: Int
+  public let submitTextLabel: String
+  public let isDefaultIcon: Bool
+  public let linkFlairPosition: String
+  public let displayNamePrefixed: String
+  public let keyColor: String
+  public let name: Fullname
+  public let id: ID36
+  public let isDefaultBanner: Bool
+  public let url: URL
+  public let bannerSize: [Int]?
+  public let userIsModerator: Bool
+  public let publicDescription: String
+  public let linkFlairEnabled: Bool
+  public let disableContributorRequests: Bool
+  public let subredditType: Subreddit.SubredditType
+  public let userIsSubscriber: Bool
+
+  public static func == (lhs: AccountSubreddit, rhs: AccountSubreddit) -> Bool {
+    lhs.name == rhs.name
+  }
+
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(name)
+  }
+
+  // MARK: Internal
 
   enum CodingKeys: String, CodingKey {
     case defaultSet = "default_set"

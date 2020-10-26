@@ -16,16 +16,25 @@ import Foundation
 
 import Alamofire
 
+// MARK: - Listing
+
 public struct Listing: Codable {
+  // MARK: Public
+
   public let kind: Kind
-  private let data: ListingData
+
+  public var after: Fullname? { data.after }
+  public var before: Fullname? { data.before }
+  public var dist: Int? { data.dist }
+  public var modhash: String? { data.modhash }
+  public var isEmpty: Bool { data.children.isEmpty }
+
+  public var children: [Content] { data.children }
+
+  // MARK: Fileprivate
 
   fileprivate struct ListingData: Codable {
-    let modhash: String?
-    let dist: Int?
-    let children: [Content]
-    let after: Fullname?
-    let before: Fullname?
+    // MARK: Lifecycle
 
     init(modhash: String? = nil, dist: Int? = nil, children: [Content] = [],
          after: Fullname? = nil, before: Fullname? = nil) {
@@ -35,15 +44,19 @@ public struct Listing: Codable {
       self.after = after
       self.before = before
     }
+
+    // MARK: Internal
+
+    let modhash: String?
+    let dist: Int?
+    let children: [Content]
+    let after: Fullname?
+    let before: Fullname?
   }
 
-  public var after: Fullname? { data.after }
-  public var before: Fullname? { data.before }
-  public var dist: Int? { data.dist }
-  public var modhash: String? { data.modhash }
-  public var isEmpty: Bool { data.children.isEmpty }
+  // MARK: Private
 
-  public var children: [Content] { data.children }
+  private let data: ListingData
 }
 
 private extension Listing {
@@ -90,11 +103,6 @@ public extension Listing {
   var more: More? { items(kind: .more).first }
 
   enum Content: Codable, Identifiable, Equatable {
-    public static func == (lhs: Listing.Content, rhs: Listing.Content) -> Bool {
-      if lhs.kind != rhs.kind { return false }
-      return lhs.id == rhs.id
-    }
-
     case comment(Comment)
     case account(Account)
     case post(Post)
@@ -102,6 +110,38 @@ public extension Listing {
     case subreddit(Subreddit)
     case award(Award)
     case more(More)
+
+    // MARK: Lifecycle
+
+    public init(from decoder: Decoder) throws {
+      let container = try decoder.container(keyedBy: CodingKeys.self)
+
+      switch try container.decode(Kind.self, forKey: .kind) {
+      case .comment:
+        self = .comment(try container.decode(Comment.self, forKey: .data))
+      case .account:
+        self = .account(try container.decode(Account.self, forKey: .data))
+      case .post:
+        self = .post(try container.decode(Post.self, forKey: .data))
+      case .message:
+        throw DecodingError.typeMismatch(Kind.self,
+                                         DecodingError.Context(codingPath: container.codingPath,
+                                                               debugDescription: "Message is yet to be implemented"))
+      //      self.data = .message(try container.decode(Message.self, forKey: .data))
+      case .subreddit:
+        self = .subreddit(try container.decode(Subreddit.self, forKey: .data))
+      case .award:
+        self = .award(try container.decode(Award.self, forKey: .data))
+      case .more:
+        self = .more(try container.decode(More.self, forKey: .data))
+      case .listing:
+        throw DecodingError.typeMismatch(Kind.self,
+                                         DecodingError.Context(codingPath: container.codingPath,
+                                                               debugDescription: "Listings should not contain anothe listing"))
+      }
+    }
+
+    // MARK: Public
 
     public var id: String {
       switch self {
@@ -139,37 +179,9 @@ public extension Listing {
       }
     }
 
-    enum CodingKeys: String, CodingKey {
-      case kind
-      case data
-    }
-
-    public init(from decoder: Decoder) throws {
-      let container = try decoder.container(keyedBy: CodingKeys.self)
-
-      switch try container.decode(Kind.self, forKey: .kind) {
-      case .comment:
-        self = .comment(try container.decode(Comment.self, forKey: .data))
-      case .account:
-        self = .account(try container.decode(Account.self, forKey: .data))
-      case .post:
-        self = .post(try container.decode(Post.self, forKey: .data))
-      case .message:
-        throw DecodingError.typeMismatch(Kind.self,
-                                         DecodingError.Context(codingPath: container.codingPath,
-                                                               debugDescription: "Message is yet to be implemented"))
-      //      self.data = .message(try container.decode(Message.self, forKey: .data))
-      case .subreddit:
-        self = .subreddit(try container.decode(Subreddit.self, forKey: .data))
-      case .award:
-        self = .award(try container.decode(Award.self, forKey: .data))
-      case .more:
-        self = .more(try container.decode(More.self, forKey: .data))
-      case .listing:
-        throw DecodingError.typeMismatch(Kind.self,
-                                         DecodingError.Context(codingPath: container.codingPath,
-                                                               debugDescription: "Listings should not contain anothe listing"))
-      }
+    public static func == (lhs: Listing.Content, rhs: Listing.Content) -> Bool {
+      if lhs.kind != rhs.kind { return false }
+      return lhs.id == rhs.id
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -193,6 +205,13 @@ public extension Listing {
       case let .more(more):
         try container.encode(more, forKey: .data)
       }
+    }
+
+    // MARK: Internal
+
+    enum CodingKeys: String, CodingKey {
+      case kind
+      case data
     }
   }
 }

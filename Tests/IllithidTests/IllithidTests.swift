@@ -16,6 +16,11 @@
 import XCTest
 
 final class IllithidTests: XCTestCase {
+  static var allTests = [
+    ("testCommentSingleton", testCommentSingleton),
+    ("testAccountSingleton", testAccountSingleton),
+  ]
+
   func testCommentSingleton() {
     Comment.fetch(name: "t1_ernlwui") { result in
       switch result {
@@ -37,9 +42,4 @@ final class IllithidTests: XCTestCase {
       }
     }
   }
-
-  static var allTests = [
-    ("testCommentSingleton", testCommentSingleton),
-    ("testAccountSingleton", testAccountSingleton),
-  ]
 }

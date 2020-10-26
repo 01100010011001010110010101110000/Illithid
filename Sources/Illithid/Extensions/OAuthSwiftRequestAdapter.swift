@@ -16,6 +16,8 @@ import Alamofire
 import Foundation
 import OAuthSwift
 
+// MARK: - IllithidRedditRequestInterceptor
+
 final class IllithidRedditRequestInterceptor: OAuthSwift2RequestInterceptor {
   override func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, Error>) -> Void) {
     super.adapt(urlRequest, for: session) { result in
@@ -35,18 +37,17 @@ final class IllithidRedditRequestInterceptor: OAuthSwift2RequestInterceptor {
   }
 }
 
+// MARK: - OAuthSwiftRequestInterceptor
+
 /// Add authentification headers from OAuthSwift to Alamofire request
 open class OAuthSwiftRequestInterceptor: RequestInterceptor {
-  fileprivate let oauthSwift: OAuthSwift
-  public var paramsLocation: OAuthSwiftHTTPRequest.ParamsLocation = .authorizationHeader
-  public var dataEncoding: String.Encoding = .utf8
-  public var retryLimit = 1
-
-  fileprivate var requestsToRetry: [(RetryResult) -> Void] = []
+  // MARK: Lifecycle
 
   public init(_ oauthSwift: OAuthSwift) {
     self.oauthSwift = oauthSwift
   }
+
+  // MARK: Open
 
   open func adapt(_ urlRequest: URLRequest, for _: Session, completion: @escaping (Result<URLRequest, Error>) -> Void) {
     var config = OAuthSwiftHTTPRequest.Config(
@@ -66,17 +67,29 @@ open class OAuthSwiftRequestInterceptor: RequestInterceptor {
   open func retry(_: Request, for _: Session, dueTo _: Error, completion: @escaping (RetryResult) -> Void) {
     completion(.doNotRetry)
   }
+
+  // MARK: Public
+
+  public var paramsLocation: OAuthSwiftHTTPRequest.ParamsLocation = .authorizationHeader
+  public var dataEncoding: String.Encoding = .utf8
+  public var retryLimit = 1
+
+  // MARK: Fileprivate
+
+  fileprivate let oauthSwift: OAuthSwift
+  fileprivate var requestsToRetry: [(RetryResult) -> Void] = []
 }
 
+// MARK: - OAuthSwift2RequestInterceptor
+
 open class OAuthSwift2RequestInterceptor: OAuthSwiftRequestInterceptor {
+  // MARK: Lifecycle
+
   public init(_ oauthSwift: OAuth2Swift) {
     super.init(oauthSwift)
   }
 
-  fileprivate var oauth2Swift: OAuth2Swift { oauthSwift as! OAuth2Swift }
-
-  private let lock = NSLock() // lock required to manage requestToRetry access
-  private var isRefreshing = false
+  // MARK: Open
 
   override open func retry(_ request: Request, for _: Session, dueTo error: Error, completion: @escaping (RetryResult) -> Void) {
     lock.lock(); defer { lock.unlock() }
@@ -117,6 +130,15 @@ open class OAuthSwift2RequestInterceptor: OAuthSwiftRequestInterceptor {
     }
     return false
   }
+
+  // MARK: Fileprivate
+
+  fileprivate var oauth2Swift: OAuth2Swift { oauthSwift as! OAuth2Swift }
+
+  // MARK: Private
+
+  private let lock = NSLock() // lock required to manage requestToRetry access
+  private var isRefreshing = false
 
   private func refreshTokens(completion: @escaping (Result<Void, Error>) -> Void) {
     guard !isRefreshing else { return }

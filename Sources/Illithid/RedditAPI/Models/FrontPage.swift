@@ -16,6 +16,8 @@ import Foundation
 
 import Alamofire
 
+// MARK: - FrontPage
+
 /// Contains cases for the different front page types
 public enum FrontPage: String, Codable, URLConvertible, Identifiable, CaseIterable {
   // Drawn from the user's subscribed Subreddits
@@ -30,19 +32,23 @@ public enum FrontPage: String, Codable, URLConvertible, Identifiable, CaseIterab
   /// Posts from a random `Subreddit`
   case random
 
+  // MARK: Public
+
   public var title: String {
     rawValue.capitalized
   }
 
   public func asURL() throws -> URL {
     switch self {
-    case .popular, .all, .random:
+    case .all, .popular, .random:
       return URL(string: "/r/\(self)/", relativeTo: Illithid.shared.baseURL)!
     default:
       return URL(string: "/", relativeTo: Illithid.shared.baseURL)!
     }
   }
 }
+
+// MARK: PostProvider
 
 extension FrontPage: PostProvider {
   public var isNsfw: Bool {
@@ -59,7 +65,8 @@ extension FrontPage: PostProvider {
 
   public func posts(sortBy sort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
                     parameters: ListingParameters, queue: DispatchQueue = .main,
-                    completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+                    completion: @escaping (Result<Listing, AFError>) -> Void)
+    -> DataRequest {
     Illithid.shared.fetchPosts(for: self, sortBy: sort, location: location, topInterval: topInterval, params: parameters, queue: queue) { result in
       completion(result)
     }

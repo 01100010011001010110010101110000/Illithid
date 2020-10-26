@@ -17,118 +17,7 @@ import Foundation
 /// A Reddit account
 /// - Note: Many proprties are nullable because they are only visible when logged in as that account
 public struct Account: RedditObject, Codable {
-  public let isEmployee: Bool
-  public let seenLayoutSwitch: Bool?
-  public let hasVisitedNewProfile: Bool?
-  public let prefNoProfanity: Bool?
-  public let hasExternalAccount: Bool?
-  public let prefGeopopular: String?
-  public let seenRedesignModal: Bool?
-  public let prefShowTrending: Bool?
-  public let subreddit: AccountSubreddit
-  public let isSponsor: Bool?
-  public let goldExpiration: Date?
-  public let hasGoldSubscription: Bool?
-  public let numFriends: Int?
-  public let hasAndroidSubscription: Bool?
-  public let verified: Bool
-  public let prefAutoplay: Bool?
-  public let coins: Int?
-  public let hasPaypalSubscription: Bool?
-  public let hasSubscribedToPremium: Bool?
-  public let id: String
-  public let hasStripeSubscription: Bool?
-  public let seenPremiumAdblockModal: Bool?
-  public let canCreateSubreddit: Bool?
-  public let over18: Bool?
-  public let isGold: Bool
-  public let isMod: Bool
-  public let suspensionExpirationUtc: Date?
-  public let hasVerifiedEmail: Bool
-  public let isSuspended: Bool?
-  public let prefVideoAutoplay: Bool?
-  public let inRedesignBeta: Bool?
-  public let iconImg: URL
-  public let prefNightmode: Bool?
-  public let oauthClientId: String?
-  public let hideFromRobots: Bool
-  public let linkKarma: Int
-  public let forcePasswordReset: Bool?
-  public let seenGiveAwardTooltip: Bool?
-  public let inboxCount: Int?
-  public let prefTopKarmaSubreddits: Bool?
-  public let prefShowSnoovatar: Bool?
-  public let name: String
-  public let prefClickgadget: Int?
-  public let created: Date
-  public let goldCreddits: Int?
-  public let createdUtc: Date
-  public let hasIosSubscription: Bool?
-  public let prefShowTwitter: Bool?
-  public let inBeta: Bool?
-  public let commentKarma: Int
-  public let hasSubscribed: Bool
-  public let seenSubredditChatFtux: Bool?
-
-  enum CodingKeys: String, CodingKey {
-    case isEmployee = "is_employee"
-    case seenLayoutSwitch = "seen_layout_switch"
-    case hasVisitedNewProfile = "has_visited_new_profile"
-    case prefNoProfanity = "pref_no_profanity"
-    case hasExternalAccount = "has_external_account"
-    case prefGeopopular = "pref_geopopular"
-    case seenRedesignModal = "seen_redesign_modal"
-    case prefShowTrending = "pref_show_trending"
-    case subreddit
-    case isSponsor = "is_sponsor"
-    case goldExpiration = "gold_expiration"
-    case hasGoldSubscription = "has_gold_subscription"
-    case numFriends = "num_friends"
-    case hasAndroidSubscription = "has_android_subscription"
-    case verified
-    case prefAutoplay = "pref_autoplay"
-    case coins
-    case hasPaypalSubscription = "has_paypal_subscription"
-    case hasSubscribedToPremium = "has_subscribed_to_premium"
-    case id
-    case hasStripeSubscription = "has_stripe_subscription"
-    case seenPremiumAdblockModal = "seen_premium_adblock_modal"
-    case canCreateSubreddit = "can_create_subreddit"
-    case over18 = "over_18"
-    case isGold = "is_gold"
-    case isMod = "is_mod"
-    case suspensionExpirationUtc = "suspension_expiration_utc"
-    case hasVerifiedEmail = "has_verified_email"
-    case isSuspended = "is_suspended"
-    case prefVideoAutoplay = "pref_video_autoplay"
-    case inRedesignBeta = "in_redesign_beta"
-    case iconImg = "icon_img"
-    case prefNightmode = "pref_nightmode"
-    case oauthClientId = "oauth_client_id"
-    case hideFromRobots = "hide_from_robots"
-    case linkKarma = "link_karma"
-    case forcePasswordReset = "force_password_reset"
-    case seenGiveAwardTooltip = "seen_give_award_tooltip"
-    case inboxCount = "inbox_count"
-    case prefTopKarmaSubreddits = "pref_top_karma_subreddits"
-    case prefShowSnoovatar = "pref_show_snoovatar"
-    case name
-    case prefClickgadget = "pref_clickgadget"
-    case created
-    case goldCreddits = "gold_creddits"
-    case createdUtc = "created_utc"
-    case hasIosSubscription = "has_ios_subscription"
-    case prefShowTwitter = "pref_show_twitter"
-    case inBeta = "in_beta"
-    case commentKarma = "comment_karma"
-    case hasSubscribed = "has_subscribed"
-    case seenSubredditChatFtux = "seen_subreddit_chat_ftux"
-  }
-
-  private enum WrapperKeys: String, CodingKey {
-    case kind
-    case data
-  }
+  // MARK: Lifecycle
 
   public init(from decoder: Decoder) throws {
     let wrappedContainer = try? decoder.container(keyedBy: WrapperKeys.self)
@@ -190,5 +79,124 @@ public struct Account: RedditObject, Codable {
     commentKarma = try workingContainer.decode(Int.self, forKey: .commentKarma)
     hasSubscribed = try workingContainer.decode(Bool.self, forKey: .hasSubscribed)
     seenSubredditChatFtux = try workingContainer.decodeIfPresent(Bool.self, forKey: .seenSubredditChatFtux)
+  }
+
+  // MARK: Public
+
+  public let isEmployee: Bool
+  public let seenLayoutSwitch: Bool?
+  public let hasVisitedNewProfile: Bool?
+  public let prefNoProfanity: Bool?
+  public let hasExternalAccount: Bool?
+  public let prefGeopopular: String?
+  public let seenRedesignModal: Bool?
+  public let prefShowTrending: Bool?
+  public let subreddit: AccountSubreddit
+  public let isSponsor: Bool?
+  public let goldExpiration: Date?
+  public let hasGoldSubscription: Bool?
+  public let numFriends: Int?
+  public let hasAndroidSubscription: Bool?
+  public let verified: Bool
+  public let prefAutoplay: Bool?
+  public let coins: Int?
+  public let hasPaypalSubscription: Bool?
+  public let hasSubscribedToPremium: Bool?
+  public let id: String
+  public let hasStripeSubscription: Bool?
+  public let seenPremiumAdblockModal: Bool?
+  public let canCreateSubreddit: Bool?
+  public let over18: Bool?
+  public let isGold: Bool
+  public let isMod: Bool
+  public let suspensionExpirationUtc: Date?
+  public let hasVerifiedEmail: Bool
+  public let isSuspended: Bool?
+  public let prefVideoAutoplay: Bool?
+  public let inRedesignBeta: Bool?
+  public let iconImg: URL
+  public let prefNightmode: Bool?
+  public let oauthClientId: String?
+  public let hideFromRobots: Bool
+  public let linkKarma: Int
+  public let forcePasswordReset: Bool?
+  public let seenGiveAwardTooltip: Bool?
+  public let inboxCount: Int?
+  public let prefTopKarmaSubreddits: Bool?
+  public let prefShowSnoovatar: Bool?
+  public let name: String
+  public let prefClickgadget: Int?
+  public let created: Date
+  public let goldCreddits: Int?
+  public let createdUtc: Date
+  public let hasIosSubscription: Bool?
+  public let prefShowTwitter: Bool?
+  public let inBeta: Bool?
+  public let commentKarma: Int
+  public let hasSubscribed: Bool
+  public let seenSubredditChatFtux: Bool?
+
+  // MARK: Internal
+
+  enum CodingKeys: String, CodingKey {
+    case isEmployee = "is_employee"
+    case seenLayoutSwitch = "seen_layout_switch"
+    case hasVisitedNewProfile = "has_visited_new_profile"
+    case prefNoProfanity = "pref_no_profanity"
+    case hasExternalAccount = "has_external_account"
+    case prefGeopopular = "pref_geopopular"
+    case seenRedesignModal = "seen_redesign_modal"
+    case prefShowTrending = "pref_show_trending"
+    case subreddit
+    case isSponsor = "is_sponsor"
+    case goldExpiration = "gold_expiration"
+    case hasGoldSubscription = "has_gold_subscription"
+    case numFriends = "num_friends"
+    case hasAndroidSubscription = "has_android_subscription"
+    case verified
+    case prefAutoplay = "pref_autoplay"
+    case coins
+    case hasPaypalSubscription = "has_paypal_subscription"
+    case hasSubscribedToPremium = "has_subscribed_to_premium"
+    case id
+    case hasStripeSubscription = "has_stripe_subscription"
+    case seenPremiumAdblockModal = "seen_premium_adblock_modal"
+    case canCreateSubreddit = "can_create_subreddit"
+    case over18 = "over_18"
+    case isGold = "is_gold"
+    case isMod = "is_mod"
+    case suspensionExpirationUtc = "suspension_expiration_utc"
+    case hasVerifiedEmail = "has_verified_email"
+    case isSuspended = "is_suspended"
+    case prefVideoAutoplay = "pref_video_autoplay"
+    case inRedesignBeta = "in_redesign_beta"
+    case iconImg = "icon_img"
+    case prefNightmode = "pref_nightmode"
+    case oauthClientId = "oauth_client_id"
+    case hideFromRobots = "hide_from_robots"
+    case linkKarma = "link_karma"
+    case forcePasswordReset = "force_password_reset"
+    case seenGiveAwardTooltip = "seen_give_award_tooltip"
+    case inboxCount = "inbox_count"
+    case prefTopKarmaSubreddits = "pref_top_karma_subreddits"
+    case prefShowSnoovatar = "pref_show_snoovatar"
+    case name
+    case prefClickgadget = "pref_clickgadget"
+    case created
+    case goldCreddits = "gold_creddits"
+    case createdUtc = "created_utc"
+    case hasIosSubscription = "has_ios_subscription"
+    case prefShowTwitter = "pref_show_twitter"
+    case inBeta = "in_beta"
+    case commentKarma = "comment_karma"
+    case hasSubscribed = "has_subscribed"
+    case seenSubredditChatFtux = "seen_subreddit_chat_ftux"
+  }
+
+  // MARK: Private
+
+  private enum WrapperKeys: String, CodingKey {
+    case kind
+    case data
   }
 }

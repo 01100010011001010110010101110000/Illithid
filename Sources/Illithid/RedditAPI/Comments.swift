@@ -20,9 +20,13 @@ import Foundation
 import Alamofire
 import Willow
 
+// MARK: - CommentRouter
+
 enum CommentRouter: URLConvertible {
   case comments(for: Post.ID, in: String)
   case moreComments
+
+  // MARK: Internal
 
   func asURL() throws -> URL {
     switch self {
@@ -56,7 +60,8 @@ public extension Illithid {
   func comments(for post: Post, parameters: ListingParameters,
                 by sort: CommentsSort = .confidence, focusOn comment: ID36? = nil, context: Int? = nil,
                 depth: Int = 0, showEdits _: Bool = true, showMore: Bool = true,
-                threaded: Bool = true, truncate: Int = 0, queue: DispatchQueue = .main) -> AnyPublisher<Listing, AFError> {
+                threaded: Bool = true, truncate: Int = 0, queue: DispatchQueue = .main)
+    -> AnyPublisher<Listing, AFError> {
     comments(for: post.id, in: post.subreddit, parameters: parameters, by: sort, focusOn: comment, context: context, depth: depth,
              showEdits: showMore, showMore: showMore, threaded: threaded, truncate: truncate, queue: queue)
   }
@@ -83,7 +88,8 @@ public extension Illithid {
   func comments(for postId: Post.ID, in subredditName: String, parameters: ListingParameters,
                 by sort: CommentsSort = .confidence, focusOn comment: ID36? = nil, context: Int? = nil,
                 depth: Int = 0, showEdits: Bool = true, showMore: Bool = true,
-                threaded: Bool = true, truncate: Int = 0, queue: DispatchQueue = .main) -> AnyPublisher<Listing, AFError> {
+                threaded: Bool = true, truncate: Int = 0, queue: DispatchQueue = .main)
+    -> AnyPublisher<Listing, AFError> {
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
 
     var encodedParameters = parameters.toParameters()
@@ -115,14 +121,16 @@ public extension Illithid {
 
   func moreComments(for more: More, on post: Post, depth: Int? = nil,
                     limitChildren: Bool = false, sortBy: CommentsSort = .confidence,
-                    queue: DispatchQueue = .main) -> AnyPublisher<(comments: [Comment], more: More?), AFError> {
+                    queue: DispatchQueue = .main)
+    -> AnyPublisher<(comments: [Comment], more: More?), AFError> {
     moreComments(for: more, on: post.name, in: post.subreddit, depth: depth,
                  limitChildren: limitChildren, sortBy: sortBy, queue: queue)
   }
 
   func moreComments(for more: More, on postFullname: Fullname, in subredit: String, depth: Int? = nil,
                     limitChildren: Bool = false, sortBy: CommentsSort = .confidence,
-                    queue: DispatchQueue = .main) -> AnyPublisher<(comments: [Comment], more: More?), AFError> {
+                    queue: DispatchQueue = .main)
+    -> AnyPublisher<(comments: [Comment], more: More?), AFError> {
     if more.isThreadContinuation {
       // We specify threaded: false to mimic the behavior of /api/morechildren
       return comments(for: postFullname.components(separatedBy: "_").last!, in: subredit,
@@ -219,7 +227,8 @@ public extension Comment {
 
 public extension Comment {
   func isModComment(queue: DispatchQueue = .main,
-                    completion: @escaping (Result<Bool, AFError>) -> Void) -> DataRequest {
+                    completion: @escaping (Result<Bool, AFError>) -> Void)
+    -> DataRequest {
     Illithid.shared.moderatorsOf(displayName: subreddit, queue: queue) { result in
       switch result {
       case let .success(moderators):

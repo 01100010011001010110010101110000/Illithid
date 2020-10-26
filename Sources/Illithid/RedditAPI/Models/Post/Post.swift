@@ -21,17 +21,17 @@ import Foundation
 
 import Alamofire
 
+// MARK: - VoteDirection
+
 public enum VoteDirection: Int, Codable {
   case down = -1
   case clear = 0
   case up = 1
 }
 
-public enum PostSort: String, Codable, CaseIterable, Identifiable, Hashable {
-  public var id: String {
-    rawValue
-  }
+// MARK: - PostSort
 
+public enum PostSort: String, Codable, CaseIterable, Identifiable, Hashable {
   case hot
   case best
   case new
@@ -39,7 +39,15 @@ public enum PostSort: String, Codable, CaseIterable, Identifiable, Hashable {
   case rising
   case top
   case controversial
+
+  // MARK: Public
+
+  public var id: String {
+    rawValue
+  }
 }
+
+// MARK: - PostHint
 
 public enum PostHint: String, Codable {
   case link
@@ -48,13 +56,7 @@ public enum PostHint: String, Codable {
   case richVideo
   case hostedVideo
 
-  private enum CodingKeys: String, CodingKey {
-    case link
-    case `self`
-    case image
-    case richVideo = "rich:video"
-    case hostedVideo = "hosted:video"
-  }
+  // MARK: Lifecycle
 
   public init(from decoder: Decoder) throws {
     let value = try decoder.singleValueContainer().decode(String.self)
@@ -74,7 +76,19 @@ public enum PostHint: String, Codable {
       }
     }
   }
+
+  // MARK: Private
+
+  private enum CodingKeys: String, CodingKey {
+    case link
+    case `self`
+    case image
+    case richVideo = "rich:video"
+    case hostedVideo = "hosted:video"
+  }
 }
+
+// MARK: - Post
 
 public struct Post: RedditObject {
   public static func == (lhs: Post, rhs: Post) -> Bool {

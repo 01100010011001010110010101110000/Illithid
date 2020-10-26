@@ -14,52 +14,10 @@
 
 import Foundation
 
-public struct ModeratedSubreddit: Codable {
-  public let iconImage: URL?
-  public let bannerImage: URL?
-  public let name: Fullname
-  public let primaryColor: String
-  public let title: String
-  public let url: URL
-  public let subredditDisplayName: String
-  public let subredditDisplayNamePrefixed: String
-  public let created: Date
-  public let createdUtc: Date
-  public let bannerSize: [Int]?
-  public let userCanCrosspost: Bool
-  public let modPermissions: [String]
-  public let over18: Bool
-  public let subscribers: Int
-  public let communityIcon: URL?
-  public let iconSize: [Int]?
-  public let keyColor: String
-  public let subredditType: Subreddit.SubredditType
-  public let whitelistStatus: Subreddit.WhitelistStatus?
-  public let userIsSubscriber: Bool
+// MARK: - ModeratedSubreddit
 
-  enum CodingKeys: String, CodingKey {
-    case iconImage = "icon_img"
-    case bannerImage = "banner_img"
-    case name
-    case primaryColor = "primary_color"
-    case title
-    case url
-    case subredditDisplayName = "sr"
-    case subredditDisplayNamePrefixed = "sr_display_name_prefixed"
-    case created
-    case createdUtc = "created_utc"
-    case bannerSize = "banner_size"
-    case userCanCrosspost = "user_can_crosspost"
-    case modPermissions = "mod_permissions"
-    case over18 = "over_18"
-    case subscribers
-    case communityIcon = "community_icon"
-    case iconSize = "icon_size"
-    case keyColor = "key_color"
-    case subredditType = "subreddit_type"
-    case whitelistStatus = "whitelist_status"
-    case userIsSubscriber = "user_is_subscriber"
-  }
+public struct ModeratedSubreddit: Codable {
+  // MARK: Lifecycle
 
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -88,7 +46,59 @@ public struct ModeratedSubreddit: Codable {
     whitelistStatus = try container.decode(Subreddit.WhitelistStatus.self, forKey: .whitelistStatus)
     userIsSubscriber = try container.decode(Bool.self, forKey: .userIsSubscriber)
   }
+
+  // MARK: Public
+
+  public let iconImage: URL?
+  public let bannerImage: URL?
+  public let name: Fullname
+  public let primaryColor: String
+  public let title: String
+  public let url: URL
+  public let subredditDisplayName: String
+  public let subredditDisplayNamePrefixed: String
+  public let created: Date
+  public let createdUtc: Date
+  public let bannerSize: [Int]?
+  public let userCanCrosspost: Bool
+  public let modPermissions: [String]
+  public let over18: Bool
+  public let subscribers: Int
+  public let communityIcon: URL?
+  public let iconSize: [Int]?
+  public let keyColor: String
+  public let subredditType: Subreddit.SubredditType
+  public let whitelistStatus: Subreddit.WhitelistStatus?
+  public let userIsSubscriber: Bool
+
+  // MARK: Internal
+
+  enum CodingKeys: String, CodingKey {
+    case iconImage = "icon_img"
+    case bannerImage = "banner_img"
+    case name
+    case primaryColor = "primary_color"
+    case title
+    case url
+    case subredditDisplayName = "sr"
+    case subredditDisplayNamePrefixed = "sr_display_name_prefixed"
+    case created
+    case createdUtc = "created_utc"
+    case bannerSize = "banner_size"
+    case userCanCrosspost = "user_can_crosspost"
+    case modPermissions = "mod_permissions"
+    case over18 = "over_18"
+    case subscribers
+    case communityIcon = "community_icon"
+    case iconSize = "icon_size"
+    case keyColor = "key_color"
+    case subredditType = "subreddit_type"
+    case whitelistStatus = "whitelist_status"
+    case userIsSubscriber = "user_is_subscriber"
+  }
 }
+
+// MARK: - ModeratedSubredditsList
 
 struct ModeratedSubredditsList: Decodable {
   let kind: String

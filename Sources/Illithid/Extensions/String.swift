@@ -14,8 +14,11 @@
 
 import Foundation
 
+// MARK: - Stack
+
 struct Stack<Element> {
-  private var array: [Element] = []
+  // MARK: Internal
+
   mutating func push(_ element: Element) {
     array.append(element)
   }
@@ -35,6 +38,10 @@ struct Stack<Element> {
   func isEmpty() -> Bool {
     array.isEmpty
   }
+
+  // MARK: Private
+
+  private var array: [Element] = []
 }
 
 extension String {

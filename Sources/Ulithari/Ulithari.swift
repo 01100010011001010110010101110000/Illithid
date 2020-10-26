@@ -19,18 +19,10 @@ import Foundation
 
 import Alamofire
 
+// MARK: - Ulithari
+
 open class Ulithari {
-  public static let shared = Ulithari()
-  public static let gfycatBaseUrl = URL(string: "https://api.gfycat.com/v1/")!
-  public static let redGifsBaseUrl = URL(string: "https://api.redgifs.com/v1/")!
-  public static let imgurBaseUrl = URL(string: "https://api.imgur.com/3/")!
-
-  internal let session: Session
-
-  internal var imgurAuthorizationHeader: HTTPHeaders = []
-
-  private let imgurDecoder = JSONDecoder()
-  private let gfycatDecoder = JSONDecoder()
+  // MARK: Lifecycle
 
   private init() {
     let alamoConfiguration = URLSessionConfiguration.default
@@ -54,9 +46,27 @@ open class Ulithari {
     gfycatDecoder.dateDecodingStrategy = .secondsSince1970
   }
 
+  // MARK: Public
+
+  public static let shared = Ulithari()
+  public static let gfycatBaseUrl = URL(string: "https://api.gfycat.com/v1/")!
+  public static let redGifsBaseUrl = URL(string: "https://api.redgifs.com/v1/")!
+  public static let imgurBaseUrl = URL(string: "https://api.imgur.com/3/")!
+
   public func configure(imgurClientId: String) {
     imgurAuthorizationHeader.add(.authorization("Client-ID \(imgurClientId)"))
   }
+
+  // MARK: Internal
+
+  internal let session: Session
+
+  internal var imgurAuthorizationHeader: HTTPHeaders = []
+
+  // MARK: Private
+
+  private let imgurDecoder = JSONDecoder()
+  private let gfycatDecoder = JSONDecoder()
 }
 
 public extension Ulithari {
@@ -161,7 +171,8 @@ public extension Ulithari {
 
   @discardableResult
   func fetchImgurAlbum(id: String, queue: DispatchQueue = .main,
-                       completion: @escaping (Result<ImgurAlbum, AFError>) -> Void) -> DataRequest {
+                       completion: @escaping (Result<ImgurAlbum, AFError>) -> Void)
+    -> DataRequest {
     session.request(URL(string: "album/\(id)", relativeTo: Self.imgurBaseUrl)!, headers: imgurAuthorizationHeader).validate()
       .responseDecodable(of: ImgurAlbumWrapper.self, queue: queue, decoder: imgurDecoder) { response in
         switch response.result {
@@ -175,7 +186,8 @@ public extension Ulithari {
 
   @discardableResult
   func fetchImgurImage(id: String, queue: DispatchQueue = .main,
-                       completion: @escaping (Result<ImgurImage, AFError>) -> Void) -> DataRequest {
+                       completion: @escaping (Result<ImgurImage, AFError>) -> Void)
+    -> DataRequest {
     session.request(URL(string: "image/\(id)", relativeTo: Self.imgurBaseUrl)!, headers: imgurAuthorizationHeader).validate()
       .responseDecodable(of: ImgurImageWrapper.self, queue: queue, decoder: imgurDecoder) { response in
         switch response.result {

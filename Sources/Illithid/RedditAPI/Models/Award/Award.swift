@@ -15,6 +15,26 @@
 import Foundation
 
 public struct Award: Codable {
+  // MARK: Public
+
+  public enum AwardID: String, Codable {
+    case gid1
+    case gid2
+    case gid3
+  }
+
+  public enum AwardName: String, Codable {
+    case Silver
+    case Gold
+    case Platinum
+  }
+
+  public struct AwardIcons: Codable {
+    public let url: URL
+    public let width: Int
+    public let height: Int
+  }
+
   public let isEnabled: Bool
   public let count: Int
   public let subredditId: String?
@@ -34,23 +54,7 @@ public struct Award: Codable {
   public let name: String
   public let resizedIcons: [AwardIcons]
 
-  public enum AwardID: String, Codable {
-    case gid1
-    case gid2
-    case gid3
-  }
-
-  public enum AwardName: String, Codable {
-    case Silver
-    case Gold
-    case Platinum
-  }
-
-  public struct AwardIcons: Codable {
-    public let url: URL
-    public let width: Int
-    public let height: Int
-  }
+  // MARK: Private
 
   private enum CodingKeys: String, CodingKey {
     case isEnabled = "is_enabled"

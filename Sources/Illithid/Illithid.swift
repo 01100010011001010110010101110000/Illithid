@@ -20,30 +20,11 @@ import Alamofire
 import OAuthSwift
 import Willow
 
+// MARK: - Illithid
+
 /// Handles Reddit API meta-operations
 open class Illithid: ObservableObject {
-  public static var shared: Illithid = .init()
-  private enum baseURLs: String, Codable {
-    case unauthenticated = "https://api.reddit.com/"
-    case authenticated = "https://oauth.reddit.com/"
-  }
-
-  public let redditBrowserUrl = URL(string: "https://www.reddit.com/")!
-  public var baseURL: URL {
-    accountManager.currentAccount != nil ? URL(string: baseURLs.authenticated.rawValue)! : URL(string: baseURLs.unauthenticated.rawValue)!
-  }
-
-  public static let authorizeEndpoint = URL(string: "https://www.reddit.com/api/v1/authorize.compact")!
-  public static let tokenEndpoint = URL(string: "https://www.reddit.com/api/v1/access_token")!
-
-  open var logger: Logger
-
-  // TODO: Make this private
-  public let accountManager: AccountManager
-
-  internal let decoder: JSONDecoder = .init()
-
-  internal var session: Session
+  // MARK: Lifecycle
 
   private init() {
     decoder.dateDecodingStrategy = .secondsSince1970
@@ -58,10 +39,41 @@ open class Illithid: ObservableObject {
     session = accountManager.makeSession(for: accountManager.currentAccount)
   }
 
+  // MARK: Open
+
+  open var logger: Logger
+
+  // MARK: Public
+
+  public static var shared: Illithid = .init()
+  public static let authorizeEndpoint = URL(string: "https://www.reddit.com/api/v1/authorize.compact")!
+  public static let tokenEndpoint = URL(string: "https://www.reddit.com/api/v1/access_token")!
+
+  public let redditBrowserUrl = URL(string: "https://www.reddit.com/")!
+  // TODO: Make this private
+  public let accountManager: AccountManager
+
+  public var baseURL: URL {
+    accountManager.currentAccount != nil ? URL(string: baseURLs.authenticated.rawValue)! : URL(string: baseURLs.unauthenticated.rawValue)!
+  }
+
   public func configure(configuration: ClientConfiguration) {
     accountManager.configuration = configuration
     session.cancelAllRequests()
     session = accountManager.makeSession(for: accountManager.currentAccount)
+  }
+
+  // MARK: Internal
+
+  internal let decoder: JSONDecoder = .init()
+
+  internal var session: Session
+
+  // MARK: Private
+
+  private enum baseURLs: String, Codable {
+    case unauthenticated = "https://api.reddit.com/"
+    case authenticated = "https://oauth.reddit.com/"
   }
 }
 
@@ -73,7 +85,8 @@ internal extension Illithid {
   @discardableResult
   func readListing(url: Alamofire.URLConvertible, queryParameters: Parameters? = nil,
                    listingParameters: ListingParameters = .init(), queue: DispatchQueue = .main,
-                   completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+                   completion: @escaping (Result<Listing, AFError>) -> Void)
+    -> DataRequest {
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
 
     let _parameters = listingParameters.toParameters()
@@ -91,7 +104,8 @@ internal extension Illithid {
 
   @discardableResult
   func readListing(request: Alamofire.URLRequestConvertible, queue: DispatchQueue = .main,
-                   completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+                   completion: @escaping (Result<Listing, AFError>) -> Void)
+    -> DataRequest {
     session.request(request)
       .validate()
       .responseDecodable(of: Listing.self, queue: queue, decoder: decoder) { completion($0.result) }

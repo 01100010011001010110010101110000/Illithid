@@ -19,6 +19,8 @@ import Foundation
 
 import Alamofire
 
+// MARK: - AccountContent
+
 public enum AccountContent: String, CaseIterable {
   case overview
   case submissions
@@ -29,16 +31,22 @@ public enum AccountContent: String, CaseIterable {
   case hidden
 }
 
-public enum AccountContentSort: String, Codable, CaseIterable, Identifiable {
-  public var id: String {
-    rawValue
-  }
+// MARK: - AccountContentSort
 
+public enum AccountContentSort: String, Codable, CaseIterable, Identifiable {
   case hot
   case new
   case top
   case controversial
+
+  // MARK: Public
+
+  public var id: String {
+    rawValue
+  }
 }
+
+// MARK: - AccountRouter
 
 private enum AccountRouter: URLRequestConvertible, MirrorableEnum {
   case account(username: String)
@@ -68,6 +76,8 @@ private enum AccountRouter: URLRequestConvertible, MirrorableEnum {
               listingParameters: ListingParameters = .init())
 
   case moderatedSubreddits(username: String)
+
+  // MARK: Internal
 
   var path: String {
     switch self {
@@ -116,7 +126,8 @@ private enum AccountRouter: URLRequestConvertible, MirrorableEnum {
 public extension Illithid {
   @discardableResult
   func fetchAccount(name: String, queue: DispatchQueue = .main,
-                    completion: @escaping (Result<Account, AFError>) -> Void) -> DataRequest {
+                    completion: @escaping (Result<Account, AFError>) -> Void)
+    -> DataRequest {
     session.request(AccountRouter.account(username: name))
       .validate()
       .responseDecodable(of: Account.self, queue: queue, decoder: decoder) { response in
@@ -162,7 +173,8 @@ public extension Account {
 
   @discardableResult
   func multireddits(queue: DispatchQueue = .main,
-                    completion: @escaping (Result<[Multireddit], AFError>) -> Void) -> DataRequest {
+                    completion: @escaping (Result<[Multireddit], AFError>) -> Void)
+    -> DataRequest {
     let illithid: Illithid = .shared
 
     return illithid.session.request(AccountRouter.multireddits(username: name))
@@ -184,7 +196,8 @@ public extension Account {
   @discardableResult
   func content(content: AccountContent, sort: AccountContentSort = .new, topInterval: TopInterval = .day,
                parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
-               completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+               completion: @escaping (Result<Listing, AFError>) -> Void)
+    -> DataRequest {
     switch content {
     case .overview:
       return overview(sort: sort, topInterval: topInterval, parameters: parameters, queue: queue, completion: completion)
@@ -206,7 +219,8 @@ public extension Account {
   @discardableResult
   func overview(sort: AccountContentSort = .new, topInterval: TopInterval = .day,
                 parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
-                completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+                completion: @escaping (Result<Listing, AFError>) -> Void)
+    -> DataRequest {
     let illithid: Illithid = .shared
     let request = AccountRouter.overview(username: name, sort: sort, t: topInterval,
                                          listingParameters: parameters)
@@ -217,7 +231,8 @@ public extension Account {
   @discardableResult
   func comments(sort: AccountContentSort = .new, topInterval: TopInterval = .day,
                 parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
-                completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+                completion: @escaping (Result<Listing, AFError>) -> Void)
+    -> DataRequest {
     let illithid: Illithid = .shared
     let request = AccountRouter.comments(username: name, sort: sort, t: topInterval,
                                          listingParameters: parameters)
@@ -228,7 +243,8 @@ public extension Account {
   @discardableResult
   func submissions(sort: AccountContentSort = .new, topInterval: TopInterval = .day,
                    parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
-                   completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+                   completion: @escaping (Result<Listing, AFError>) -> Void)
+    -> DataRequest {
     let illithid: Illithid = .shared
     let request = AccountRouter.submissions(username: name, sort: sort, t: topInterval,
                                             listingParameters: parameters)
@@ -239,7 +255,8 @@ public extension Account {
   @discardableResult
   func upvotedPosts(sort: AccountContentSort = .new, topInterval: TopInterval = .day,
                     parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
-                    completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+                    completion: @escaping (Result<Listing, AFError>) -> Void)
+    -> DataRequest {
     let illithid: Illithid = .shared
     let request = AccountRouter.upvoted(username: name, sort: sort, t: topInterval,
                                         listingParameters: parameters)
@@ -250,7 +267,8 @@ public extension Account {
   @discardableResult
   func downvotedPosts(sort: AccountContentSort = .new, topInterval: TopInterval = .day,
                       parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
-                      completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+                      completion: @escaping (Result<Listing, AFError>) -> Void)
+    -> DataRequest {
     let illithid: Illithid = .shared
     let request = AccountRouter.downvoted(username: name, sort: sort, t: topInterval,
                                           listingParameters: parameters)
@@ -261,7 +279,8 @@ public extension Account {
   @discardableResult
   func hiddenPosts(sort: AccountContentSort = .new, topInterval: TopInterval = .day,
                    parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
-                   completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+                   completion: @escaping (Result<Listing, AFError>) -> Void)
+    -> DataRequest {
     let illithid: Illithid = .shared
     let request = AccountRouter.hidden(username: name, sort: sort, t: topInterval,
                                        listingParameters: parameters)
@@ -272,7 +291,8 @@ public extension Account {
   @discardableResult
   func savedContent(sort: AccountContentSort = .new, topInterval: TopInterval = .day, context _: Int = 2,
                     parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
-                    completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+                    completion: @escaping (Result<Listing, AFError>) -> Void)
+    -> DataRequest {
     let illithid: Illithid = .shared
     let request = AccountRouter.saved(username: name, sort: sort, t: topInterval,
                                       listingParameters: parameters)
@@ -286,7 +306,8 @@ public extension Account {
 public extension Illithid {
   @discardableResult
   func moderatedSubreddits(username: String, queue: DispatchQueue = .main,
-                           completion: @escaping (Result<[ModeratedSubreddit], AFError>) -> Void) -> DataRequest {
+                           completion: @escaping (Result<[ModeratedSubreddit], AFError>) -> Void)
+    -> DataRequest {
     session.request(AccountRouter.moderatedSubreddits(username: username))
       .validate()
       .responseDecodable(of: ModeratedSubredditsList.self, queue: queue, decoder: decoder) { response in
@@ -313,7 +334,8 @@ public extension Illithid {
 public extension Account {
   @discardableResult
   func moderatedSubreddits(queue: DispatchQueue = .main,
-                           completion: @escaping (Result<[ModeratedSubreddit], AFError>) -> Void) -> DataRequest {
+                           completion: @escaping (Result<[ModeratedSubreddit], AFError>) -> Void)
+    -> DataRequest {
     Illithid.shared.moderatedSubreddits(username: name, queue: queue, completion: completion)
   }
 
@@ -326,7 +348,8 @@ public extension Account {
 public extension Account {
   @discardableResult
   static func fetch(username: String, queue: DispatchQueue = .main,
-                    completion: @escaping (Result<Account, AFError>) -> Void) -> DataRequest {
+                    completion: @escaping (Result<Account, AFError>) -> Void)
+    -> DataRequest {
     Illithid.shared.fetchAccount(name: username, queue: queue) { result in
       completion(result)
     }

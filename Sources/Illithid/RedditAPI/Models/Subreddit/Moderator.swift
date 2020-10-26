@@ -16,7 +16,11 @@ import Foundation
 
 public typealias Moderator = User
 
+// MARK: - User
+
 public struct User: Codable, Identifiable {
+  // MARK: Public
+
   public let name: String
   public let authorFlairText: String?
   public let modPermissions: [String]
@@ -24,6 +28,8 @@ public struct User: Codable, Identifiable {
   public let relId: String
   public let id: Fullname
   public let authorFlairCssClass: String?
+
+  // MARK: Private
 
   private enum CodingKeys: String, CodingKey {
     case name
@@ -36,14 +42,22 @@ public struct User: Codable, Identifiable {
   }
 }
 
+// MARK: - UserList
+
 internal struct UserList: Codable {
+  // MARK: Internal
+
   let kind: String
-  fileprivate let data: UserListData
+
   var users: [User] {
     data.children
   }
 
+  // MARK: Fileprivate
+
   fileprivate struct UserListData: Codable {
     let children: [User]
   }
+
+  fileprivate let data: UserListData
 }

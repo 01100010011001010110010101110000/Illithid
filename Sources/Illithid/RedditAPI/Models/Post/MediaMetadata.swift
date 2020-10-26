@@ -16,6 +16,8 @@ import Foundation
 
 /// The object describing an item in a gallery `Post`
 public struct MediaMetadata: Codable {
+  // MARK: Public
+
   public enum MediaType: String, Codable {
     case image = "Image"
     case animatedImage = "AnimatedImage"
@@ -27,6 +29,8 @@ public struct MediaMetadata: Codable {
 
   /// The source attributes of a gallery item
   public struct MediaSource: Codable {
+    // MARK: Public
+
     public let width: Int
     public let height: Int
     public let url: URL?
@@ -34,6 +38,8 @@ public struct MediaMetadata: Codable {
     public let gif: URL?
     /// The URL of the item's MP4 if the gallery item is a `MediaType.animatedImage`
     public let mp4: URL?
+
+    // MARK: Private
 
     private enum CodingKeys: String, CodingKey {
       case width = "x"
@@ -50,6 +56,8 @@ public struct MediaMetadata: Codable {
   public let mimeType: String
   public let previews: [MediaSource]
   public let source: MediaSource
+
+  // MARK: Private
 
   private enum CodingKeys: String, CodingKey {
     case id

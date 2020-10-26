@@ -16,6 +16,10 @@
 import XCTest
 
 final class UlithariTests: XCTestCase {
+  static var allTests = [
+    ("Imgur Link Type Parser", testImgurLinkType),
+  ]
+
   func testImgurLinkType() {
     let ulithari: Ulithari = .shared
 
@@ -27,8 +31,4 @@ final class UlithariTests: XCTestCase {
     XCTAssertTrue(ulithari.imgurLinkType(albumLink)! == Ulithari.ImgurLinkType.album(id: "7osn4XS"))
     XCTAssertTrue(ulithari.imgurLinkType(galleryLink)! == Ulithari.ImgurLinkType.gallery(id: "q2cO84x"))
   }
-
-  static var allTests = [
-    ("Imgur Link Type Parser", testImgurLinkType),
-  ]
 }

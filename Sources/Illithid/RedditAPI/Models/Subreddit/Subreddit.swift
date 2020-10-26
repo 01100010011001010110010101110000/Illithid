@@ -18,6 +18,8 @@ import Foundation
 
 import Alamofire
 
+// MARK: - SubredditSort
+
 public enum SubredditSort {
   case popular
   case new
@@ -25,7 +27,118 @@ public enum SubredditSort {
   case `default`
 }
 
+// MARK: - Subreddit
+
 public struct Subreddit: RedditObject {
+  // MARK: Lifecycle
+
+  public init(from decoder: Decoder) throws {
+    let wrappedContainer = try? decoder.container(keyedBy: WrapperKeys.self)
+    let nestedContainer = try? wrappedContainer?.nestedContainer(keyedBy: CodingKeys.self, forKey: .data)
+
+    let unwrappedContainer = try? decoder.container(keyedBy: CodingKeys.self)
+
+    let container = nestedContainer != nil ? nestedContainer! : unwrappedContainer!
+
+    // For certain bool properties, Reddit returns null to indicate false
+    wikiEnabled = try container.decodeIfPresent(Bool.self, forKey: .wikiEnabled) ?? false
+    userCanFlairInSr = try container.decodeIfPresent(Bool.self, forKey: .userCanFlairInSr) ?? false
+    userSrFlairEnabled = try container.decodeIfPresent(Bool.self, forKey: .userSrFlairEnabled) ?? false
+    isCrosspostableSubreddit = try container.decodeIfPresent(Bool.self, forKey: .isCrosspostableSubreddit) ?? false
+
+    // When a URL property does not exist, Reddit returns the empty string
+    headerImg = try? container.decode(URL.self, forKey: .headerImg)
+    iconImg = try? container.decode(URL.self, forKey: .iconImg)
+    communityIcon = try? container.decode(URL.self, forKey: .communityIcon)
+    bannerBackgroundImage = try? container.decode(URL.self, forKey: .bannerBackgroundImage)
+    bannerImg = try? container.decode(URL.self, forKey: .bannerImg)
+    mobileBannerImage = try? container.decode(URL.self, forKey: .mobileBannerImage)
+
+    userFlairBackgroundColor = try container.decodeIfPresent(String.self, forKey: .userFlairBackgroundColor)
+    submitTextHtml = try container.decodeIfPresent(String.self, forKey: .submitTextHtml)
+    restrictPosting = try container.decodeIfPresent(Bool.self, forKey: .restrictPosting)
+    userIsBanned = try container.decodeIfPresent(Bool.self, forKey: .userIsBanned)
+    freeFormReports = try container.decodeIfPresent(Bool.self, forKey: .freeFormReports)
+    userIsMuted = try container.decodeIfPresent(Bool.self, forKey: .userIsMuted)
+    displayName = try container.decode(String.self, forKey: .displayName)
+    title = try container.decode(String.self, forKey: .title)
+    allowGalleries = try container.decodeIfPresent(Bool.self, forKey: .allowGalleries)
+    iconSize = try container.decodeIfPresent([Int].self, forKey: .iconSize)
+    primaryColor = try container.decodeIfPresent(String.self, forKey: .primaryColor)
+    activeUserCount = try container.decodeIfPresent(Int.self, forKey: .activeUserCount)
+    displayNamePrefixed = try container.decode(String.self, forKey: .displayNamePrefixed)
+    accountsActive = try container.decodeIfPresent(Int.self, forKey: .accountsActive)
+    publicTraffic = try container.decodeIfPresent(Bool.self, forKey: .publicTraffic)
+    subscribers = try container.decodeIfPresent(Int.self, forKey: .subscribers)
+    userFlairRichtext = try container.decode([String].self, forKey: .userFlairRichtext)
+    videostreamLinksCount = try container.decodeIfPresent(Int.self, forKey: .videostreamLinksCount)
+    name = try container.decode(Fullname.self, forKey: .name)
+    quarantine = try container.decodeIfPresent(Bool.self, forKey: .quarantine)
+    hideAds = try container.decodeIfPresent(Bool.self, forKey: .hideAds)
+    emojisEnabled = try container.decode(Bool.self, forKey: .emojisEnabled)
+    advertiserCategory = try container.decodeIfPresent(String.self, forKey: .advertiserCategory)
+    description = try container.decodeIfPresent(String.self, forKey: .description)
+    publicDescription = try container.decode(String.self, forKey: .publicDescription)
+    commentScoreHideMins = try container.decodeIfPresent(Int.self, forKey: .commentScoreHideMins)
+    userHasFavorited = try container.decodeIfPresent(Bool.self, forKey: .userHasFavorited)
+    userFlairTemplateId = try container.decodeIfPresent(UUID.self, forKey: .userFlairTemplateId)
+    originalContentTagEnabled = try container.decodeIfPresent(Bool.self, forKey: .originalContentTagEnabled)
+    submitText = try container.decodeIfPresent(String.self, forKey: .submitText)
+    descriptionHtml = try container.decodeIfPresent(String.self, forKey: .descriptionHtml)
+    spoilersEnabled = try container.decodeIfPresent(Bool.self, forKey: .spoilersEnabled)
+    headerTitle = try container.decodeIfPresent(String.self, forKey: .headerTitle)
+    headerSize = try container.decodeIfPresent([Int].self, forKey: .headerSize)
+    userFlairPosition = try container.decodeIfPresent(String.self, forKey: .userFlairPosition)
+    allOriginalContent = try container.decodeIfPresent(Bool.self, forKey: .allOriginalContent)
+    hasMenuWidget = try container.decode(Bool.self, forKey: .hasMenuWidget)
+    isEnrolledInNewModmail = try container.decodeIfPresent(Bool.self, forKey: .isEnrolledInNewModmail)
+    keyColor = try container.decodeIfPresent(String.self, forKey: .keyColor)
+    canAssignUserFlair = try container.decode(Bool.self, forKey: .canAssignUserFlair)
+    created = try container.decode(Date.self, forKey: .created)
+    wls = try container.decodeIfPresent(Int.self, forKey: .wls)
+    showMediaPreview = try container.decodeIfPresent(Bool.self, forKey: .showMediaPreview)
+    submissionType = try container.decodeIfPresent(SubmissionType.self, forKey: .submissionType)
+    userIsSubscriber = try container.decodeIfPresent(Bool.self, forKey: .userIsSubscriber)
+    disableContributorRequests = try container.decodeIfPresent(Bool.self, forKey: .disableContributorRequests)
+    allowVideogifs = try container.decode(Bool.self, forKey: .allowVideogifs)
+    userFlairType = try container.decode(String.self, forKey: .userFlairType)
+    allowPolls = try container.decodeIfPresent(Bool.self, forKey: .allowPolls)
+    collapseDeletedComments = try container.decodeIfPresent(Bool.self, forKey: .collapseDeletedComments)
+    emojisCustomSize = try container.decodeIfPresent([Int].self, forKey: .emojisCustomSize)
+    publicDescriptionHtml = try container.decodeIfPresent(String.self, forKey: .publicDescriptionHtml)
+    allowVideos = try container.decode(Bool.self, forKey: .allowVideos)
+    notificationLevel = try container.decodeIfPresent(NotificationLevel.self, forKey: .notificationLevel)
+    canAssignLinkFlair = try container.decode(Bool.self, forKey: .canAssignLinkFlair)
+    accountsActiveIsFuzzed = try container.decodeIfPresent(Bool.self, forKey: .accountsActiveIsFuzzed)
+    submitTextLabel = try container.decodeIfPresent(String.self, forKey: .submitTextLabel)
+    linkFlairPosition = try container.decodeIfPresent(String.self, forKey: .linkFlairPosition)
+    userFlairEnabledInSr = try container.decodeIfPresent(Bool.self, forKey: .userFlairEnabledInSr)
+    allowDiscovery = try container.decodeIfPresent(Bool.self, forKey: .allowDiscovery)
+    userSrThemeEnabled = try container.decodeIfPresent(Bool.self, forKey: .userSrThemeEnabled)
+    linkFlairEnabled = try container.decodeIfPresent(Bool.self, forKey: .linkFlairEnabled)
+    subredditType = try container.decode(SubredditType.self, forKey: .subredditType)
+    suggestedCommentSort = try container.decodeIfPresent(CommentsSort.self, forKey: .suggestedCommentSort)
+    userFlairText = try container.decodeIfPresent(String.self, forKey: .userFlairText)
+    bannerBackgroundColor = try container.decodeIfPresent(String.self, forKey: .bannerBackgroundColor)
+    showMedia = try container.decodeIfPresent(Bool.self, forKey: .showMedia)
+    id = try container.decode(ID36.self, forKey: .id)
+    userIsModerator = try container.decodeIfPresent(Bool.self, forKey: .userIsModerator)
+    over18 = try container.decodeIfPresent(Bool.self, forKey: .over18)
+    submitLinkLabel = try container.decodeIfPresent(String.self, forKey: .submitLinkLabel)
+    userFlairTextColor = try container.decodeIfPresent(String.self, forKey: .userFlairTextColor)
+    restrictCommenting = try container.decodeIfPresent(Bool.self, forKey: .restrictCommenting)
+    userFlairCssClass = try container.decodeIfPresent(String.self, forKey: .userFlairCssClass)
+    allowImages = try container.decodeIfPresent(Bool.self, forKey: .allowImages)
+    lang = try container.decodeIfPresent(String.self, forKey: .lang)
+    whitelistStatus = try container.decodeIfPresent(WhitelistStatus.self, forKey: .whitelistStatus)
+    url = try container.decode(URL.self, forKey: .url)
+    createdUtc = try container.decode(Date.self, forKey: .createdUtc)
+    bannerSize = try container.decodeIfPresent([Int].self, forKey: .bannerSize)
+    userIsContributor = try container.decodeIfPresent(Bool.self, forKey: .userIsContributor)
+  }
+
+  // MARK: Public
+
   public let userFlairBackgroundColor: String?
   /// The HTML formatted text that appears when submitting a new post to this subreddit
   /// - Note: `nil` if the subreddit is private and the current user does not have access, or if no submission text has been defined
@@ -209,110 +322,7 @@ public struct Subreddit: RedditObject {
   public let mobileBannerImage: URL?
   public let userIsContributor: Bool?
 
-  public init(from decoder: Decoder) throws {
-    let wrappedContainer = try? decoder.container(keyedBy: WrapperKeys.self)
-    let nestedContainer = try? wrappedContainer?.nestedContainer(keyedBy: CodingKeys.self, forKey: .data)
-
-    let unwrappedContainer = try? decoder.container(keyedBy: CodingKeys.self)
-
-    let container = nestedContainer != nil ? nestedContainer! : unwrappedContainer!
-
-    // For certain bool properties, Reddit returns null to indicate false
-    wikiEnabled = try container.decodeIfPresent(Bool.self, forKey: .wikiEnabled) ?? false
-    userCanFlairInSr = try container.decodeIfPresent(Bool.self, forKey: .userCanFlairInSr) ?? false
-    userSrFlairEnabled = try container.decodeIfPresent(Bool.self, forKey: .userSrFlairEnabled) ?? false
-    isCrosspostableSubreddit = try container.decodeIfPresent(Bool.self, forKey: .isCrosspostableSubreddit) ?? false
-
-    // When a URL property does not exist, Reddit returns the empty string
-    headerImg = try? container.decode(URL.self, forKey: .headerImg)
-    iconImg = try? container.decode(URL.self, forKey: .iconImg)
-    communityIcon = try? container.decode(URL.self, forKey: .communityIcon)
-    bannerBackgroundImage = try? container.decode(URL.self, forKey: .bannerBackgroundImage)
-    bannerImg = try? container.decode(URL.self, forKey: .bannerImg)
-    mobileBannerImage = try? container.decode(URL.self, forKey: .mobileBannerImage)
-
-    userFlairBackgroundColor = try container.decodeIfPresent(String.self, forKey: .userFlairBackgroundColor)
-    submitTextHtml = try container.decodeIfPresent(String.self, forKey: .submitTextHtml)
-    restrictPosting = try container.decodeIfPresent(Bool.self, forKey: .restrictPosting)
-    userIsBanned = try container.decodeIfPresent(Bool.self, forKey: .userIsBanned)
-    freeFormReports = try container.decodeIfPresent(Bool.self, forKey: .freeFormReports)
-    userIsMuted = try container.decodeIfPresent(Bool.self, forKey: .userIsMuted)
-    displayName = try container.decode(String.self, forKey: .displayName)
-    title = try container.decode(String.self, forKey: .title)
-    allowGalleries = try container.decodeIfPresent(Bool.self, forKey: .allowGalleries)
-    iconSize = try container.decodeIfPresent([Int].self, forKey: .iconSize)
-    primaryColor = try container.decodeIfPresent(String.self, forKey: .primaryColor)
-    activeUserCount = try container.decodeIfPresent(Int.self, forKey: .activeUserCount)
-    displayNamePrefixed = try container.decode(String.self, forKey: .displayNamePrefixed)
-    accountsActive = try container.decodeIfPresent(Int.self, forKey: .accountsActive)
-    publicTraffic = try container.decodeIfPresent(Bool.self, forKey: .publicTraffic)
-    subscribers = try container.decodeIfPresent(Int.self, forKey: .subscribers)
-    userFlairRichtext = try container.decode([String].self, forKey: .userFlairRichtext)
-    videostreamLinksCount = try container.decodeIfPresent(Int.self, forKey: .videostreamLinksCount)
-    name = try container.decode(Fullname.self, forKey: .name)
-    quarantine = try container.decodeIfPresent(Bool.self, forKey: .quarantine)
-    hideAds = try container.decodeIfPresent(Bool.self, forKey: .hideAds)
-    emojisEnabled = try container.decode(Bool.self, forKey: .emojisEnabled)
-    advertiserCategory = try container.decodeIfPresent(String.self, forKey: .advertiserCategory)
-    description = try container.decodeIfPresent(String.self, forKey: .description)
-    publicDescription = try container.decode(String.self, forKey: .publicDescription)
-    commentScoreHideMins = try container.decodeIfPresent(Int.self, forKey: .commentScoreHideMins)
-    userHasFavorited = try container.decodeIfPresent(Bool.self, forKey: .userHasFavorited)
-    userFlairTemplateId = try container.decodeIfPresent(UUID.self, forKey: .userFlairTemplateId)
-    originalContentTagEnabled = try container.decodeIfPresent(Bool.self, forKey: .originalContentTagEnabled)
-    submitText = try container.decodeIfPresent(String.self, forKey: .submitText)
-    descriptionHtml = try container.decodeIfPresent(String.self, forKey: .descriptionHtml)
-    spoilersEnabled = try container.decodeIfPresent(Bool.self, forKey: .spoilersEnabled)
-    headerTitle = try container.decodeIfPresent(String.self, forKey: .headerTitle)
-    headerSize = try container.decodeIfPresent([Int].self, forKey: .headerSize)
-    userFlairPosition = try container.decodeIfPresent(String.self, forKey: .userFlairPosition)
-    allOriginalContent = try container.decodeIfPresent(Bool.self, forKey: .allOriginalContent)
-    hasMenuWidget = try container.decode(Bool.self, forKey: .hasMenuWidget)
-    isEnrolledInNewModmail = try container.decodeIfPresent(Bool.self, forKey: .isEnrolledInNewModmail)
-    keyColor = try container.decodeIfPresent(String.self, forKey: .keyColor)
-    canAssignUserFlair = try container.decode(Bool.self, forKey: .canAssignUserFlair)
-    created = try container.decode(Date.self, forKey: .created)
-    wls = try container.decodeIfPresent(Int.self, forKey: .wls)
-    showMediaPreview = try container.decodeIfPresent(Bool.self, forKey: .showMediaPreview)
-    submissionType = try container.decodeIfPresent(SubmissionType.self, forKey: .submissionType)
-    userIsSubscriber = try container.decodeIfPresent(Bool.self, forKey: .userIsSubscriber)
-    disableContributorRequests = try container.decodeIfPresent(Bool.self, forKey: .disableContributorRequests)
-    allowVideogifs = try container.decode(Bool.self, forKey: .allowVideogifs)
-    userFlairType = try container.decode(String.self, forKey: .userFlairType)
-    allowPolls = try container.decodeIfPresent(Bool.self, forKey: .allowPolls)
-    collapseDeletedComments = try container.decodeIfPresent(Bool.self, forKey: .collapseDeletedComments)
-    emojisCustomSize = try container.decodeIfPresent([Int].self, forKey: .emojisCustomSize)
-    publicDescriptionHtml = try container.decodeIfPresent(String.self, forKey: .publicDescriptionHtml)
-    allowVideos = try container.decode(Bool.self, forKey: .allowVideos)
-    notificationLevel = try container.decodeIfPresent(NotificationLevel.self, forKey: .notificationLevel)
-    canAssignLinkFlair = try container.decode(Bool.self, forKey: .canAssignLinkFlair)
-    accountsActiveIsFuzzed = try container.decodeIfPresent(Bool.self, forKey: .accountsActiveIsFuzzed)
-    submitTextLabel = try container.decodeIfPresent(String.self, forKey: .submitTextLabel)
-    linkFlairPosition = try container.decodeIfPresent(String.self, forKey: .linkFlairPosition)
-    userFlairEnabledInSr = try container.decodeIfPresent(Bool.self, forKey: .userFlairEnabledInSr)
-    allowDiscovery = try container.decodeIfPresent(Bool.self, forKey: .allowDiscovery)
-    userSrThemeEnabled = try container.decodeIfPresent(Bool.self, forKey: .userSrThemeEnabled)
-    linkFlairEnabled = try container.decodeIfPresent(Bool.self, forKey: .linkFlairEnabled)
-    subredditType = try container.decode(SubredditType.self, forKey: .subredditType)
-    suggestedCommentSort = try container.decodeIfPresent(CommentsSort.self, forKey: .suggestedCommentSort)
-    userFlairText = try container.decodeIfPresent(String.self, forKey: .userFlairText)
-    bannerBackgroundColor = try container.decodeIfPresent(String.self, forKey: .bannerBackgroundColor)
-    showMedia = try container.decodeIfPresent(Bool.self, forKey: .showMedia)
-    id = try container.decode(ID36.self, forKey: .id)
-    userIsModerator = try container.decodeIfPresent(Bool.self, forKey: .userIsModerator)
-    over18 = try container.decodeIfPresent(Bool.self, forKey: .over18)
-    submitLinkLabel = try container.decodeIfPresent(String.self, forKey: .submitLinkLabel)
-    userFlairTextColor = try container.decodeIfPresent(String.self, forKey: .userFlairTextColor)
-    restrictCommenting = try container.decodeIfPresent(Bool.self, forKey: .restrictCommenting)
-    userFlairCssClass = try container.decodeIfPresent(String.self, forKey: .userFlairCssClass)
-    allowImages = try container.decodeIfPresent(Bool.self, forKey: .allowImages)
-    lang = try container.decodeIfPresent(String.self, forKey: .lang)
-    whitelistStatus = try container.decodeIfPresent(WhitelistStatus.self, forKey: .whitelistStatus)
-    url = try container.decode(URL.self, forKey: .url)
-    createdUtc = try container.decode(Date.self, forKey: .createdUtc)
-    bannerSize = try container.decodeIfPresent([Int].self, forKey: .bannerSize)
-    userIsContributor = try container.decodeIfPresent(Bool.self, forKey: .userIsContributor)
-  }
+  // MARK: Private
 
   private enum WrapperKeys: String, CodingKey {
     case kind

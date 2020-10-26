@@ -18,12 +18,34 @@ import Foundation
 
 /// A user defined multireddit
 public struct Multireddit: RedditObject {
-  public static func == (lhs: Multireddit, rhs: Multireddit) -> Bool {
-    lhs.id == rhs.id &&
-      lhs.descriptionMd == rhs.descriptionMd &&
-      lhs.visibility == rhs.visibility &&
-      lhs.subreddits == rhs.subreddits
+  // MARK: Lifecycle
+
+  public init(from decoder: Decoder) throws {
+    let wrappedContainer = try? decoder.container(keyedBy: WrapperKeys.self).nestedContainer(keyedBy: CodingKeys.self, forKey: .data)
+    let workingContainer = wrappedContainer != nil ? wrappedContainer! : try decoder.container(keyedBy: CodingKeys.self)
+
+    canEdit = try workingContainer.decode(Bool.self, forKey: .canEdit)
+    displayName = try workingContainer.decode(String.self, forKey: .displayName)
+    name = try workingContainer.decode(String.self, forKey: .name)
+    descriptionHtml = try workingContainer.decode(String.self, forKey: .descriptionHtml)
+    subscriberCount = try workingContainer.decode(Int.self, forKey: .subscriberCount)
+    copiedFrom = try workingContainer.decodeIfPresent(URL.self, forKey: .copiedFrom)
+    iconUrl = try workingContainer.decode(URL.self, forKey: .iconUrl)
+    subreddits = try workingContainer.decode([MultiSubreddit].self, forKey: .subreddits)
+    createdUtc = try workingContainer.decode(Date.self, forKey: .createdUtc)
+    visibility = try workingContainer.decode(Visibility.self, forKey: .visibility)
+    created = try workingContainer.decode(Date.self, forKey: .created)
+    over18 = try workingContainer.decodeIfPresent(Bool.self, forKey: .over18)
+    path = try workingContainer.decode(URL.self, forKey: .path)
+    owner = try workingContainer.decode(String.self, forKey: .owner)
+    isSubscriber = try workingContainer.decode(Bool.self, forKey: .isSubscriber)
+    ownerId = try workingContainer.decode(Fullname.self, forKey: .ownerId)
+    descriptionMd = try workingContainer.decode(String.self, forKey: .descriptionMd)
+    isFavorited = try workingContainer.decode(Bool.self, forKey: .isFavorited)
+    id = path.absoluteString
   }
+
+  // MARK: Public
 
   /// A `Multireddit`'s different possible visibility levels
   public enum Visibility: String, Codable {
@@ -32,8 +54,13 @@ public struct Multireddit: RedditObject {
     case hidden
   }
 
-  public func hash(into hasher: inout Hasher) {
-    hasher.combine(id)
+  /// Trivial struct for deserializing the list of member `Subreddits` returned from the `Multireddit` API
+  public struct MultiSubreddit: Codable, Identifiable, Equatable {
+    public let name: String
+
+    public var id: String {
+      name
+    }
   }
 
   public let id: String
@@ -71,6 +98,19 @@ public struct Multireddit: RedditObject {
   /// Whether the current user has favorited the `MultiReddit`
   public let isFavorited: Bool
 
+  public static func == (lhs: Multireddit, rhs: Multireddit) -> Bool {
+    lhs.id == rhs.id &&
+      lhs.descriptionMd == rhs.descriptionMd &&
+      lhs.visibility == rhs.visibility &&
+      lhs.subreddits == rhs.subreddits
+  }
+
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(id)
+  }
+
+  // MARK: Internal
+
   enum CodingKeys: String, CodingKey {
     case canEdit = "can_edit"
     case displayName = "display_name"
@@ -93,42 +133,10 @@ public struct Multireddit: RedditObject {
     case isFavorited = "is_favorited"
   }
 
+  // MARK: Private
+
   private enum WrapperKeys: String, CodingKey {
     case kind
     case data
-  }
-
-  public init(from decoder: Decoder) throws {
-    let wrappedContainer = try? decoder.container(keyedBy: WrapperKeys.self).nestedContainer(keyedBy: CodingKeys.self, forKey: .data)
-    let workingContainer = wrappedContainer != nil ? wrappedContainer! : try decoder.container(keyedBy: CodingKeys.self)
-
-    canEdit = try workingContainer.decode(Bool.self, forKey: .canEdit)
-    displayName = try workingContainer.decode(String.self, forKey: .displayName)
-    name = try workingContainer.decode(String.self, forKey: .name)
-    descriptionHtml = try workingContainer.decode(String.self, forKey: .descriptionHtml)
-    subscriberCount = try workingContainer.decode(Int.self, forKey: .subscriberCount)
-    copiedFrom = try workingContainer.decodeIfPresent(URL.self, forKey: .copiedFrom)
-    iconUrl = try workingContainer.decode(URL.self, forKey: .iconUrl)
-    subreddits = try workingContainer.decode([MultiSubreddit].self, forKey: .subreddits)
-    createdUtc = try workingContainer.decode(Date.self, forKey: .createdUtc)
-    visibility = try workingContainer.decode(Visibility.self, forKey: .visibility)
-    created = try workingContainer.decode(Date.self, forKey: .created)
-    over18 = try workingContainer.decodeIfPresent(Bool.self, forKey: .over18)
-    path = try workingContainer.decode(URL.self, forKey: .path)
-    owner = try workingContainer.decode(String.self, forKey: .owner)
-    isSubscriber = try workingContainer.decode(Bool.self, forKey: .isSubscriber)
-    ownerId = try workingContainer.decode(Fullname.self, forKey: .ownerId)
-    descriptionMd = try workingContainer.decode(String.self, forKey: .descriptionMd)
-    isFavorited = try workingContainer.decode(Bool.self, forKey: .isFavorited)
-    id = path.absoluteString
-  }
-
-  /// Trivial struct for deserializing the list of member `Subreddits` returned from the `Multireddit` API
-  public struct MultiSubreddit: Codable, Identifiable, Equatable {
-    public var id: String {
-      name
-    }
-
-    public let name: String
   }
 }

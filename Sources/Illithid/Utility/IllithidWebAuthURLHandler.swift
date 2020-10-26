@@ -17,15 +17,21 @@ import Foundation
 
 import OAuthSwift
 
+// MARK: - IllithidWebAuthURLHandler
+
 final class IllithidWebAuthURLHandler: OAuthSwiftURLHandlerType {
-  var webAuthSession: ASWebAuthenticationSession!
-  let callbackURLScheme: String
-  let anchor: ASWebAuthenticationPresentationContextProviding
+  // MARK: Lifecycle
 
   init(callbackURLScheme: String, anchor: ASWebAuthenticationPresentationContextProviding) {
     self.callbackURLScheme = callbackURLScheme
     self.anchor = anchor
   }
+
+  // MARK: Internal
+
+  var webAuthSession: ASWebAuthenticationSession!
+  let callbackURLScheme: String
+  let anchor: ASWebAuthenticationPresentationContextProviding
 
   func handle(_ url: URL) {
     webAuthSession = ASWebAuthenticationSession(url: url, callbackURLScheme: callbackURLScheme) { callback, error in
@@ -42,6 +48,8 @@ final class IllithidWebAuthURLHandler: OAuthSwiftURLHandlerType {
     _ = webAuthSession.start()
   }
 }
+
+// MARK: - NSWindow + ASWebAuthenticationPresentationContextProviding
 
 extension NSWindow: ASWebAuthenticationPresentationContextProviding {
   public func presentationAnchor(for _: ASWebAuthenticationSession) -> ASPresentationAnchor {

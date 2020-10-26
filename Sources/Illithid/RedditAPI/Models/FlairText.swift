@@ -14,14 +14,20 @@
 
 import Foundation
 
+// MARK: - FlairType
+
 /// Whether the flair is plaintext or richtext
 public enum FlairType: String, Codable {
   case text
   case richtext
 }
 
+// MARK: - FlairRichtext
+
 /// A richtext chunk containing either plaintext, or an emoji and its URL
 public struct FlairRichtext: Codable {
+  // MARK: Public
+
   public enum RichtextType: String, Codable {
     case text
     case emoji
@@ -31,6 +37,8 @@ public struct FlairRichtext: Codable {
   public let emojiUrl: URL?
   public let type: RichtextType
   public let text: String?
+
+  // MARK: Internal
 
   enum CodingKeys: String, CodingKey {
     case type = "e"

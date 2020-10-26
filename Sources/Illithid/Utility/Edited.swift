@@ -17,7 +17,7 @@ import Foundation
 /// The Reddit API returns either `false` or a UTC timestamp for this field, so if we can decode a Bool it has not been edited,
 /// otherwise we should deocde the edited date
 public struct Edited: Codable {
-  public let on: Date?
+  // MARK: Lifecycle
 
   public init(from decoder: Decoder) throws {
     let container = try decoder.singleValueContainer()
@@ -29,6 +29,10 @@ public struct Edited: Codable {
       on = try container.decode(Date.self)
     }
   }
+
+  // MARK: Public
+
+  public let on: Date?
 
   public func encode(to encoder: Encoder) throws {
     var container = encoder.singleValueContainer()

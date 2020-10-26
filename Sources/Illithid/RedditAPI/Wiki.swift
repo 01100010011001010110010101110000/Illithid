@@ -19,8 +19,12 @@ import Foundation
 
 import Alamofire
 
+// MARK: - WikiRouter
+
 enum WikiRouter: URLRequestConvertible, URLConvertible, MirrorableEnum {
   case pages(ofSubreddit: String)
+
+  // MARK: Internal
 
   var path: String {
     switch self {

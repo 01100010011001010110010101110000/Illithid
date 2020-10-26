@@ -14,12 +14,18 @@
 
 import Foundation
 
+// MARK: - GalleryDataItem
+
 /// The object representing the ordered gallery view. The Media IDs here should be tied back to the post's `MediaMetadata` to get the content for each item
 public struct GalleryDataItem: Codable, Identifiable {
+  // MARK: Public
+
   public let id: Int
   public let mediaId: String
   public let caption: String?
   public let outboundUrl: URL?
+
+  // MARK: Private
 
   private enum CodingKeys: String, CodingKey {
     case id
@@ -28,6 +34,8 @@ public struct GalleryDataItem: Codable, Identifiable {
     case outboundUrl = "outbound_url"
   }
 }
+
+// MARK: - GalleryData
 
 public struct GalleryData: Codable {
   public let items: [GalleryDataItem]
