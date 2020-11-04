@@ -91,13 +91,97 @@ public enum PostHint: String, Codable {
 // MARK: - Post
 
 public struct Post: RedditObject {
-  public static func == (lhs: Post, rhs: Post) -> Bool {
-    lhs.name == rhs.name
+  // MARK: Lifecycle
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+
+    ups = try container.decode(Int.self, forKey: .ups)
+    authorFlairType = try container.decodeIfPresent(FlairType.self, forKey: .authorFlairType)
+    removalReason = try container.decodeIfPresent(String.self, forKey: .removalReason)
+    likes = try container.decodeIfPresent(Bool.self, forKey: .likes)
+    noFollow = try container.decode(Bool.self, forKey: .noFollow)
+    saved = try container.decode(Bool.self, forKey: .saved)
+    id = try container.decode(ID36.self, forKey: .id)
+    url = try container.decode(String.self, forKey: .url)
+    gilded = try container.decode(Int.self, forKey: .gilded)
+    archived = try container.decode(Bool.self, forKey: .archived)
+    author = try container.decode(String.self, forKey: .author)
+    sendReplies = try container.decode(Bool.self, forKey: .sendReplies)
+    score = try container.decode(Int.self, forKey: .score)
+    authorFullname = try container.decodeIfPresent(String.self, forKey: .authorFullname)
+    allAwardings = try container.decode([Award].self, forKey: .allAwardings)
+    subredditId = try container.decode(String.self, forKey: .subredditId)
+    edited = try container.decode(Edited.self, forKey: .edited)
+    downs = try container.decode(Int.self, forKey: .downs)
+    authorFlairRichtext = try container.decodeIfPresent([FlairRichtext].self, forKey: .authorFlairRichtext)
+    authorFlairTextColor = try container.decodeIfPresent(FlairTextColor.self, forKey: .authorFlairTextColor)
+    stickied = try container.decode(Bool.self, forKey: .stickied)
+    canGild = try container.decode(Bool.self, forKey: .canGild)
+//    let gildings = try? container.decode([Any = try? container.decode(Any]
+    permalink = try container.decode(String.self, forKey: .permalink)
+    numReports = try container.decodeIfPresent(Int.self, forKey: .numReports)
+    locked = try container.decode(Bool.self, forKey: .locked)
+    name = try container.decode(String.self, forKey: .name)
+    created = try container.decode(Date.self, forKey: .created)
+    subreddit = try container.decode(String.self, forKey: .subreddit)
+    authorFlairText = try container.decodeIfPresent(String.self, forKey: .authorFlairText)
+    createdUtc = try container.decode(Date.self, forKey: .createdUtc)
+    subredditNamePrefixed = try container.decode(String.self, forKey: .subredditNamePrefixed)
+    authorFlairBackgroundColor = try container.decodeIfPresent(String.self, forKey: .authorFlairBackgroundColor)
+    distinguished = try container.decodeIfPresent(String.self, forKey: .distinguished)
+    contentCategories = try container.decodeIfPresent([String].self, forKey: .contentCategories)
+
+    selftext = try container.decode(String.self, forKey: .selftext)
+    selftextHtml = try container.decodeIfPresent(String.self, forKey: .selftextHtml)
+    attributedSelfText = NSMutableAttributedString(html: Data((selftextHtml ?? "").utf8), options: [
+      .documentType: NSAttributedString.DocumentType.html,
+      .characterEncoding: NSNumber(value: String.Encoding.utf8.rawValue),
+    ], documentAttributes: nil) ?? NSAttributedString()
+
+    media = try container.decodeIfPresent(PostMedia.self, forKey: .media)
+    secureMedia = try container.decodeIfPresent(PostMedia.self, forKey: .secureMedia)
+    domain = try container.decode(String.self, forKey: .domain)
+    title = try container.decode(String.self, forKey: .title)
+    linkFlairText = try container.decodeIfPresent(String.self, forKey: .linkFlairText)
+    linkFlairType = try container.decodeIfPresent(FlairType.self, forKey: .linkFlairType)
+    linkFlairRichtext = try container.decodeIfPresent([FlairRichtext].self, forKey: .linkFlairRichtext)
+    linkFlairTextColor = try container.decodeIfPresent(FlairTextColor.self, forKey: .linkFlairTextColor)
+    linkFlairBackgroundColor = try container.decode(String.self, forKey: .linkFlairBackgroundColor)
+
+    thumbnailHeight = try container.decodeIfPresent(Int.self, forKey: .thumbnailHeight)
+    thumbnailWidth = try container.decodeIfPresent(Int.self, forKey: .thumbnailWidth)
+    thumbnail = try container.decodeIfPresent(URL.self, forKey: .thumbnail)
+    preview = try container.decodeIfPresent(Preview.self, forKey: .preview)
+
+    over18 = try container.decode(Bool.self, forKey: .over18)
+    isOriginalContent = try container.decode(Bool.self, forKey: .isOriginalContent)
+    isMeta = try container.decode(Bool.self, forKey: .isMeta)
+    isSelf = try container.decode(Bool.self, forKey: .isSelf)
+    isGallery = try container.decodeIfPresent(Bool.self, forKey: .isGallery)
+    galleryData = try container.decodeIfPresent(GalleryData.self, forKey: .galleryData)
+    mediaMetadata = try container.decodeIfPresent([String: MediaMetadata].self, forKey: .mediaMetadata)
+
+    subredditSubscribers = try container.decode(Int.self, forKey: .subredditSubscribers)
+    clicked = try container.decode(Bool.self, forKey: .clicked)
+    numComments = try container.decode(Int.self, forKey: .numComments)
+    upvoteRatio = try container.decodeIfPresent(Float.self, forKey: .upvoteRatio)
+    crosspostParent = try container.decodeIfPresent(Fullname.self, forKey: .crosspostParent)
+    crosspostParentList = try container.decodeIfPresent([Post].self, forKey: .crosspostParentList)
+    isCrosspostable = try container.decode(Bool.self, forKey: .isCrosspostable)
+    numCrossposts = try container.decode(Int.self, forKey: .numCrossposts)
+
+    suggestedSort = try container.decodeIfPresent(CommentsSort.self, forKey: .suggestedSort)
+    postHint = try container.decodeIfPresent(PostHint.self, forKey: .postHint)
+    mediaOnly = try container.decode(Bool.self, forKey: .mediaOnly)
+    spoiler = try container.decode(Bool.self, forKey: .spoiler)
+    visited = try container.decode(Bool.self, forKey: .visited)
+    contestMode = try container.decode(Bool.self, forKey: .contestMode)
+    isVideo = try container.decode(Bool.self, forKey: .isVideo)
+    pinned = try container.decode(Bool.self, forKey: .pinned)
   }
 
-  public func hash(into hasher: inout Hasher) {
-    hasher.combine(name)
-  }
+  // MARK: Public
 
   public let id: ID36
   public let name: Fullname
@@ -109,6 +193,7 @@ public struct Post: RedditObject {
 
   public let selftext: String
   public let selftextHtml: String?
+  public let attributedSelfText: NSAttributedString
   public let secureMedia: PostMedia?
   public let media: PostMedia?
   public let domain: String
@@ -116,10 +201,6 @@ public struct Post: RedditObject {
   public let title: String
   public let authorFullname: String?
   public let author: String
-  public var authorPrefixed: String {
-    "u/\(author)"
-  }
-
   public let authorFlairTextColor: FlairTextColor?
   public let authorFlairText: String?
   public let authorFlairType: FlairType?
@@ -130,23 +211,6 @@ public struct Post: RedditObject {
   public let linkFlairRichtext: [FlairRichtext]?
   public let linkFlairTextColor: FlairTextColor?
   public let linkFlairBackgroundColor: String
-
-  /// The string value returned by the Reddit API for the URL attribute
-  private let url: String
-  /// The computed `URL`, derived from `self.url`
-  public var contentUrl: URL {
-    if let unwrapped = URL(string: url) {
-      return unwrapped
-    } else {
-      // This is ugly, but I will keep it for the time being under the assumption that non-encoded URLs are the only
-      // pathological case for this property
-      return URL(string: url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)!
-    }
-  }
-
-  public var postUrl: URL {
-    URL(string: permalink, relativeTo: Illithid.shared.redditBrowserUrl)!
-  }
 
   public var saved: Bool
 
@@ -200,6 +264,29 @@ public struct Post: RedditObject {
   public let removalReason: String?
   public let sendReplies: Bool
   public let distinguished: String?
+  public let contestMode: Bool
+  public let createdUtc: Date
+  public let isVideo: Bool
+
+  public var authorPrefixed: String {
+    "u/\(author)"
+  }
+
+  /// The computed `URL`, derived from `self.url`
+  public var contentUrl: URL {
+    if let unwrapped = URL(string: url) {
+      return unwrapped
+    } else {
+      // This is ugly, but I will keep it for the time being under the assumption that non-encoded URLs are the only
+      // pathological case for this property
+      return URL(string: url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)!
+    }
+  }
+
+  public var postUrl: URL {
+    URL(string: permalink, relativeTo: Illithid.shared.redditBrowserUrl)!
+  }
+
   public var isAdminPost: Bool {
     distinguished?.contains("admin") ?? false
   }
@@ -208,9 +295,15 @@ public struct Post: RedditObject {
     author == "[deleted]"
   }
 
-  public let contestMode: Bool
-  public let createdUtc: Date
-  public let isVideo: Bool
+  public static func == (lhs: Post, rhs: Post) -> Bool {
+    lhs.name == rhs.name
+  }
+
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(name)
+  }
+
+  // MARK: Private
 
   private enum CodingKeys: String, CodingKey {
     case id
@@ -286,6 +379,9 @@ public struct Post: RedditObject {
     case createdUtc = "created_utc"
     case isVideo = "is_video"
   }
+
+  /// The string value returned by the Reddit API for the URL attribute
+  private let url: String
 }
 
 public extension Post {
