@@ -99,6 +99,10 @@ public struct Post: RedditObject {
     ups = try container.decode(Int.self, forKey: .ups)
     authorFlairType = try container.decodeIfPresent(FlairType.self, forKey: .authorFlairType)
     removalReason = try container.decodeIfPresent(String.self, forKey: .removalReason)
+    removedBy = try container.decodeIfPresent(String.self, forKey: .removedBy)
+    removedByCategory = try container.decodeIfPresent(RemovedByCategory.self, forKey: .removedByCategory)
+    bannedBy = try container.decodeIfPresent(String.self, forKey: .bannedBy)
+    bannedAtUtc = try container.decodeIfPresent(Date.self, forKey: .bannedAtUtc)
     likes = try container.decodeIfPresent(Bool.self, forKey: .likes)
     noFollow = try container.decode(Bool.self, forKey: .noFollow)
     saved = try container.decode(Bool.self, forKey: .saved)
@@ -169,6 +173,7 @@ public struct Post: RedditObject {
     crosspostParent = try container.decodeIfPresent(Fullname.self, forKey: .crosspostParent)
     crosspostParentList = try container.decodeIfPresent([Post].self, forKey: .crosspostParentList)
     isCrosspostable = try container.decode(Bool.self, forKey: .isCrosspostable)
+    duplicates = try container.decodeIfPresent(Int.self, forKey: .duplicates)
     numCrossposts = try container.decode(Int.self, forKey: .numCrossposts)
 
     suggestedSort = try container.decodeIfPresent(CommentsSort.self, forKey: .suggestedSort)
@@ -242,6 +247,7 @@ public struct Post: RedditObject {
   public let upvoteRatio: Float?
   public let crosspostParent: Fullname?
   public let crosspostParentList: [Post]?
+  public let duplicates: Int?
   public let numCrossposts: Int
   public let permalink: String
   public let contentCategories: [String]?
@@ -262,6 +268,11 @@ public struct Post: RedditObject {
   public let visited: Bool
   public let numReports: Int?
   public let removalReason: String?
+  public let removedBy: String?
+  public let removedByCategory: RemovedByCategory?
+  /// The account name of the moder who removed the post. Only non-`nil` if you are a moderator of the post's subreddit
+  public let bannedBy: String?
+  public let bannedAtUtc: Date?
   public let sendReplies: Bool
   public let distinguished: String?
   public let contestMode: Bool
@@ -348,6 +359,7 @@ public struct Post: RedditObject {
     case subredditSubscribers = "subreddit_subscribers"
     case clicked
     case created
+    case duplicates = "num_duplicates"
     case numComments = "num_comments"
     case upvoteRatio = "upvote_ratio"
     case crosspostParent = "crosspost_parent"
@@ -373,6 +385,10 @@ public struct Post: RedditObject {
     case visited
     case numReports = "num_reports"
     case removalReason = "removal_reason"
+    case removedBy = "removed_by"
+    case removedByCategory = "removed_by_category"
+    case bannedBy = "banned_by"
+    case bannedAtUtc = "banned_at_utc"
     case sendReplies = "send_replies"
     case distinguished
     case contestMode = "contest_mode"
@@ -429,6 +445,12 @@ public extension Post {
     } else {
       return []
     }
+  }
+}
+
+public extension Post {
+  enum RemovedByCategory: String, Codable {
+    case moderator
   }
 }
 
