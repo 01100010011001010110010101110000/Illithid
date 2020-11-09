@@ -84,8 +84,8 @@ internal extension Illithid {
   ///   - completion: The function to call upon fetching a `Listing`
   @discardableResult
   func readListing(url: Alamofire.URLConvertible, queryParameters: Parameters? = nil,
-                   listingParameters: ListingParameters = .init(), queue: DispatchQueue = .main,
-                   completion: @escaping (Result<Listing, AFError>) -> Void)
+                   listingParameters: ListingParameters = .init(), redirectHandler: Redirector = .follow,
+                   queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void)
     -> DataRequest {
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
 
@@ -93,6 +93,7 @@ internal extension Illithid {
       .merging(queryParameters ?? [:], uniquingKeysWith: { $1 })
 
     return session.request(url, method: .get, parameters: _parameters, encoding: queryEncoding)
+      .redirect(using: redirectHandler)
       .validate()
       .responseDecodable(of: Listing.self, queue: queue, decoder: decoder) { request in
         if case let .failure(error) = request.result {
@@ -103,10 +104,11 @@ internal extension Illithid {
   }
 
   @discardableResult
-  func readListing(request: Alamofire.URLRequestConvertible, queue: DispatchQueue = .main,
-                   completion: @escaping (Result<Listing, AFError>) -> Void)
+  func readListing(request: Alamofire.URLRequestConvertible, redirectHandler: Redirector = .follow,
+                   queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void)
     -> DataRequest {
     session.request(request)
+      .redirect(using: redirectHandler)
       .validate()
       .responseDecodable(of: Listing.self, queue: queue, decoder: decoder) { completion($0.result) }
   }
@@ -117,8 +119,8 @@ internal extension Illithid {
   ///   - queue: The `DispatchQueue` in which `completion` will run
   ///   - completion: The function to call upon fetching all `Listings`
   /// - Warning: If this method is called on a large endpoint, like the endpoint for fetching subreddits, this method may take a very long time to terminate or not terminate at all
-  func readAllListings(url: Alamofire.URLConvertible, queue: DispatchQueue = .main,
-                       completion: @escaping (Result<[Listing], AFError>) -> Void) {
+  func readAllListings(url: Alamofire.URLConvertible, redirectHandler: Redirector = .follow,
+                       queue: DispatchQueue = .main, completion: @escaping (Result<[Listing], AFError>) -> Void) {
     var results: [Listing] = []
     var parameters: Parameters = ["after": ""] {
       didSet {
@@ -126,7 +128,7 @@ internal extension Illithid {
           completion(.success(results))
           return
         }
-        readListing(url: url, queryParameters: parameters, queue: queue) { result in
+        readListing(url: url, queryParameters: parameters, redirectHandler: redirectHandler, queue: queue) { result in
           switch result {
           case let .success(listing):
             results.append(listing)
@@ -139,7 +141,7 @@ internal extension Illithid {
         }
       }
     }
-    readListing(url: url, queue: queue) { result in
+    readListing(url: url, redirectHandler: redirectHandler, queue: queue) { result in
       switch result {
       case let .success(listing):
         results.append(listing)

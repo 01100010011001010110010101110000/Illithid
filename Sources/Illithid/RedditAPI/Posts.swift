@@ -29,6 +29,21 @@ enum PostRouter: URLConvertible {
 
   // MARK: Internal
 
+  /// The AF redirector to use when fetching posts from `FrontPage` objects.
+  /// This adds the contents of the `Authorization` header to the redirected request if we are still talking to Reddit's authenticated endpoint.
+  ///
+  /// - Remark: This is necessary to handle `FrontPage.random`, because Reddit handles that endpoint by replying with an HTTP 302 to a random subreddit,
+  /// and without the `Authorization` header, we receive a 403 when following the redirect.
+  static let frontPageRedirector = Redirector(behavior: .modify({ (task, request, _) -> URLRequest? in
+    if request.url?.host == "oauth.reddit.com",
+       let authzHeader = task.originalRequest?.headers["Authorization"] {
+      var newRequest = request
+      newRequest.setValue(authzHeader, forHTTPHeaderField: "Authorization")
+      return newRequest
+    }
+    return request
+  }))
+
   func asURL() throws -> URL {
     switch self {
     case let .subreddit(displayName, sort):
@@ -92,7 +107,7 @@ public extension Illithid {
     if let interval = topInterval { parameters["t"] = interval }
     if let location = location { parameters["g"] = location }
 
-    return readListing(url: url, queryParameters: parameters, queue: queue) { result in
+    return readListing(url: url, queryParameters: parameters, redirectHandler: PostRouter.frontPageRedirector, queue: queue) { result in
       completion(result)
     }
   }
