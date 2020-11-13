@@ -1,12 +1,22 @@
+// Copyright (C) 2020 Tyler Gregory (@01100010011001010110010101110000)
 //
-// OAuthSwiftRequestAdapter.swift
-// Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
+// This program is free software: you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later
+// version.
 //
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of  MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with
+// this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import Alamofire
 import Foundation
 import OAuthSwift
+
+// MARK: - IllithidRedditRequestInterceptor
 
 final class IllithidRedditRequestInterceptor: OAuthSwift2RequestInterceptor {
   override func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, Error>) -> Void) {
@@ -27,18 +37,17 @@ final class IllithidRedditRequestInterceptor: OAuthSwift2RequestInterceptor {
   }
 }
 
+// MARK: - OAuthSwiftRequestInterceptor
+
 /// Add authentification headers from OAuthSwift to Alamofire request
 open class OAuthSwiftRequestInterceptor: RequestInterceptor {
-  fileprivate let oauthSwift: OAuthSwift
-  public var paramsLocation: OAuthSwiftHTTPRequest.ParamsLocation = .authorizationHeader
-  public var dataEncoding: String.Encoding = .utf8
-  public var retryLimit = 1
-
-  fileprivate var requestsToRetry: [(RetryResult) -> Void] = []
+  // MARK: Lifecycle
 
   public init(_ oauthSwift: OAuthSwift) {
     self.oauthSwift = oauthSwift
   }
+
+  // MARK: Open
 
   open func adapt(_ urlRequest: URLRequest, for _: Session, completion: @escaping (Result<URLRequest, Error>) -> Void) {
     var config = OAuthSwiftHTTPRequest.Config(
@@ -58,19 +67,31 @@ open class OAuthSwiftRequestInterceptor: RequestInterceptor {
   open func retry(_: Request, for _: Session, dueTo _: Error, completion: @escaping (RetryResult) -> Void) {
     completion(.doNotRetry)
   }
+
+  // MARK: Public
+
+  public var paramsLocation: OAuthSwiftHTTPRequest.ParamsLocation = .authorizationHeader
+  public var dataEncoding: String.Encoding = .utf8
+  public var retryLimit = 1
+
+  // MARK: Fileprivate
+
+  fileprivate let oauthSwift: OAuthSwift
+  fileprivate var requestsToRetry: [(RetryResult) -> Void] = []
 }
 
+// MARK: - OAuthSwift2RequestInterceptor
+
 open class OAuthSwift2RequestInterceptor: OAuthSwiftRequestInterceptor {
+  // MARK: Lifecycle
+
   public init(_ oauthSwift: OAuth2Swift) {
     super.init(oauthSwift)
   }
 
-  fileprivate var oauth2Swift: OAuth2Swift { oauthSwift as! OAuth2Swift }
+  // MARK: Open
 
-  private let lock = NSLock() // lock required to manage requestToRetry access
-  private var isRefreshing = false
-
-  open override func retry(_ request: Request, for _: Session, dueTo error: Error, completion: @escaping (RetryResult) -> Void) {
+  override open func retry(_ request: Request, for _: Session, dueTo error: Error, completion: @escaping (RetryResult) -> Void) {
     lock.lock(); defer { lock.unlock() }
 
     if mustRetry(request: request, dueTo: error) {
@@ -109,6 +130,15 @@ open class OAuthSwift2RequestInterceptor: OAuthSwiftRequestInterceptor {
     }
     return false
   }
+
+  // MARK: Fileprivate
+
+  fileprivate var oauth2Swift: OAuth2Swift { oauthSwift as! OAuth2Swift }
+
+  // MARK: Private
+
+  private let lock = NSLock() // lock required to manage requestToRetry access
+  private var isRefreshing = false
 
   private func refreshTokens(completion: @escaping (Result<Void, Error>) -> Void) {
     guard !isRefreshing else { return }

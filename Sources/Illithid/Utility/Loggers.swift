@@ -1,27 +1,37 @@
+// Copyright (C) 2020 Tyler Gregory (@01100010011001010110010101110000)
 //
-// Loggers.swift
-// Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
+// This program is free software: you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later
+// version.
 //
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of  MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with
+// this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import Foundation
 
 import Willow
 
-extension Logger {
-  public static func debugLogger() -> Logger {
+public extension Logger {
+  static func debugLogger() -> Logger {
     let consoleWriter = ConsoleWriter(modifiers: [EmojiModifier(), TimestampModifier()])
     return Logger(logLevels: [.all], writers: [consoleWriter],
                   executionMethod: .synchronous(lock: NSRecursiveLock()))
   }
 
-  public static func releaseLogger(subsystem: String, logLevels: LogLevel = .event) -> Logger {
+  static func releaseLogger(subsystem: String, logLevels: LogLevel = .event) -> Logger {
     let writer = OSLogWriter(subsystem: subsystem,
                              category: "release", modifiers: [LevelLabelModifier(), TimestampModifier()])
     return Logger(logLevels: logLevels, writers: [writer],
                   executionMethod: .asynchronous(queue: DispatchQueue(label: "\(subsystem).log", qos: .utility)))
   }
 }
+
+// MARK: - EmojiModifier
 
 public struct EmojiModifier: LogModifier {
   /**
@@ -48,6 +58,8 @@ public struct EmojiModifier: LogModifier {
     }
   }
 }
+
+// MARK: - LevelLabelModifier
 
 public struct LevelLabelModifier: LogModifier {
   /**

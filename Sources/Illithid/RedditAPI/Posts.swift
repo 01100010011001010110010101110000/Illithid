@@ -1,8 +1,16 @@
+// Copyright (C) 2020 Tyler Gregory (@01100010011001010110010101110000)
 //
-// Posts.swift
-// Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
+// This program is free software: you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later
+// version.
 //
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of  MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with
+// this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #if canImport(Combine)
   import Combine
@@ -12,14 +20,29 @@ import Foundation
 import Alamofire
 import Willow
 
+// MARK: - PostRouter
+
 enum PostRouter: URLConvertible {
   case subreddit(displayName: String, sort: PostSort)
   case userMultireddit(username: String, multiName: String, sort: PostSort)
   case frontPage(page: FrontPage, sort: PostSort)
 
-  private var baseUrl: URL {
-    Illithid.shared.baseURL
-  }
+  // MARK: Internal
+
+  /// The AF redirector to use when fetching posts from `FrontPage` objects.
+  /// This adds the contents of the `Authorization` header to the redirected request if we are still talking to Reddit's authenticated endpoint.
+  ///
+  /// - Remark: This is necessary to handle `FrontPage.random`, because Reddit handles that endpoint by replying with an HTTP 302 to a random subreddit,
+  /// and without the `Authorization` header, we receive a 403 when following the redirect.
+  static let frontPageRedirector = Redirector(behavior: .modify({ (task, request, _) -> URLRequest? in
+    if request.url?.host == "oauth.reddit.com",
+       let authzHeader = task.originalRequest?.headers["Authorization"] {
+      var newRequest = request
+      newRequest.setValue(authzHeader, forHTTPHeaderField: "Authorization")
+      return newRequest
+    }
+    return request
+  }))
 
   func asURL() throws -> URL {
     switch self {
@@ -31,6 +54,12 @@ enum PostRouter: URLConvertible {
       return try page.asURL().appendingPathComponent("\(sort)")
     }
   }
+
+  // MARK: Private
+
+  private var baseUrl: URL {
+    Illithid.shared.baseURL
+  }
 }
 
 public extension Illithid {
@@ -38,7 +67,8 @@ public extension Illithid {
   func fetchPosts(for subreddit: Subreddit, sortBy postSort: PostSort,
                   location: Location? = nil, topInterval: TopInterval? = nil,
                   params: ListingParameters = .init(), queue: DispatchQueue = .main,
-                  completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+                  completion: @escaping (Result<Listing, AFError>) -> Void)
+    -> DataRequest {
     let url = PostRouter.subreddit(displayName: subreddit.displayName, sort: postSort)
     var parameters = params.toParameters()
     if let interval = topInterval { parameters["t"] = interval }
@@ -53,7 +83,8 @@ public extension Illithid {
   func fetchPosts(for multireddit: Multireddit, sortBy postSort: PostSort,
                   location: Location? = nil, topInterval: TopInterval? = nil,
                   params: ListingParameters = .init(), queue: DispatchQueue = .main,
-                  completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+                  completion: @escaping (Result<Listing, AFError>) -> Void)
+    -> DataRequest {
     let url = PostRouter.userMultireddit(username: multireddit.owner, multiName: multireddit.name, sort: postSort)
     var parameters = params.toParameters()
     if let interval = topInterval { parameters["t"] = interval }
@@ -68,14 +99,15 @@ public extension Illithid {
   func fetchPosts(for frontPage: FrontPage, sortBy postSort: PostSort,
                   location: Location? = nil, topInterval: TopInterval? = nil,
                   params: ListingParameters = .init(), queue: DispatchQueue = .main,
-                  completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+                  completion: @escaping (Result<Listing, AFError>) -> Void)
+    -> DataRequest {
     let url = PostRouter.frontPage(page: frontPage, sort: postSort)
     var parameters = params.toParameters()
 
     if let interval = topInterval { parameters["t"] = interval }
     if let location = location { parameters["g"] = location }
 
-    return readListing(url: url, queryParameters: parameters, queue: queue) { result in
+    return readListing(url: url, queryParameters: parameters, redirectHandler: PostRouter.frontPageRedirector, queue: queue) { result in
       completion(result)
     }
   }
@@ -83,7 +115,7 @@ public extension Illithid {
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public extension Post {
-  static func fetch(name: Fullname, queue: DispatchQueue = .main) -> AnyPublisher<Post, Error> {
+  static func fetch(name: Fullname, queue: DispatchQueue = .main) -> AnyPublisher<Post, AFError> {
     Illithid.shared.info(name: name, queue: queue)
       .compactMap { listing in
         listing.posts.last
@@ -93,23 +125,23 @@ public extension Post {
 
 public extension Post {
   func upvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
-    Illithid.shared.vote(fullname: fullname, direction: .up, queue: queue, completion: completion)
+    Illithid.shared.vote(fullname: name, direction: .up, queue: queue, completion: completion)
   }
 
   func downvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
-    Illithid.shared.vote(fullname: fullname, direction: .down, queue: queue, completion: completion)
+    Illithid.shared.vote(fullname: name, direction: .down, queue: queue, completion: completion)
   }
 
   func clearVote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
-    Illithid.shared.vote(fullname: fullname, direction: .clear, queue: queue, completion: completion)
+    Illithid.shared.vote(fullname: name, direction: .clear, queue: queue, completion: completion)
   }
 
   func save(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
-    Illithid.shared.save(fullname: fullname, queue: queue, completion: completion)
+    Illithid.shared.save(fullname: name, queue: queue, completion: completion)
   }
 
   func unsave(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
-    Illithid.shared.unsave(fullname: fullname, queue: queue, completion: completion)
+    Illithid.shared.unsave(fullname: name, queue: queue, completion: completion)
   }
 }
 
@@ -139,7 +171,8 @@ public extension Post {
   ///   - completion: The callback function to execute when we get the `Post` `Listing` back from Reddit
   @discardableResult
   static func all(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
-                  params: ListingParameters = .init(), queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+                  params: ListingParameters = .init(), queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void)
+    -> DataRequest {
     Illithid.shared.fetchPosts(for: .all, sortBy: postSort, location: location, topInterval: topInterval,
                                params: params, queue: queue, completion: completion)
   }
@@ -154,7 +187,8 @@ public extension Post {
   ///   - completion: The callback function to execute when we get the `Post` `Listing` back from Reddit
   @discardableResult
   static func popular(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
-                      params: ListingParameters = .init(), queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+                      params: ListingParameters = .init(), queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void)
+    -> DataRequest {
     Illithid.shared.fetchPosts(for: .popular, sortBy: postSort, location: location, topInterval: topInterval,
                                params: params, queue: queue, completion: completion)
   }
@@ -168,7 +202,8 @@ public extension Post {
   ///   - completion: The callback function to execute when we get the `Post` `Listing` back from Reddit
   @discardableResult
   static func random(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
-                     params: ListingParameters = .init(), queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+                     params: ListingParameters = .init(), queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void)
+    -> DataRequest {
     Illithid.shared.fetchPosts(for: .random, sortBy: postSort, location: location, topInterval: topInterval,
                                params: params, queue: queue, completion: completion)
   }

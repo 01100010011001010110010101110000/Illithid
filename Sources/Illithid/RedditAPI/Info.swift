@@ -1,8 +1,16 @@
+// Copyright (C) 2020 Tyler Gregory (@01100010011001010110010101110000)
 //
-// Info.swift
-// Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 4/4/20
+// This program is free software: you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later
+// version.
 //
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of  MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with
+// this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #if canImport(Combine)
   import Combine
@@ -13,22 +21,23 @@ import Alamofire
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public extension Illithid {
-  func info(names: [Fullname], queue: DispatchQueue = .main) -> AnyPublisher<Listing, Error> {
+  func info(names: [Fullname], queue: DispatchQueue = .main) -> AnyPublisher<Listing, AFError> {
     let endpoint = URL(string: "/api/info", relativeTo: baseURL)!
     let infoParameters: Parameters = ["id": names.joined(separator: ",")]
 
-    return session.requestPublisher(url: endpoint, method: .get, parameters: infoParameters, queue: queue)
-      .decode(type: Listing.self, decoder: decoder)
-      .eraseToAnyPublisher()
+    return session.request(endpoint, method: .get, parameters: infoParameters)
+      .publishDecodable(type: Listing.self, queue: queue, decoder: decoder)
+      .value()
   }
 
-  func info(name: Fullname, queue: DispatchQueue = .main) -> AnyPublisher<Listing, Error> { info(names: [name], queue: queue) }
+  func info(name: Fullname, queue: DispatchQueue = .main) -> AnyPublisher<Listing, AFError> { info(names: [name], queue: queue) }
 }
 
 public extension Illithid {
   @discardableResult
   func info(names: [Fullname], queue: DispatchQueue = .main,
-            completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+            completion: @escaping (Result<Listing, AFError>) -> Void)
+    -> DataRequest {
     let endpoint = URL(string: "/api/info", relativeTo: baseURL)!
     let infoParameters: Parameters = ["id": names.joined(separator: ",")]
 
@@ -41,7 +50,8 @@ public extension Illithid {
 
   @discardableResult
   func info(name: Fullname, queue: DispatchQueue = .main,
-            completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+            completion: @escaping (Result<Listing, AFError>) -> Void)
+    -> DataRequest {
     info(names: [name], queue: queue) { completion($0) }
   }
 }

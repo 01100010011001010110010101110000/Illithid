@@ -1,8 +1,16 @@
+// Copyright (C) 2020 Tyler Gregory (@01100010011001010110010101110000)
 //
-// GfyItem.swift
-// Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
+// This program is free software: you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later
+// version.
 //
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of  MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with
+// this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import Foundation
 
@@ -11,9 +19,11 @@ import Alamofire
 import Alamofire
 import Foundation
 
-// MARK: - GfyItem
+// MARK: - GfyWrapper
 
 public struct GfyWrapper: Codable, Hashable, Equatable {
+  // MARK: Public
+
   public let item: GfyItem
 
   public static func == (lhs: GfyWrapper, rhs: GfyWrapper) -> Bool {
@@ -24,19 +34,17 @@ public struct GfyWrapper: Codable, Hashable, Equatable {
     hasher.combine(item)
   }
 
+  // MARK: Internal
+
   enum CodingKeys: String, CodingKey {
     case item = "gfyItem"
   }
 }
 
-public struct GfyItem: Codable, Hashable, Equatable {
-  public static func == (lhs: GfyItem, rhs: GfyItem) -> Bool {
-    lhs.gfyId == rhs.gfyId
-  }
+// MARK: - GfyItem
 
-  public func hash(into hasher: inout Hasher) {
-    hasher.combine(gfyId)
-  }
+public struct GfyItem: Codable, Hashable, Equatable {
+  // MARK: Public
 
   public let tags: [String]
   public let languageCategories: [String]
@@ -84,6 +92,16 @@ public struct GfyItem: Codable, Hashable, Equatable {
   public let md5: String?
   public let source: Int
   public let contentUrls: [String: GfyContent]
+
+  public static func == (lhs: GfyItem, rhs: GfyItem) -> Bool {
+    lhs.gfyId == rhs.gfyId
+  }
+
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(gfyId)
+  }
+
+  // MARK: Internal
 
   enum CodingKeys: String, CodingKey {
     case tags
@@ -135,13 +153,17 @@ public struct GfyItem: Codable, Hashable, Equatable {
   }
 }
 
-// MARK: - ContentURL
+// MARK: - GfyContent
 
 public struct GfyContent: Codable, Hashable {
+  // MARK: Public
+
   public let url: URL
   public let size: Int?
   public let height: Int
   public let width: Int
+
+  // MARK: Internal
 
   enum CodingKeys: String, CodingKey {
     case url

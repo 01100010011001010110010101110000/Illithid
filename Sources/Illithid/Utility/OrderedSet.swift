@@ -1,17 +1,22 @@
+// Copyright (C) 2020 Tyler Gregory (@01100010011001010110010101110000)
 //
-// OrderedSet.swift
-// Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
+// This program is free software: you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later
+// version.
 //
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of  MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with
+// this program.  If not, see <http://www.gnu.org/licenses/>.
+
+// MARK: - OrderedSet
 
 /// A data structure which guarantees unique membership and preserves lement ordering
 public struct OrderedSet<E: Hashable>: RandomAccessCollection, Equatable, Hashable {
-  public typealias Element = E
-  public typealias Index = Int
-  public typealias Indices = Range<Int>
-
-  private var set: Set<Element>
-  private var array: [Element]
+  // MARK: Lifecycle
 
   public init() {
     set = .init()
@@ -29,6 +34,12 @@ public struct OrderedSet<E: Hashable>: RandomAccessCollection, Equatable, Hashab
     for element in array { append(element) }
   }
 
+  // MARK: Public
+
+  public typealias Element = E
+  public typealias Index = Int
+  public typealias Indices = Range<Int>
+
   // MARK: Working with OrderedSet
 
   /// The number of elements in the ordered set
@@ -43,6 +54,11 @@ public struct OrderedSet<E: Hashable>: RandomAccessCollection, Equatable, Hashab
 
   /// A copy of the contents of the ordered set as an array
   public var contents: [Element] { array }
+
+  // MARK: RandomAccessCollection compliance
+
+  public var startIndex: Int { array.startIndex }
+  public var endIndex: Int { array.endIndex }
 
   /// Checks whether the ordered set contains a given element
   /// - Parameter member: The element to test for membership
@@ -107,14 +123,17 @@ public struct OrderedSet<E: Hashable>: RandomAccessCollection, Equatable, Hashab
     set.removeAll(keepingCapacity: keepCapacity)
   }
 
-  // MARK: RandomAccessCollection compliance
-
-  public var startIndex: Int { array.startIndex }
-  public var endIndex: Int { array.endIndex }
   public subscript(position: Int) -> Element {
     array[position]
   }
+
+  // MARK: Private
+
+  private var set: Set<Element>
+  private var array: [Element]
 }
+
+// MARK: ExpressibleByArrayLiteral
 
 extension OrderedSet: ExpressibleByArrayLiteral {
   public init(arrayLiteral elements: Element...) {

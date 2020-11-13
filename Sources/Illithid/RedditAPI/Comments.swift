@@ -1,8 +1,16 @@
+// Copyright (C) 2020 Tyler Gregory (@01100010011001010110010101110000)
 //
-// Comments.swift
-// Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
+// This program is free software: you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later
+// version.
 //
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of  MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with
+// this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #if canImport(Combine)
   import Combine
@@ -12,14 +20,18 @@ import Foundation
 import Alamofire
 import Willow
 
+// MARK: - CommentRouter
+
 enum CommentRouter: URLConvertible {
-  case comments(for: Post)
+  case comments(for: Post.ID, in: String)
   case moreComments
+
+  // MARK: Internal
 
   func asURL() throws -> URL {
     switch self {
-    case let .comments(post):
-      return URL(string: "/r/\(post.subreddit)/comments/\(post.id)", relativeTo: Illithid.shared.baseURL)!
+    case let .comments(post, subreddit):
+      return URL(string: "/r/\(subreddit)/comments/\(post)", relativeTo: Illithid.shared.baseURL)!
     case .moreComments:
       return URL(string: "/api/morechildren", relativeTo: Illithid.shared.baseURL)!
     }
@@ -47,8 +59,37 @@ public extension Illithid {
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
   func comments(for post: Post, parameters: ListingParameters,
                 by sort: CommentsSort = .confidence, focusOn comment: ID36? = nil, context: Int? = nil,
+                depth: Int = 0, showEdits _: Bool = true, showMore: Bool = true,
+                threaded: Bool = true, truncate: Int = 0, queue: DispatchQueue = .main)
+    -> AnyPublisher<Listing, AFError> {
+    comments(for: post.id, in: post.subreddit, parameters: parameters, by: sort, focusOn: comment, context: context, depth: depth,
+             showEdits: showMore, showMore: showMore, threaded: threaded, truncate: truncate, queue: queue)
+  }
+
+  /**
+   Fetch comments for a particular `Post`
+   - Parameters:
+     - postId: The `ID36` of the post for which to fetch comments
+     - subredditName: The display name of the subreddit the post is in
+     - parameters: The standard `ListingParams` to pass to the listing endopont when slicing through comments
+     - focus: The root comment of the returned `Comment` `Listing`
+     - context: The number of parents to give the`focus` `Comment`
+     - depth: The maximum number of `Comment` subtrees
+     - showEdits: Whether to show if a comment has been edited
+     - showMore: Whether to append a `more` `Listing` to leaf comments with more replies. Whether a `Comment`'s `replies` attribute is a `more`,
+                 a standard `Comment` `Listing`, or the empty string is governed by the sort method.
+     - sortBy: Which Reddit sort method to use when fetching comments
+     - threaded: If true, the comments listing returns a `Comment` `Listing` with `replies` properties on each comment node. If false, the `Listing` is instead a flat
+                 array and the client must determine threading from the `parentID` attribute
+     - truncate: Truncate the listing after `truncate` `Comments` if greater than zero
+   - Returns: A one-shot `AnyPublisher` with the `Listing` or an error
+   */
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+  func comments(for postId: Post.ID, in subredditName: String, parameters: ListingParameters,
+                by sort: CommentsSort = .confidence, focusOn comment: ID36? = nil, context: Int? = nil,
                 depth: Int = 0, showEdits: Bool = true, showMore: Bool = true,
-                threaded: Bool = true, truncate: Int = 0, queue: DispatchQueue = .main) -> AnyPublisher<Listing, Error> {
+                threaded: Bool = true, truncate: Int = 0, queue: DispatchQueue = .main)
+    -> AnyPublisher<Listing, AFError> {
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
 
     var encodedParameters = parameters.toParameters()
@@ -60,14 +101,15 @@ public extension Illithid {
       "showmore": showMore,
       "sort": sort.rawValue,
       "threaded": threaded,
-      "truncate": truncate
+      "truncate": truncate,
     ]
     encodedParameters.merge(commentsParameters) { current, _ in current }
 
-    return session.requestPublisher(url: CommentRouter.comments(for: post), method: .get, parameters: encodedParameters,
-                                    encoding: queryEncoding, queue: queue)
-      .decode(type: [Listing].self, decoder: decoder)
-      .mapError { (error) -> Error in
+    return session.request(CommentRouter.comments(for: postId, in: subredditName), method: .get,
+                           parameters: encodedParameters, encoding: queryEncoding)
+      .publishDecodable(type: [Listing].self, queue: queue, decoder: decoder)
+      .value()
+      .mapError { (error) -> AFError in
         self.logger.errorMessage { "Error fetching comments: \(error)" }
         return error
       }
@@ -77,22 +119,51 @@ public extension Illithid {
       .eraseToAnyPublisher()
   }
 
-  func moreComments(for more: More, in post: Post, depth: Int? = nil,
-                    limitChildren: Bool = false, sortBy: CommentsSort = .confidence, queue: DispatchQueue = .main) -> AnyPublisher<[CommentWrapper], Error> {
-    var parameters: Parameters = [
-      "api_type": "json",
-      "children": more.children.joined(separator: ","),
-      "limit_children": limitChildren,
-      "link_id": post.fullname,
-      "sort": sortBy.rawValue
-    ]
-    if let depth = depth { parameters["depth"] = depth }
+  func moreComments(for more: More, on post: Post, depth: Int? = nil,
+                    limitChildren: Bool = false, sortBy: CommentsSort = .confidence,
+                    queue: DispatchQueue = .main)
+    -> AnyPublisher<(comments: [Comment], more: More?), AFError> {
+    moreComments(for: more, on: post.name, in: post.subreddit, depth: depth,
+                 limitChildren: limitChildren, sortBy: sortBy, queue: queue)
+  }
 
-    return session.requestPublisher(url: CommentRouter.moreComments, method: .post, parameters: parameters,
-                                    encoding: URLEncoding(destination: .httpBody, boolEncoding: .numeric), queue: queue)
-      .decode(type: MoreChildren.self, decoder: decoder)
-      .map { $0.allComments }
-      .eraseToAnyPublisher()
+  func moreComments(for more: More, on postFullname: Fullname, in subredit: String, depth: Int? = nil,
+                    limitChildren: Bool = false, sortBy: CommentsSort = .confidence,
+                    queue: DispatchQueue = .main)
+    -> AnyPublisher<(comments: [Comment], more: More?), AFError> {
+    if more.isThreadContinuation {
+      // We specify threaded: false to mimic the behavior of /api/morechildren
+      return comments(for: postFullname.components(separatedBy: "_").last!, in: subredit,
+                      parameters: .init(), by: sortBy, focusOn: more.parentId.components(separatedBy: "_").last!,
+                      depth: depth ?? 0, threaded: false, queue: queue)
+        .map { listing in
+          var comments = listing.comments.filter { $0.fullname != more.parentId }
+          for idx in comments.indices {
+            comments[idx].depth = (comments[idx].depth ?? 0) + more.depth
+          }
+
+          return (comments, listing.more)
+        }
+        .eraseToAnyPublisher()
+    } else {
+      var parameters: Parameters = [
+        "api_type": "json",
+        "children": more.children.joined(separator: ","),
+        "limit_children": limitChildren,
+        "link_id": postFullname,
+        "sort": sortBy.rawValue,
+      ]
+      if let depth = depth { parameters["depth"] = depth }
+
+      return session.request(CommentRouter.moreComments, method: .post, parameters: parameters,
+                             encoding: URLEncoding(destination: .httpBody, boolEncoding: .numeric))
+        .publishDecodable(type: MoreChildren.self, queue: queue, decoder: decoder)
+        .value()
+        .map { more in
+          (more.comments, more.more)
+        }
+        .eraseToAnyPublisher()
+    }
   }
 }
 
@@ -125,7 +196,7 @@ public extension Comment {
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public extension Comment {
-  static func fetch(name: Fullname, queue: DispatchQueue = .main) -> AnyPublisher<Comment, Error> {
+  static func fetch(name: Fullname, queue: DispatchQueue = .main) -> AnyPublisher<Comment, AFError> {
     Illithid.shared.info(name: name, queue: queue)
       .compactMap { listing in
         listing.comments.last
@@ -135,6 +206,8 @@ public extension Comment {
 }
 
 public extension Comment {
+  /// Fetches a comment using its `Fullname` from Reddit's info endpoint
+  /// - Warning: This **will not** return a comment's replies; replies will always be empty. For that, you must use the fetch the comment using its permalink
   @discardableResult
   static func fetch(name: Fullname, queue: DispatchQueue = .main, completion: @escaping (Result<Comment, Error>) -> Void) -> DataRequest {
     Illithid.shared.info(name: name, queue: queue) { result in
@@ -154,7 +227,8 @@ public extension Comment {
 
 public extension Comment {
   func isModComment(queue: DispatchQueue = .main,
-                    completion: @escaping (Result<Bool, AFError>) -> Void) -> DataRequest {
+                    completion: @escaping (Result<Bool, AFError>) -> Void)
+    -> DataRequest {
     Illithid.shared.moderatorsOf(displayName: subreddit, queue: queue) { result in
       switch result {
       case let .success(moderators):

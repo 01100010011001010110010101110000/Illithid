@@ -1,8 +1,16 @@
+// Copyright (C) 2020 Tyler Gregory (@01100010011001010110010101110000)
 //
-// Accounts.swift
-// Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 4/4/20
+// This program is free software: you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later
+// version.
 //
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of  MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with
+// this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #if canImport(Combine)
   import Combine
@@ -10,6 +18,8 @@
 import Foundation
 
 import Alamofire
+
+// MARK: - AccountContent
 
 public enum AccountContent: String, CaseIterable {
   case overview
@@ -21,16 +31,22 @@ public enum AccountContent: String, CaseIterable {
   case hidden
 }
 
-public enum AccountContentSort: String, Codable, CaseIterable, Identifiable {
-  public var id: String {
-    rawValue
-  }
+// MARK: - AccountContentSort
 
+public enum AccountContentSort: String, Codable, CaseIterable, Identifiable {
   case hot
   case new
   case top
   case controversial
+
+  // MARK: Public
+
+  public var id: String {
+    rawValue
+  }
 }
+
+// MARK: - AccountRouter
 
 private enum AccountRouter: URLRequestConvertible, MirrorableEnum {
   case account(username: String)
@@ -59,6 +75,10 @@ private enum AccountRouter: URLRequestConvertible, MirrorableEnum {
               sort: AccountContentSort = .new, t: TopInterval = .day,
               listingParameters: ListingParameters = .init())
 
+  case moderatedSubreddits(username: String)
+
+  // MARK: Internal
+
   var path: String {
     switch self {
     case let .account(username):
@@ -81,6 +101,8 @@ private enum AccountRouter: URLRequestConvertible, MirrorableEnum {
       return "/subreddits/mine/subscriber"
     case let .upvoted(username, _, _, _):
       return "/user/\(username)/upvoted"
+    case let .moderatedSubreddits(username):
+      return "/user/\(username)/moderated_subreddits"
     }
   }
 
@@ -104,7 +126,8 @@ private enum AccountRouter: URLRequestConvertible, MirrorableEnum {
 public extension Illithid {
   @discardableResult
   func fetchAccount(name: String, queue: DispatchQueue = .main,
-                    completion: @escaping (Result<Account, AFError>) -> Void) -> DataRequest {
+                    completion: @escaping (Result<Account, AFError>) -> Void)
+    -> DataRequest {
     session.request(AccountRouter.account(username: name))
       .validate()
       .responseDecodable(of: Account.self, queue: queue, decoder: decoder) { response in
@@ -150,7 +173,8 @@ public extension Account {
 
   @discardableResult
   func multireddits(queue: DispatchQueue = .main,
-                    completion: @escaping (Result<[Multireddit], AFError>) -> Void) -> DataRequest {
+                    completion: @escaping (Result<[Multireddit], AFError>) -> Void)
+    -> DataRequest {
     let illithid: Illithid = .shared
 
     return illithid.session.request(AccountRouter.multireddits(username: name))
@@ -172,7 +196,8 @@ public extension Account {
   @discardableResult
   func content(content: AccountContent, sort: AccountContentSort = .new, topInterval: TopInterval = .day,
                parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
-               completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+               completion: @escaping (Result<Listing, AFError>) -> Void)
+    -> DataRequest {
     switch content {
     case .overview:
       return overview(sort: sort, topInterval: topInterval, parameters: parameters, queue: queue, completion: completion)
@@ -194,7 +219,8 @@ public extension Account {
   @discardableResult
   func overview(sort: AccountContentSort = .new, topInterval: TopInterval = .day,
                 parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
-                completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+                completion: @escaping (Result<Listing, AFError>) -> Void)
+    -> DataRequest {
     let illithid: Illithid = .shared
     let request = AccountRouter.overview(username: name, sort: sort, t: topInterval,
                                          listingParameters: parameters)
@@ -205,7 +231,8 @@ public extension Account {
   @discardableResult
   func comments(sort: AccountContentSort = .new, topInterval: TopInterval = .day,
                 parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
-                completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+                completion: @escaping (Result<Listing, AFError>) -> Void)
+    -> DataRequest {
     let illithid: Illithid = .shared
     let request = AccountRouter.comments(username: name, sort: sort, t: topInterval,
                                          listingParameters: parameters)
@@ -216,7 +243,8 @@ public extension Account {
   @discardableResult
   func submissions(sort: AccountContentSort = .new, topInterval: TopInterval = .day,
                    parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
-                   completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+                   completion: @escaping (Result<Listing, AFError>) -> Void)
+    -> DataRequest {
     let illithid: Illithid = .shared
     let request = AccountRouter.submissions(username: name, sort: sort, t: topInterval,
                                             listingParameters: parameters)
@@ -227,7 +255,8 @@ public extension Account {
   @discardableResult
   func upvotedPosts(sort: AccountContentSort = .new, topInterval: TopInterval = .day,
                     parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
-                    completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+                    completion: @escaping (Result<Listing, AFError>) -> Void)
+    -> DataRequest {
     let illithid: Illithid = .shared
     let request = AccountRouter.upvoted(username: name, sort: sort, t: topInterval,
                                         listingParameters: parameters)
@@ -238,7 +267,8 @@ public extension Account {
   @discardableResult
   func downvotedPosts(sort: AccountContentSort = .new, topInterval: TopInterval = .day,
                       parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
-                      completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+                      completion: @escaping (Result<Listing, AFError>) -> Void)
+    -> DataRequest {
     let illithid: Illithid = .shared
     let request = AccountRouter.downvoted(username: name, sort: sort, t: topInterval,
                                           listingParameters: parameters)
@@ -249,7 +279,8 @@ public extension Account {
   @discardableResult
   func hiddenPosts(sort: AccountContentSort = .new, topInterval: TopInterval = .day,
                    parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
-                   completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+                   completion: @escaping (Result<Listing, AFError>) -> Void)
+    -> DataRequest {
     let illithid: Illithid = .shared
     let request = AccountRouter.hidden(username: name, sort: sort, t: topInterval,
                                        listingParameters: parameters)
@@ -260,7 +291,8 @@ public extension Account {
   @discardableResult
   func savedContent(sort: AccountContentSort = .new, topInterval: TopInterval = .day, context _: Int = 2,
                     parameters: ListingParameters = .init(), queue: DispatchQueue = .main,
-                    completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+                    completion: @escaping (Result<Listing, AFError>) -> Void)
+    -> DataRequest {
     let illithid: Illithid = .shared
     let request = AccountRouter.saved(username: name, sort: sort, t: topInterval,
                                       listingParameters: parameters)
@@ -269,10 +301,55 @@ public extension Account {
   }
 }
 
+// MARK: Moderation
+
+public extension Illithid {
+  @discardableResult
+  func moderatedSubreddits(username: String, queue: DispatchQueue = .main,
+                           completion: @escaping (Result<[ModeratedSubreddit], AFError>) -> Void)
+    -> DataRequest {
+    session.request(AccountRouter.moderatedSubreddits(username: username))
+      .validate()
+      .responseDecodable(of: ModeratedSubredditsList.self, queue: queue, decoder: decoder) { response in
+        switch response.result {
+        case let .success(list):
+          completion(.success(list.data))
+        case let .failure(error):
+          completion(.failure(error))
+        }
+      }
+  }
+
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+  func moderatedSubreddits(username: String, queue: DispatchQueue = .main) -> AnyPublisher<[ModeratedSubreddit], AFError> {
+    session.request(AccountRouter.moderatedSubreddits(username: username))
+      .validate()
+      .publishDecodable(type: ModeratedSubredditsList.self, queue: queue, decoder: decoder)
+      .value()
+      .map { $0.data }
+      .eraseToAnyPublisher()
+  }
+}
+
+public extension Account {
+  @discardableResult
+  func moderatedSubreddits(queue: DispatchQueue = .main,
+                           completion: @escaping (Result<[ModeratedSubreddit], AFError>) -> Void)
+    -> DataRequest {
+    Illithid.shared.moderatedSubreddits(username: name, queue: queue, completion: completion)
+  }
+
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+  func moderatedSubreddits(queue: DispatchQueue = .main) -> AnyPublisher<[ModeratedSubreddit], AFError> {
+    Illithid.shared.moderatedSubreddits(username: name, queue: queue)
+  }
+}
+
 public extension Account {
   @discardableResult
   static func fetch(username: String, queue: DispatchQueue = .main,
-                    completion: @escaping (Result<Account, AFError>) -> Void) -> DataRequest {
+                    completion: @escaping (Result<Account, AFError>) -> Void)
+    -> DataRequest {
     Illithid.shared.fetchAccount(name: username, queue: queue) { result in
       completion(result)
     }

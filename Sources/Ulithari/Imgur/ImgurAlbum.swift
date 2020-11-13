@@ -1,28 +1,42 @@
+// Copyright (C) 2020 Tyler Gregory (@01100010011001010110010101110000)
 //
-// ImgurAlbum.swift
-// Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 4/28/20
+// This program is free software: you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later
+// version.
 //
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of  MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with
+// this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import Foundation
 
-// MARK: - ImgurAlbum
+// MARK: - ImgurAlbumWrapper
 
 internal struct ImgurAlbumWrapper: Codable {
-  public let data: ImgurAlbum
-  public let success: Bool
-  public let status: Int
+  // MARK: Lifecycle
 
   public init(data: ImgurAlbum, success: Bool, status: Int) {
     self.data = data
     self.success = success
     self.status = status
   }
+
+  // MARK: Public
+
+  public let data: ImgurAlbum
+  public let success: Bool
+  public let status: Int
 }
 
-// MARK: - AlbumData
+// MARK: - ImgurAlbum
 
-public struct ImgurAlbum: Codable {
+public struct ImgurAlbum: Codable, Identifiable {
+  // MARK: Public
+
   public let id: String
   public let title: String?
   public let dataDescription: String?
@@ -46,6 +60,8 @@ public struct ImgurAlbum: Codable {
   public let includeAlbumAds: Bool
   public let isAlbum: Bool
   public let images: [ImgurImage]
+
+  // MARK: Internal
 
   enum CodingKeys: String, CodingKey {
     case id, title

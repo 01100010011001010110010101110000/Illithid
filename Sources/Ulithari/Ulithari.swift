@@ -1,8 +1,16 @@
+// Copyright (C) 2020 Tyler Gregory (@01100010011001010110010101110000)
 //
-// Ulithari.swift
-// Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 4/27/20
+// This program is free software: you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later
+// version.
 //
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of  MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with
+// this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #if canImport(Combine)
   import Combine
@@ -11,17 +19,10 @@ import Foundation
 
 import Alamofire
 
+// MARK: - Ulithari
+
 open class Ulithari {
-  public static let shared = Ulithari()
-  public static let gfycatBaseUrl = URL(string: "https://api.gfycat.com/v1/")!
-  public static let imgurBaseUrl = URL(string: "https://api.imgur.com/3/")!
-
-  internal let session: Session
-
-  internal var imgurAuthorizationHeader: HTTPHeaders = []
-
-  private let imgurDecoder = JSONDecoder()
-  private let gfycatDecoder = JSONDecoder()
+  // MARK: Lifecycle
 
   private init() {
     let alamoConfiguration = URLSessionConfiguration.default
@@ -30,11 +31,11 @@ open class Ulithari {
     let osVersion = ProcessInfo().operatingSystemVersion
     let userAgentComponents = [
       "Ulithari/1",
-      "macOS \(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion)"
+      "macOS \(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion)",
     ]
     let headers: HTTPHeaders = [
       .userAgent(userAgentComponents.joined(separator: ":")),
-      .accept("application/json")
+      .accept("application/json"),
     ]
     alamoConfiguration.httpAdditionalHeaders = headers.dictionary
 
@@ -45,13 +46,31 @@ open class Ulithari {
     gfycatDecoder.dateDecodingStrategy = .secondsSince1970
   }
 
+  // MARK: Public
+
+  public static let shared = Ulithari()
+  public static let gfycatBaseUrl = URL(string: "https://api.gfycat.com/v1/")!
+  public static let redGifsBaseUrl = URL(string: "https://api.redgifs.com/v1/")!
+  public static let imgurBaseUrl = URL(string: "https://api.imgur.com/3/")!
+
   public func configure(imgurClientId: String) {
     imgurAuthorizationHeader.add(.authorization("Client-ID \(imgurClientId)"))
   }
+
+  // MARK: Internal
+
+  internal let session: Session
+
+  internal var imgurAuthorizationHeader: HTTPHeaders = []
+
+  // MARK: Private
+
+  private let imgurDecoder = JSONDecoder()
+  private let gfycatDecoder = JSONDecoder()
 }
 
 public extension Ulithari {
-  func fetchGfycat(id: String, queue: DispatchQueue = .main, completion: @escaping (Result<GfyItem, AFError>) -> Void) {
+  func fetchGfycat(id: String, queue: DispatchQueue = .main, completion: @escaping (Result<GfyItem, AFError>) -> Void) -> DataRequest {
     session.request(URL(string: "gfycats/\(id)", relativeTo: Self.gfycatBaseUrl)!).validate()
       .responseDecodable(of: GfyWrapper.self, queue: queue, decoder: gfycatDecoder) { response in
         switch response.result {
@@ -63,9 +82,26 @@ public extension Ulithari {
       }
   }
 
-  func fetchGfycat(from url: URL, queue: DispatchQueue = .main, completion: @escaping (Result<GfyItem, AFError>) -> Void) {
+  func fetchGfycat(from url: URL, queue: DispatchQueue = .main, completion: @escaping (Result<GfyItem, AFError>) -> Void) -> DataRequest {
     let gfyId = String(url.path.dropFirst())
-    fetchGfycat(id: gfyId, queue: queue, completion: completion)
+    return fetchGfycat(id: gfyId, queue: queue, completion: completion)
+  }
+
+  func fetchRedGif(id: String, queue: DispatchQueue = .main, completion: @escaping (Result<GfyItem, AFError>) -> Void) -> DataRequest {
+    session.request(URL(string: "gfycats/\(id)", relativeTo: Self.redGifsBaseUrl)!).validate()
+      .responseDecodable(of: GfyWrapper.self, queue: queue, decoder: gfycatDecoder) { response in
+        switch response.result {
+        case let .success(wrapper):
+          completion(.success(wrapper.item))
+        case let .failure(error):
+          completion(.failure(error))
+        }
+      }
+  }
+
+  func fetchRedGif(from url: URL, queue: DispatchQueue = .main, completion: @escaping (Result<GfyItem, AFError>) -> Void) -> DataRequest {
+    let redGifId = String(url.path.dropFirst())
+    return fetchRedGif(id: redGifId, queue: queue, completion: completion)
   }
 }
 
@@ -135,7 +171,8 @@ public extension Ulithari {
 
   @discardableResult
   func fetchImgurAlbum(id: String, queue: DispatchQueue = .main,
-                       completion: @escaping (Result<ImgurAlbum, AFError>) -> Void) -> DataRequest {
+                       completion: @escaping (Result<ImgurAlbum, AFError>) -> Void)
+    -> DataRequest {
     session.request(URL(string: "album/\(id)", relativeTo: Self.imgurBaseUrl)!, headers: imgurAuthorizationHeader).validate()
       .responseDecodable(of: ImgurAlbumWrapper.self, queue: queue, decoder: imgurDecoder) { response in
         switch response.result {
@@ -149,7 +186,8 @@ public extension Ulithari {
 
   @discardableResult
   func fetchImgurImage(id: String, queue: DispatchQueue = .main,
-                       completion: @escaping (Result<ImgurImage, AFError>) -> Void) -> DataRequest {
+                       completion: @escaping (Result<ImgurImage, AFError>) -> Void)
+    -> DataRequest {
     session.request(URL(string: "image/\(id)", relativeTo: Self.imgurBaseUrl)!, headers: imgurAuthorizationHeader).validate()
       .responseDecodable(of: ImgurImageWrapper.self, queue: queue, decoder: imgurDecoder) { response in
         switch response.result {

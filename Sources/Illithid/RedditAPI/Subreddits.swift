@@ -1,8 +1,16 @@
+// Copyright (C) 2020 Tyler Gregory (@01100010011001010110010101110000)
 //
-// Subreddits.swift
-// Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
+// This program is free software: you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later
+// version.
 //
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of  MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with
+// this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #if canImport(Combine)
   import Combine
@@ -11,13 +19,13 @@ import Foundation
 
 import Alamofire
 
+// MARK: - SubredditRouter
+
 enum SubredditRouter: URLConvertible {
   case subreddits(sort: SubredditSort)
   case moderators(subredditDisplayName: String)
 
-  private var baseUrl: URL {
-    Illithid.shared.baseURL
-  }
+  // MARK: Internal
 
   func asURL() throws -> URL {
     switch self {
@@ -26,6 +34,12 @@ enum SubredditRouter: URLConvertible {
     case let .moderators(displayName):
       return URL(string: "/r/\(displayName)/about/moderators", relativeTo: baseUrl)!
     }
+  }
+
+  // MARK: Private
+
+  private var baseUrl: URL {
+    Illithid.shared.baseURL
   }
 }
 
@@ -49,7 +63,7 @@ public extension Illithid {
   }
 }
 
-// MARK: Getting posts
+// MARK: - Subreddit + PostProvider
 
 extension Subreddit: PostProvider {
   public var isNsfw: Bool {
@@ -58,7 +72,8 @@ extension Subreddit: PostProvider {
 
   public func posts(sortBy sort: PostSort, location: Location?, topInterval: TopInterval?,
                     parameters: ListingParameters, queue: DispatchQueue = .main,
-                    completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+                    completion: @escaping (Result<Listing, AFError>) -> Void)
+    -> DataRequest {
     Illithid.shared.fetchPosts(for: self, sortBy: sort, location: location,
                                topInterval: topInterval, params: parameters, queue: queue) { result in
       completion(result)
@@ -79,7 +94,7 @@ public extension Subreddit {
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public extension Subreddit {
   /// Loads a specific `Subreddit` by its `Fullname`
-  static func fetch(name: Fullname, queue: DispatchQueue = .main) -> AnyPublisher<Subreddit, Error> {
+  static func fetch(name: Fullname, queue: DispatchQueue = .main) -> AnyPublisher<Subreddit, AFError> {
     Illithid.shared.info(name: name, queue: queue)
       .compactMap { listing in
         listing.subreddits.last
@@ -131,9 +146,10 @@ public extension Subreddit {
 
 // MARK: Moderator fetching
 
-extension Illithid {
-  public func moderatorsOf(displayName name: String, queue: DispatchQueue = .main,
-                           completion: @escaping (Result<[Moderator], AFError>) -> Void) -> DataRequest {
+public extension Illithid {
+  func moderatorsOf(displayName name: String, queue: DispatchQueue = .main,
+                    completion: @escaping (Result<[Moderator], AFError>) -> Void)
+    -> DataRequest {
     session.request(SubredditRouter.moderators(subredditDisplayName: name), method: .get)
       .validate()
       .responseDecodable(of: UserList.self, queue: queue, decoder: decoder) { response in
@@ -141,20 +157,23 @@ extension Illithid {
         case let .success(list):
           completion(.success(list.users))
         case let .failure(error):
+          self.logger.errorMessage("Failed loading moderators of \(name): \(error)")
           completion(.failure(error))
         }
       }
   }
 
-  public func moderatorsOf(subreddit: Subreddit, queue: DispatchQueue = .main,
-                           completion: @escaping (Result<[Moderator], AFError>) -> Void) -> DataRequest {
+  func moderatorsOf(subreddit: Subreddit, queue: DispatchQueue = .main,
+                    completion: @escaping (Result<[Moderator], AFError>) -> Void)
+    -> DataRequest {
     moderatorsOf(displayName: subreddit.displayName, queue: queue, completion: completion)
   }
 }
 
 public extension Subreddit {
   func moderators(queue: DispatchQueue = .main,
-                  completion: @escaping (Result<[Moderator], AFError>) -> Void) -> DataRequest {
+                  completion: @escaping (Result<[Moderator], AFError>) -> Void)
+    -> DataRequest {
     Illithid.shared.moderatorsOf(subreddit: self, queue: queue, completion: completion)
   }
 }

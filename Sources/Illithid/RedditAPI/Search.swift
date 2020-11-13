@@ -1,8 +1,16 @@
+// Copyright (C) 2020 Tyler Gregory (@01100010011001010110010101110000)
 //
-// Search.swift
-// Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 4/4/20
+// This program is free software: you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later
+// version.
 //
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of  MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with
+// this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #if canImport(Combine)
   import Combine
@@ -11,11 +19,15 @@ import Foundation
 
 import Alamofire
 
+// MARK: - SearchType
+
 public enum SearchType: String, CaseIterable {
   case subreddit = "sr"
   case post = "link"
   case user
 }
+
+// MARK: - SearchSort
 
 public enum SearchSort: String, Codable {
   case relevance
@@ -25,11 +37,15 @@ public enum SearchSort: String, Codable {
   case comments
 }
 
+// MARK: - SearchRouter
+
 private enum SearchRouter: URLConvertible, URLRequestConvertible, MirrorableEnum {
   case search(subreddit: Subreddit?)
   case completeSubredditName(query: String, exact: Bool, over_18: Bool, include_unadvertisable: Bool)
   case completeSubreddit(query: String, limit: Int, exact: Bool, include_over_18: Bool, include_profiles: Bool)
   case searchSubreddit(query: String, exact: Bool, over_18: Bool, include_unadvertisable: Bool)
+
+  // MARK: Internal
 
   var method: HTTPMethod {
     switch self {
@@ -69,7 +85,7 @@ private enum SearchRouter: URLConvertible, URLRequestConvertible, MirrorableEnum
   }
 
   func asURLRequest() throws -> URLRequest {
-    let request = try URLRequest(url: self, method: self.method)
+    let request = try URLRequest(url: self, method: method)
     switch self {
     case .completeSubredditName:
       return try URLEncoding.httpBody.encode(request, with: parameters)
@@ -96,7 +112,8 @@ public extension Illithid {
   func search(for query: String, subreddit: String? = nil, after: Fullname? = nil, before: Fullname? = nil,
               limit: UInt = 25, show: ShowAllPreference = .filtered, sort: SearchSort = .relevance,
               topInterval: TopInterval? = nil, resultTypes: Set<SearchType> = [.subreddit, .post, .user], queue: DispatchQueue = .main,
-              completion: @escaping (Result<[Listing], Error>) -> Void) -> DataRequest {
+              completion: @escaping (Result<[Listing], Error>) -> Void)
+    -> DataRequest {
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
     var parameters: Parameters = ["q": query]
 
@@ -157,7 +174,8 @@ public extension Illithid {
                               includeNsfw: Bool = true,
                               includeUnadvertisable: Bool = true,
                               queue: DispatchQueue = .main,
-                              completion: @escaping (Result<[String], AFError>) -> Void) -> DataRequest {
+                              completion: @escaping (Result<[String], AFError>) -> Void)
+    -> DataRequest {
     assert(query.count <= 50, "Query must be no more than 50 characters")
     return session.request(SearchRouter.completeSubredditName(query: query, exact: exact, over_18: includeNsfw,
                                                               include_unadvertisable: includeUnadvertisable))
@@ -186,7 +204,8 @@ public extension Illithid {
                               exact: Bool = false,
                               includeNsfw: Bool = true,
                               includeUnadvertisable: Bool = true,
-                              queue: DispatchQueue = .main) -> AnyPublisher<[String], AFError> {
+                              queue: DispatchQueue = .main)
+    -> AnyPublisher<[String], AFError> {
     assert(query.count <= 50, "Query must be less than 50 characters")
     return session.request(SearchRouter.completeSubredditName(query: query, exact: exact, over_18: includeNsfw,
                                                               include_unadvertisable: includeUnadvertisable))
@@ -214,7 +233,8 @@ public extension Illithid {
                           includeNsfw: Bool = true,
                           includeProfiles: Bool = true,
                           queue: DispatchQueue = .main,
-                          completion: @escaping (Result<[Subreddit], AFError>) -> Void) -> DataRequest {
+                          completion: @escaping (Result<[Subreddit], AFError>) -> Void)
+    -> DataRequest {
     assert(query.count <= 25, "Query must be no more than 25 characters")
     assert(limit >= 1 && limit <= 10, "Limit must be between 1 and 10, inclusive")
     return session.request(SearchRouter.completeSubreddit(query: query, limit: limit, exact: exact,
@@ -246,7 +266,8 @@ public extension Illithid {
                           limit: Int = 5,
                           includeNsfw: Bool = true,
                           includeProfiles: Bool = true,
-                          queue: DispatchQueue = .main) -> AnyPublisher<[Subreddit], AFError> {
+                          queue: DispatchQueue = .main)
+    -> AnyPublisher<[Subreddit], AFError> {
     assert(query.count <= 25, "Query must be no more than 25 characters")
     assert(limit >= 1 && limit <= 10, "Limit must be between 1 and 10, inclusive")
     return session.request(SearchRouter.completeSubreddit(query: query, limit: limit, exact: exact,
@@ -274,7 +295,8 @@ public extension Illithid {
                         includeNsfw: Bool = true,
                         includeUnadvertisable: Bool = true,
                         queue: DispatchQueue = .main,
-                        completion: @escaping (Result<[SubredditSuggestion], AFError>) -> Void) -> DataRequest {
+                        completion: @escaping (Result<[SubredditSuggestion], AFError>) -> Void)
+    -> DataRequest {
     assert(query.count <= 50, "Query must be no more than 50 characters")
     return session.request(SearchRouter.searchSubreddit(query: query, exact: exact, over_18: includeNsfw,
                                                         include_unadvertisable: includeUnadvertisable))
@@ -303,7 +325,8 @@ public extension Illithid {
                         exact: Bool = false,
                         includeNsfw: Bool = true,
                         includeUnadvertisable: Bool = true,
-                        queue: DispatchQueue = .main) -> AnyPublisher<[SubredditSuggestion], AFError> {
+                        queue: DispatchQueue = .main)
+    -> AnyPublisher<[SubredditSuggestion], AFError> {
     assert(query.count <= 50, "Query must be no more than 50 characters")
     return session.request(SearchRouter.searchSubreddit(query: query, exact: exact, over_18: includeNsfw,
                                                         include_unadvertisable: includeUnadvertisable))

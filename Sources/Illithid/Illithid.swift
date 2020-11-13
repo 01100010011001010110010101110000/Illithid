@@ -1,8 +1,16 @@
+// Copyright (C) 2020 Tyler Gregory (@01100010011001010110010101110000)
 //
-// Illithid.swift
-// Copyright (c) 2020 Flayware
-// Created by Tyler Gregory (@01100010011001010110010101110000) on 3/21/20
+// This program is free software: you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later
+// version.
 //
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of  MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with
+// this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import AuthenticationServices
 import Cocoa
@@ -12,34 +20,14 @@ import Alamofire
 import OAuthSwift
 import Willow
 
+// MARK: - Illithid
+
 /// Handles Reddit API meta-operations
 open class Illithid: ObservableObject {
-  public static var shared: Illithid = .init()
-  private enum baseURLs: String, Codable {
-    case unauthenticated = "https://api.reddit.com/"
-    case authenticated = "https://oauth.reddit.com/"
-  }
-
-  public let redditBrowserUrl: URL = URL(string: "https://www.reddit.com/")!
-  public var baseURL: URL {
-    accountManager.currentAccount != nil ? URL(string: baseURLs.authenticated.rawValue)! : URL(string: baseURLs.unauthenticated.rawValue)!
-  }
-
-  public static let authorizeEndpoint: URL = URL(string: "https://www.reddit.com/api/v1/authorize.compact")!
-  public static let tokenEndpoint: URL = URL(string: "https://www.reddit.com/api/v1/access_token")!
-
-  open var logger: Logger
-
-  // TODO: Make this private
-  public let accountManager: AccountManager
-
-  internal let decoder: JSONDecoder = .init()
-
-  internal var session: Session
+  // MARK: Lifecycle
 
   private init() {
     decoder.dateDecodingStrategy = .secondsSince1970
-    decoder.keyDecodingStrategy = .convertFromSnakeCase
 
     #if DEBUG
       logger = .debugLogger()
@@ -51,10 +39,41 @@ open class Illithid: ObservableObject {
     session = accountManager.makeSession(for: accountManager.currentAccount)
   }
 
+  // MARK: Open
+
+  open var logger: Logger
+
+  // MARK: Public
+
+  public static var shared: Illithid = .init()
+  public static let authorizeEndpoint = URL(string: "https://www.reddit.com/api/v1/authorize.compact")!
+  public static let tokenEndpoint = URL(string: "https://www.reddit.com/api/v1/access_token")!
+
+  public let redditBrowserUrl = URL(string: "https://www.reddit.com/")!
+  // TODO: Make this private
+  public let accountManager: AccountManager
+
+  public var baseURL: URL {
+    accountManager.currentAccount != nil ? URL(string: baseURLs.authenticated.rawValue)! : URL(string: baseURLs.unauthenticated.rawValue)!
+  }
+
   public func configure(configuration: ClientConfiguration) {
     accountManager.configuration = configuration
     session.cancelAllRequests()
     session = accountManager.makeSession(for: accountManager.currentAccount)
+  }
+
+  // MARK: Internal
+
+  internal let decoder: JSONDecoder = .init()
+
+  internal var session: Session
+
+  // MARK: Private
+
+  private enum baseURLs: String, Codable {
+    case unauthenticated = "https://api.reddit.com/"
+    case authenticated = "https://oauth.reddit.com/"
   }
 }
 
@@ -65,24 +84,31 @@ internal extension Illithid {
   ///   - completion: The function to call upon fetching a `Listing`
   @discardableResult
   func readListing(url: Alamofire.URLConvertible, queryParameters: Parameters? = nil,
-                   listingParameters: ListingParameters = .init(), queue: DispatchQueue = .main,
-                   completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+                   listingParameters: ListingParameters = .init(), redirectHandler: Redirector = .follow,
+                   queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void)
+    -> DataRequest {
     let queryEncoding = URLEncoding(boolEncoding: .numeric)
 
     let _parameters = listingParameters.toParameters()
       .merging(queryParameters ?? [:], uniquingKeysWith: { $1 })
 
     return session.request(url, method: .get, parameters: _parameters, encoding: queryEncoding)
+      .redirect(using: redirectHandler)
       .validate()
       .responseDecodable(of: Listing.self, queue: queue, decoder: decoder) { request in
+        if case let .failure(error) = request.result {
+          print(error)
+        }
         completion(request.result)
       }
   }
 
   @discardableResult
-  func readListing(request: Alamofire.URLRequestConvertible, queue: DispatchQueue = .main,
-                   completion: @escaping (Result<Listing, AFError>) -> Void) -> DataRequest {
+  func readListing(request: Alamofire.URLRequestConvertible, redirectHandler: Redirector = .follow,
+                   queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void)
+    -> DataRequest {
     session.request(request)
+      .redirect(using: redirectHandler)
       .validate()
       .responseDecodable(of: Listing.self, queue: queue, decoder: decoder) { completion($0.result) }
   }
@@ -93,8 +119,8 @@ internal extension Illithid {
   ///   - queue: The `DispatchQueue` in which `completion` will run
   ///   - completion: The function to call upon fetching all `Listings`
   /// - Warning: If this method is called on a large endpoint, like the endpoint for fetching subreddits, this method may take a very long time to terminate or not terminate at all
-  func readAllListings(url: Alamofire.URLConvertible, queue: DispatchQueue = .main,
-                       completion: @escaping (Result<[Listing], AFError>) -> Void) {
+  func readAllListings(url: Alamofire.URLConvertible, redirectHandler: Redirector = .follow,
+                       queue: DispatchQueue = .main, completion: @escaping (Result<[Listing], AFError>) -> Void) {
     var results: [Listing] = []
     var parameters: Parameters = ["after": ""] {
       didSet {
@@ -102,7 +128,7 @@ internal extension Illithid {
           completion(.success(results))
           return
         }
-        readListing(url: url, queryParameters: parameters, queue: queue) { result in
+        readListing(url: url, queryParameters: parameters, redirectHandler: redirectHandler, queue: queue) { result in
           switch result {
           case let .success(listing):
             results.append(listing)
@@ -115,7 +141,7 @@ internal extension Illithid {
         }
       }
     }
-    readListing(url: url, queue: queue) { result in
+    readListing(url: url, redirectHandler: redirectHandler, queue: queue) { result in
       switch result {
       case let .success(listing):
         results.append(listing)
