@@ -46,12 +46,19 @@ public struct GfyWrapper: Codable, Hashable, Equatable {
 public struct GfyItem: Codable, Hashable, Equatable {
   // MARK: Public
 
+  /// Representation of Gfycat's ternary `nsfw` state
+  public enum Nsfw: Int, Codable {
+    case safe = 0
+    case notSafe = 1
+    case potentiallyUnsafe = 3
+  }
+
   public let tags: [String]
   public let languageCategories: [String]
   public let domainWhitelist: [String]
   public let geoWhitelist: [String]
   public let published: Int
-  public let nsfw: String
+  public let nsfw: Nsfw
   public let gatekeeper: Int
   public let mp4URL: URL
   public let gifURL: URL
@@ -71,12 +78,12 @@ public struct GfyItem: Codable, Hashable, Equatable {
   public let posterURL: URL
   public let languageText: String
   public let views: Int
-  public let userName: String
+  public let username: String
   public let gfyItemDescription: String
   public let hasTransparency: Bool
   public let hasAudio: Bool
-  public let likes: String
-  public let dislikes: String
+  public let likes: Int
+  public let dislikes: Int
   public let gfyNumber: String
   public let gfyId: String
   public let gfyName: String
@@ -129,7 +136,7 @@ public struct GfyItem: Codable, Hashable, Equatable {
     case posterURL = "posterUrl"
     case languageText
     case views
-    case userName
+    case username
     case gfyItemDescription = "description"
     case hasTransparency
     case hasAudio
