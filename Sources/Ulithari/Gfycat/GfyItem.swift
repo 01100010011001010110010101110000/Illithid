@@ -129,6 +129,8 @@ public struct GfyItem: Codable, Hashable, Equatable {
     case notSafe = 1
     /// Unclear what precisely this would imply, but that is how Gfycat's documentation puts it
     case potentiallyOffensive = 3
+    /// Meaning not currently known
+    case unknown = 12
 
     // MARK: Lifecycle
 
