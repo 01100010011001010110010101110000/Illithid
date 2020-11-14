@@ -44,13 +44,119 @@ public struct GfyWrapper: Codable, Hashable, Equatable {
 // MARK: - GfyItem
 
 public struct GfyItem: Codable, Hashable, Equatable {
+  // MARK: Lifecycle
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    let oldContainer = try decoder.container(keyedBy: OldCodingKeys.self)
+
+    // API Changes
+    if let unwrapped = try? container.decode(String.self, forKey: .username) {
+      username = unwrapped
+    } else if let unwrapped = try? oldContainer.decode(String.self, forKey: .userName) {
+      username = unwrapped
+    } else {
+      throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath,
+                                                              debugDescription: "Invalid username"))
+    }
+    if let number = try? container.decode(Int.self, forKey: .likes) {
+      likes = number
+    } else if let string = try? container.decode(String.self, forKey: .likes), let number = Int(string) {
+      likes = number
+    } else {
+      throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath,
+                                                              debugDescription: "Could not decode number from likes"))
+    }
+    if let number = try? container.decode(Int.self, forKey: .dislikes) {
+      dislikes = number
+    } else if let string = try? container.decode(String.self, forKey: .dislikes), let number = Int(string) {
+      dislikes = number
+    } else {
+      throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath,
+                                                              debugDescription: "Could not decode number from dislikes"))
+    }
+
+    tags = try container.decode([String].self, forKey: .tags)
+    languageCategories = try container.decode([String].self, forKey: .languageCategories)
+    domainWhitelist = try container.decode([String].self, forKey: .domainWhitelist)
+    geoWhitelist = try container.decode([String].self, forKey: .geoWhitelist)
+    published = try container.decode(Int.self, forKey: .published)
+    nsfw = try container.decode(Nsfw.self, forKey: .nsfw)
+    gatekeeper = try container.decode(Int.self, forKey: .gatekeeper)
+    mp4URL = try container.decode(URL.self, forKey: .mp4URL)
+    gifURL = try container.decode(URL.self, forKey: .gifURL)
+    webmURL = try container.decode(URL.self, forKey: .webmURL)
+    webpURL = try container.decode(URL.self, forKey: .webpURL)
+    mobileURL = try container.decode(URL.self, forKey: .mobileURL)
+    mobilePosterURL = try container.decode(URL.self, forKey: .mobilePosterURL)
+    extraLemmas = try container.decode(String.self, forKey: .extraLemmas)
+    thumb100PosterURL = try container.decode(URL.self, forKey: .thumb100PosterURL)
+    miniURL = try container.decode(URL.self, forKey: .miniURL)
+    gif100Px = try container.decode(String.self, forKey: .gif100Px)
+    miniPosterURL = try container.decode(URL.self, forKey: .miniPosterURL)
+    max5MBGIF = try container.decode(String.self, forKey: .max5MBGIF)
+    title = try container.decode(String.self, forKey: .title)
+    max2MBGIF = try container.decode(URL.self, forKey: .max2MBGIF)
+    max1MBGIF = try container.decode(URL.self, forKey: .max1MBGIF)
+    posterURL = try container.decode(URL.self, forKey: .posterURL)
+    languageText = try container.decode(String.self, forKey: .languageText)
+    views = try container.decode(Int.self, forKey: .views)
+    gfyItemDescription = try container.decode(String.self, forKey: .gfyItemDescription)
+    hasTransparency = try container.decode(Bool.self, forKey: .hasTransparency)
+    hasAudio = try container.decode(Bool.self, forKey: .hasAudio)
+    gfyNumber = try container.decode(String.self, forKey: .gfyNumber)
+    gfyId = try container.decode(String.self, forKey: .gfyId)
+    gfyName = try container.decode(String.self, forKey: .gfyName)
+    avgColor = try container.decode(String.self, forKey: .avgColor)
+    gfySlug = try container.decodeIfPresent(String.self, forKey: .gfySlug)
+    width = try container.decode(Int.self, forKey: .width)
+    height = try container.decode(Int.self, forKey: .height)
+    frameRate = try container.decode(Double.self, forKey: .frameRate)
+    numFrames = try container.decode(Int.self, forKey: .numFrames)
+    mp4Size = try container.decode(Int.self, forKey: .mp4Size)
+    webmSize = try container.decode(Int.self, forKey: .webmSize)
+    createDate = try container.decode(Date.self, forKey: .createDate)
+    md5 = try container.decodeIfPresent(String.self, forKey: .md5)
+    source = try container.decode(Int.self, forKey: .source)
+    contentUrls = try container.decode([String: GfyContent].self, forKey: .contentUrls)
+  }
+
   // MARK: Public
 
   /// Representation of Gfycat's ternary `nsfw` state
   public enum Nsfw: Int, Codable {
     case safe = 0
     case notSafe = 1
-    case potentiallyUnsafe = 3
+    /// Unclear what precisely this would imply, but that is how Gfycat's documentation puts it
+    case potentiallyOffensive = 3
+
+    // MARK: Lifecycle
+
+    public init?(rawValue: Int) {
+      switch rawValue {
+      case 0:
+        self = .safe
+      case 1:
+        self = .notSafe
+      case 3:
+        self = .potentiallyOffensive
+      default:
+        return nil
+      }
+    }
+
+    public init(from decoder: Decoder) throws {
+      let container = try decoder.singleValueContainer()
+
+      if let number = try? container.decode(Int.self), let unwrapped = Nsfw(rawValue: number) {
+        self = unwrapped
+      } else if let string = try? container.decode(String.self), let number = Int(string), let unwrapped = Nsfw(rawValue: number) {
+        self = unwrapped
+      } else {
+        throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath,
+                                                                debugDescription: "Invalid NSFW ternary"))
+      }
+    }
   }
 
   public let tags: [String]
@@ -109,6 +215,10 @@ public struct GfyItem: Codable, Hashable, Equatable {
   }
 
   // MARK: Internal
+
+  enum OldCodingKeys: String, CodingKey {
+    case userName
+  }
 
   enum CodingKeys: String, CodingKey {
     case tags
