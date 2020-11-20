@@ -142,6 +142,8 @@ public struct GfyItem: Codable, Hashable, Equatable {
         self = .notSafe
       case 3:
         self = .potentiallyOffensive
+      case 12:
+        self = .unknown
       default:
         return nil
       }
