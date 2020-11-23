@@ -66,7 +66,7 @@ public final class AccountManager: ObservableObject {
                          completion: @escaping (_ account: Account) -> Void = { _ in }) {
     let oauth = OAuth2Swift(parameters: configuration.oauthParameters)!
     oauth.accessTokenBasicAuthentification = true
-    oauth.authorizeURLHandler = IllithidWebAuthURLHandler(callbackURLScheme: configuration.redirectURI.absoluteString,
+    oauth.authorizeURLHandler = IllithidWebAuthURLHandler(callbackURLScheme: configuration.redirectURI.scheme!,
                                                           anchor: anchor)
 
     // Generate random state value to protect from CSRF
@@ -81,7 +81,10 @@ public final class AccountManager: ObservableObject {
       switch result {
       case .success:
         self.logger.debugMessage("Authorization successful")
-        self.fetchNewAccount(oauth: oauth, completion: completion)
+        self.fetchNewAccount(oauth: oauth) { account in
+          self.setAccount(account)
+          completion(account)
+        }
       case let .failure(error):
         self.logger.errorMessage("Authorization failed: \(error)")
       }
@@ -91,7 +94,7 @@ public final class AccountManager: ObservableObject {
   public func reauthenticate(account: Account, anchor: ASWebAuthenticationPresentationContextProviding) {
     let oauth = OAuth2Swift(parameters: configuration.oauthParameters)!
     oauth.accessTokenBasicAuthentification = true
-    oauth.authorizeURLHandler = IllithidWebAuthURLHandler(callbackURLScheme: configuration.redirectURI.absoluteString,
+    oauth.authorizeURLHandler = IllithidWebAuthURLHandler(callbackURLScheme: configuration.redirectURI.scheme!,
                                                           anchor: anchor)
 
     // Generate random state value to protect from CSRF
@@ -237,7 +240,6 @@ public final class AccountManager: ObservableObject {
           let account = try self.decoder.decode(Account.self, from: response.data)
           self.accounts.append(account)
           try self.write(token: oauth.client.credential, for: account)
-          self.currentAccount = account
           completion(account)
         } catch {
           self.logger.errorMessage("ERROR decoding new account: \(error)")
