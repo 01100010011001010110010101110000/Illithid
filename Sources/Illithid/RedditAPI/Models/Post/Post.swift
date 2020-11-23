@@ -451,6 +451,7 @@ public extension Post {
 public extension Post {
   enum RemovedByCategory: String, Codable {
     case moderator
+    case copyrightTakedown = "copyright_takedown"
   }
 }
 
