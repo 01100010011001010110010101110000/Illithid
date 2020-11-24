@@ -21,7 +21,7 @@ import Alamofire
 
 // MARK: - AccountContent
 
-public enum AccountContent: String, CaseIterable {
+public enum AccountContent: String, CaseIterable, Hashable {
   case overview
   case submissions
   case comments
