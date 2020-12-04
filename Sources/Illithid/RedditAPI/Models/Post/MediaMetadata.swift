@@ -54,7 +54,7 @@ public struct MediaMetadata: Codable {
   public let id: String
   public let status: Status
   public let type: MediaType
-  public let mimeType: String
+  public let mimeType: String?
   public let previews: [MediaSource]?
   public let source: MediaSource?
   /// The URL of the item's HLS if the gallery item is an `.redditVideo`
