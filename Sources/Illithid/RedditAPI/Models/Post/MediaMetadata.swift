@@ -35,9 +35,9 @@ public struct MediaMetadata: Codable {
     public let width: Int
     public let height: Int
     public let url: URL?
-    /// The URL of the item's GIF if the gallery item is a `MediaType.animatedImage`
+    /// The URL of the item's GIF if the gallery item is an `.animatedImage`
     public let gif: URL?
-    /// The URL of the item's MP4 if the gallery item is a `MediaType.animatedImage`
+    /// The URL of the item's MP4 if the gallery item is an `.animatedImage`
     public let mp4: URL?
 
     // MARK: Private
@@ -55,8 +55,17 @@ public struct MediaMetadata: Codable {
   public let status: Status
   public let type: MediaType
   public let mimeType: String
-  public let previews: [MediaSource]
-  public let source: MediaSource
+  public let previews: [MediaSource]?
+  public let source: MediaSource?
+  /// The URL of the item's HLS if the gallery item is an `.redditVideo`
+  public let hls: URL?
+  /// The URL of the item's dash if the gallery item is an `.redditVideo`
+  public let dash: URL?
+  public let isGif: Bool?
+  /// The item's width if the gallery item is an `.redditVideo`
+  public let width: Int?
+  /// The item's height if the gallery item is an `.redditVideo`
+  public let height: Int?
 
   // MARK: Private
 
@@ -67,5 +76,10 @@ public struct MediaMetadata: Codable {
     case mimeType = "m"
     case previews = "p"
     case source = "s"
+    case isGif
+    case hlsUrl
+    case dashUrl
+    case width = "x"
+    case height = "y"
   }
 }
