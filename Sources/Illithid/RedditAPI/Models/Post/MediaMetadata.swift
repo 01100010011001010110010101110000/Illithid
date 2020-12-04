@@ -21,6 +21,7 @@ public struct MediaMetadata: Codable {
   public enum MediaType: String, Codable {
     case image = "Image"
     case animatedImage = "AnimatedImage"
+    case redditVideo = "RedditVideo"
   }
 
   public enum Status: String, Codable {
