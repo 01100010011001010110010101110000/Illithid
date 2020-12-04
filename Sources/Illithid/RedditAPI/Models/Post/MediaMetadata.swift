@@ -77,8 +77,8 @@ public struct MediaMetadata: Codable {
     case previews = "p"
     case source = "s"
     case isGif
-    case hlsUrl
-    case dashUrl
+    case hls = "hlsUrl"
+    case dash = "dashUrl"
     case width = "x"
     case height = "y"
   }
