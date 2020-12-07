@@ -450,8 +450,11 @@ public extension Post {
 
 public extension Post {
   enum RemovedByCategory: String, Codable {
+    /// Removed by a moderator of the `Subreddit` the `Post` is in
     case moderator
+    /// Removed due to a copyright notice
     case copyrightTakedown = "copyright_takedown"
+    case reddit
   }
 }
 
