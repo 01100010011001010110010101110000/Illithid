@@ -170,7 +170,8 @@ public struct Comment: RedditObject {
   public let permalink: String
   public let numReports: Int?
   public let locked: Bool
-  public let name: String
+  /// The `Fullname` of the comment
+  public let name: Fullname
   public let created: Date
   public let subreddit: String
   public let authorFlairText: String?
