@@ -95,7 +95,7 @@ public struct Comment: RedditObject {
     permalink = try container.decode(String.self, forKey: .permalink)
     numReports = try container.decodeIfPresent(Int.self, forKey: .numReports)
     locked = try container.decode(Bool.self, forKey: .locked)
-    name = try container.decode(String.self, forKey: .name)
+    name = try container.decode(Fullname.self, forKey: .name)
     created = try container.decode(Date.self, forKey: .created)
     subreddit = try container.decode(String.self, forKey: .subreddit)
     authorFlairText = try container.decodeIfPresent(String.self, forKey: .authorFlairText)
@@ -189,7 +189,7 @@ public struct Comment: RedditObject {
   public let contentCategories: [String]?
 
   public var fullname: Fullname {
-    "\(Kind.comment.rawValue)_\(id)"
+    name
   }
 
   public var isAdminComment: Bool {
