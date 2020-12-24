@@ -127,6 +127,11 @@ public struct Comment: RedditObject {
   /// The `Fullname` of this comment's post
   public let linkId: Fullname
   public let authorFlairTemplateId: String?
+  /// Whether the user has voted on the comment
+  /// - Note: This variable represents a ternary state
+  ///   * `true` - the user has upvoted the comment
+  ///   * `false` - the user has downvoted the comment
+  ///   * `nil` - the user has not voted on the comment
   public var likes: Bool?
   public let noFollow: Bool
 
