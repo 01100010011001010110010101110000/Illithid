@@ -179,7 +179,8 @@ public struct Comment: RedditObject {
   public let createdUtc: Date
   public let subredditNamePrefixed: String
   public let controversiality: Int
-  /// Depth is present unless fetching a comment from `/api/info` or `/search`
+  /// The depth of the comment in the comment forest.
+  /// - Note: Depth is present unless fetching a comment from `/api/info` or `/search`
   public internal(set) var depth: Int?
   public let authorFlairBackgroundColor: String?
   public let modReports: [String]
