@@ -20,7 +20,11 @@ import Alamofire
 
 // MARK: - SubredditSort
 
-public enum SubredditSort {
+public enum SubredditSort: String, Codable, CaseIterable, Identifiable, Hashable {
+  public var id: Self.RawValue {
+    rawValue
+  }
+  
   case popular
   case new
   case gold

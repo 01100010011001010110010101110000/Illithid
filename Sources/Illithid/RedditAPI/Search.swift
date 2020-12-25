@@ -29,7 +29,11 @@ public enum SearchType: String, CaseIterable {
 
 // MARK: - SearchSort
 
-public enum SearchSort: String, Codable {
+public enum SearchSort: String, Codable, CaseIterable, Identifiable, Hashable {
+  public var id: Self.RawValue {
+    rawValue
+  }
+  
   case relevance
   case hot
   case top

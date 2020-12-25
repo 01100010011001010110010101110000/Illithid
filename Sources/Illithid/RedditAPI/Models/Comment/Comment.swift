@@ -19,8 +19,14 @@ import Alamofire
 
 // MARK: - CommentsSort
 
-public enum CommentsSort: String, Codable {
+public enum CommentsSort: String, Codable, CaseIterable, Identifiable, Hashable {
+  public var id: Self.RawValue {
+    rawValue
+  }
+
+  /// Reddit's internal name for `best`, returns the same results
   case confidence
+  case best
   case top
   case new
   case controversial
