@@ -66,12 +66,26 @@ enum ActionRouter: URLRequestConvertible, MirrorableEnum {
 
 // MARK: - SubscribeAction
 
-enum SubscribeAction: String, Codable {
+public enum SubscribeAction: String, Codable {
   case subscribe = "sub"
   case unsubscribe = "unsub"
 }
 
-internal extension Illithid {
+public extension Illithid {
+  @discardableResult
+  func vote(comment: Comment, direction: VoteDirection, queue: DispatchQueue = .main,
+            completion: @escaping (Result<Data, AFError>) -> Void)
+  -> DataRequest {
+    vote(fullname: comment.name, direction: direction, queue: queue, completion: completion)
+  }
+
+  @discardableResult
+  func vote(post: Post, direction: VoteDirection, queue: DispatchQueue = .main,
+            completion: @escaping (Result<Data, AFError>) -> Void)
+  -> DataRequest {
+    vote(fullname: post.name, direction: direction, queue: queue, completion: completion)
+  }
+
   @discardableResult
   func vote(fullname: Fullname, direction: VoteDirection, queue: DispatchQueue = .main,
             completion: @escaping (Result<Data, AFError>) -> Void)
@@ -84,6 +98,20 @@ internal extension Illithid {
   }
 
   @discardableResult
+  func save(comment: Comment, queue: DispatchQueue = .main,
+            completion: @escaping (Result<Data, AFError>) -> Void)
+    -> DataRequest {
+    save(fullname: comment.name, queue: queue, completion: completion)
+  }
+
+  @discardableResult
+  func save(post: Post, queue: DispatchQueue = .main,
+            completion: @escaping (Result<Data, AFError>) -> Void)
+    -> DataRequest {
+    save(fullname: post.name, queue: queue, completion: completion)
+  }
+
+  @discardableResult
   func save(fullname: Fullname, queue: DispatchQueue = .main,
             completion: @escaping (Result<Data, AFError>) -> Void)
     -> DataRequest {
@@ -92,6 +120,20 @@ internal extension Illithid {
       .responseData(queue: queue) { response in
         completion(response.result)
       }
+  }
+
+  @discardableResult
+  func unsave(comment: Comment, queue: DispatchQueue = .main,
+              completion: @escaping (Result<Data, AFError>) -> Void)
+    -> DataRequest {
+    unsave(fullname: comment.name, queue: queue, completion: completion)
+  }
+
+  @discardableResult
+  func unsave(post: Comment, queue: DispatchQueue = .main,
+              completion: @escaping (Result<Data, AFError>) -> Void)
+    -> DataRequest {
+    unsave(fullname: post.name, queue: queue, completion: completion)
   }
 
   @discardableResult
