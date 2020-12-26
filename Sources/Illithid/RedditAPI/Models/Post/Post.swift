@@ -29,7 +29,7 @@ public enum VoteDirection: Int, Codable {
   case up = 1
 
   /// Initializes `self` to the current vote direction in a comment
-  init(from comment: Comment) {
+  public init(from comment: Comment) {
     if let likeDirection = comment.likes {
       self = likeDirection ? .up : .down
     } else {
