@@ -25,6 +25,7 @@ import Willow
 enum CommentRouter: URLConvertible {
   case comments(for: Post.ID, in: String)
   case moreComments
+  case submitComment
 
   // MARK: Internal
 
@@ -34,10 +35,13 @@ enum CommentRouter: URLConvertible {
       return URL(string: "/r/\(subreddit)/comments/\(post)", relativeTo: Illithid.shared.baseURL)!
     case .moreComments:
       return URL(string: "/api/morechildren", relativeTo: Illithid.shared.baseURL)!
+    case .submitComment:
+      return URL(string: "/api/comment", relativeTo: Illithid.shared.baseURL)!
     }
   }
 }
 
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public extension Illithid {
   /**
    Fetch comments for a particular `Post`
@@ -56,7 +60,6 @@ public extension Illithid {
      - truncate: Truncate the listing after `truncate` `Comments` if greater than zero
    - Returns: A one-shot `AnyPublisher` with the `Listing` or an error
    */
-  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
   func comments(for post: Post, parameters: ListingParameters,
                 by sort: CommentsSort = .confidence, focusOn comment: ID36? = nil, context: Int? = nil,
                 depth: Int = 0, showEdits _: Bool = true, showMore: Bool = true,
@@ -84,7 +87,6 @@ public extension Illithid {
      - truncate: Truncate the listing after `truncate` `Comments` if greater than zero
    - Returns: A one-shot `AnyPublisher` with the `Listing` or an error
    */
-  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
   func comments(for postId: Post.ID, in subredditName: String, parameters: ListingParameters,
                 by sort: CommentsSort = .confidence, focusOn comment: ID36? = nil, context: Int? = nil,
                 depth: Int = 0, showEdits: Bool = true, showMore: Bool = true,
@@ -165,6 +167,22 @@ public extension Illithid {
         .eraseToAnyPublisher()
     }
   }
+
+  func postComment(replyingTo parent: Fullname, body: String, queue: DispatchQueue = .main)
+    -> AnyPublisher<Comment, AFError> {
+    let parameterEncoding = URLEncoding(boolEncoding: .numeric)
+    let parameters: Parameters = [
+      "api_type": "json",
+      "return_rtjson": true,
+      "text": body,
+      "thing_id": parent
+    ]
+
+    return session.request(CommentRouter.submitComment, method: .post,
+                           parameters: parameters, encoding: parameterEncoding)
+      .publishDecodable(type: Comment.self, queue: queue, decoder: decoder)
+      .value()
+  }
 }
 
 public extension Comment {
@@ -241,5 +259,19 @@ public extension Comment {
         completion(.failure(error))
       }
     }
+  }
+}
+
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+public extension Comment {
+  func reply(body: String, queue: DispatchQueue = .main) -> AnyPublisher<Comment, AFError> {
+    Illithid.shared.postComment(replyingTo: name, body: body, queue: queue)
+  }
+}
+
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+public extension Post {
+  func reply(body: String, queue: DispatchQueue = .main) -> AnyPublisher<Comment, AFError> {
+    Illithid.shared.postComment(replyingTo: name, body: body, queue: queue)
   }
 }
