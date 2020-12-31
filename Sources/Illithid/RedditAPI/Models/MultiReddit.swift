@@ -123,7 +123,7 @@ public struct Multireddit: RedditObject {
     case createdUtc = "created_utc"
     case visibility
     case created
-    case over18
+    case over18 = "over_18"
     case path
     case owner
 //    case keyColor
