@@ -180,7 +180,7 @@ public extension Subreddit {
 
 public extension Subreddit {
   @discardableResult
-  func submitLinkPost(`title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
+  func submitLinkPost(title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
                       collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
                       flairId: String? = nil, flairText: String? = nil, resubmit: Bool = false,
                       notifyOfReplies subscribe: Bool = true, linkTo: URL, queue: DispatchQueue = .main,
