@@ -177,3 +177,56 @@ public extension Subreddit {
     Illithid.shared.moderatorsOf(subreddit: self, queue: queue, completion: completion)
   }
 }
+
+public extension Subreddit {
+  @discardableResult
+  func submitLinkPost(subredditDisplayName subreddit: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
+                      collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
+                      flairId: String? = nil, flairText: String? = nil, resubmit: Bool = false,
+                      notifyOfReplies subscribe: Bool = true, linkTo: URL? = nil, queue: DispatchQueue = .main,
+                      completion: @escaping (Result<NewPostResponse, AFError>) -> Void)
+  -> DataRequest {
+    Illithid.shared.submit(kind: .link, subredditDisplayName: displayName, title: title, isNsfw: isNsfw, isSpoiler: isSpoiler,
+           collectionId: collectionId, eventStart: eventStart, eventEnd: eventEnd, eventTimeZone: eventTimeZone,
+           flairId: flairId, flairText: flairText, resubmit: resubmit, notifyOfReplies: subscribe,
+           linkTo: linkTo, queue: queue, completion: completion)
+  }
+
+  @discardableResult
+  func submitTextPost(subredditDisplayName subreddit: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
+                      collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
+                      flairId: String? = nil, flairText: String? = nil, notifyOfReplies subscribe: Bool = true,
+                      markdown text: String? = nil, queue: DispatchQueue = .main,
+                      completion: @escaping (Result<NewPostResponse, AFError>) -> Void)
+  -> DataRequest {
+    Illithid.shared.submit(kind: .`self`, subredditDisplayName: displayName, title: title, isNsfw: isNsfw, isSpoiler: isSpoiler,
+           collectionId: collectionId, eventStart: eventStart, eventEnd: eventEnd, eventTimeZone: eventTimeZone,
+           flairId: flairId, flairText: flairText, resubmit: false, notifyOfReplies: subscribe, markdown: text,
+           queue: queue, completion: completion)
+  }
+}
+
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+public extension Subreddit {
+  func submitLinkPost(title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
+                      collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
+                      flairId: String? = nil, flairText: String? = nil, resubmit: Bool = false,
+                      notifyOfReplies subscribe: Bool = true, linkTo: URL? = nil, queue: DispatchQueue = .main)
+  -> AnyPublisher<NewPostResponse, AFError> {
+    Illithid.shared.submit(kind: .link, subredditDisplayName: displayName, title: title, isNsfw: isNsfw, isSpoiler: isSpoiler,
+           collectionId: collectionId, eventStart: eventStart, eventEnd: eventEnd, eventTimeZone: eventTimeZone,
+           flairId: flairId, flairText: flairText, resubmit: resubmit, notifyOfReplies: subscribe,
+           linkTo: linkTo, queue: queue)
+  }
+
+  func submitTextPost(title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
+                      collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
+                      flairId: String? = nil, flairText: String? = nil, notifyOfReplies subscribe: Bool = true,
+                      markdown text: String? = nil, queue: DispatchQueue = .main)
+  -> AnyPublisher<NewPostResponse, AFError> {
+    Illithid.shared.submit(kind: .`self`, subredditDisplayName: displayName, title: title, isNsfw: isNsfw, isSpoiler: isSpoiler,
+           collectionId: collectionId, eventStart: eventStart, eventEnd: eventEnd, eventTimeZone: eventTimeZone,
+           flairId: flairId, flairText: flairText, resubmit: false, notifyOfReplies: subscribe, markdown: text,
+           queue: queue)
+  }
+}
