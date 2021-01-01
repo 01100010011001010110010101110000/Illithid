@@ -159,7 +159,7 @@ public extension Illithid {
   func submitLinkPost(subredditDisplayName subreddit: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
                       collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
                       flairId: String? = nil, flairText: String? = nil, resubmit: Bool = false,
-                      notifyOfReplies subscribe: Bool = true, linkTo: URL? = nil, queue: DispatchQueue = .main,
+                      notifyOfReplies subscribe: Bool = true, linkTo: URL, queue: DispatchQueue = .main,
                       completion: @escaping (Result<NewPostResponse, AFError>) -> Void)
   -> DataRequest {
     submit(kind: .link, subredditDisplayName: subreddit, title: title, isNsfw: isNsfw, isSpoiler: isSpoiler,
@@ -172,7 +172,7 @@ public extension Illithid {
   func submitTextPost(subredditDisplayName subreddit: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
                       collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
                       flairId: String? = nil, flairText: String? = nil, notifyOfReplies subscribe: Bool = true,
-                      markdown text: String? = nil, queue: DispatchQueue = .main,
+                      markdown text: String, queue: DispatchQueue = .main,
                       completion: @escaping (Result<NewPostResponse, AFError>) -> Void)
   -> DataRequest {
     submit(kind: .`self`, subredditDisplayName: subreddit, title: title, isNsfw: isNsfw, isSpoiler: isSpoiler,
@@ -220,7 +220,7 @@ public extension Illithid {
   func submitLinkPost(subredditDisplayName subreddit: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
                       collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
                       flairId: String? = nil, flairText: String? = nil, resubmit: Bool = false,
-                      notifyOfReplies subscribe: Bool = true, linkTo: URL? = nil, queue: DispatchQueue = .main)
+                      notifyOfReplies subscribe: Bool = true, linkTo: URL, queue: DispatchQueue = .main)
   -> AnyPublisher<NewPostResponse, AFError> {
     submit(kind: .link, subredditDisplayName: subreddit, title: title, isNsfw: isNsfw, isSpoiler: isSpoiler,
            collectionId: collectionId, eventStart: eventStart, eventEnd: eventEnd, eventTimeZone: eventTimeZone,
@@ -232,7 +232,7 @@ public extension Illithid {
   func submitTextPost(subredditDisplayName subreddit: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
                       collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
                       flairId: String? = nil, flairText: String? = nil, notifyOfReplies subscribe: Bool = true,
-                      markdown text: String? = nil, queue: DispatchQueue = .main)
+                      markdown text: String, queue: DispatchQueue = .main)
   -> AnyPublisher<NewPostResponse, AFError> {
     submit(kind: .`self`, subredditDisplayName: subreddit, title: title, isNsfw: isNsfw, isSpoiler: isSpoiler,
            collectionId: collectionId, eventStart: eventStart, eventEnd: eventEnd, eventTimeZone: eventTimeZone,
