@@ -26,6 +26,7 @@ enum PostRouter: URLConvertible {
   case subreddit(displayName: String, sort: PostSort)
   case userMultireddit(username: String, multiName: String, sort: PostSort)
   case frontPage(page: FrontPage, sort: PostSort)
+  case submit
 
   // MARK: Internal
 
@@ -52,6 +53,8 @@ enum PostRouter: URLConvertible {
       return URL(string: "/user/\(username)/m/\(multiName)/\(sort)", relativeTo: baseUrl)!
     case let .frontPage(page, sort):
       return try page.asURL().appendingPathComponent("\(sort)")
+    case .submit:
+      return URL(string: "/api/submit", relativeTo: baseUrl)!
     }
   }
 
@@ -63,6 +66,7 @@ enum PostRouter: URLConvertible {
 }
 
 public extension Illithid {
+  // MARK: Fetch Posts
   @discardableResult
   func fetchPosts(for subreddit: Subreddit, sortBy postSort: PostSort,
                   location: Location? = nil, topInterval: TopInterval? = nil,
@@ -111,6 +115,130 @@ public extension Illithid {
       completion(result)
     }
   }
+
+  // MARK: Submit Posts
+
+  @discardableResult
+  func submit(kind: NewPostType, subredditDisplayName subreddit: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
+              collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
+              flairId: String? = nil, flairText: String? = nil, resubmit: Bool = false,
+              notifyOfReplies subscribe: Bool = true, markdown text: String? = nil,
+              linkTo: URL? = nil, videoPosterUrl: URL? = nil, queue: DispatchQueue = .main,
+              completion: @escaping (Result<NewPostResponse, AFError>) -> Void)
+    -> DataRequest {
+    let encoding = URLEncoding(boolEncoding: .numeric)
+    let dateFormatter = ISO8601DateFormatter()
+    let tempParameters: [String: Any?] = [
+      "api_type": "json",
+      "kind": kind,
+      "sr": subreddit,
+      "title": title,
+      "nsfw": isNsfw,
+      "spoiler": isSpoiler,
+      "collection_id": collectionId?.uuidString,
+      "event_start": eventStart == nil ? nil : dateFormatter.string(from: eventStart!),
+      "event_end": eventStart == nil ? nil : dateFormatter.string(from: eventEnd!),
+      "event_tz": eventTimeZone,
+      "flair_id": flairId,
+      "flair_text": flairText,
+      "resubmit": resubmit,
+      "sendreplies": subscribe,
+      "text": text,
+      "url": linkTo?.absoluteString,
+      "video_poster_url": videoPosterUrl?.absoluteString
+    ]
+    let parameters: Parameters = tempParameters.compactMapValues { $0 }
+
+    return session.request(PostRouter.submit, method: .post, parameters: parameters, encoding: encoding)
+      .responseDecodable(of: NewPostResponse.self, queue: queue, decoder: decoder) { response in
+        completion(response.result)
+      }
+  }
+
+  @discardableResult
+  func submitLinkPost(subredditDisplayName subreddit: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
+                      collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
+                      flairId: String? = nil, flairText: String? = nil, resubmit: Bool = false,
+                      notifyOfReplies subscribe: Bool = true, linkTo: URL? = nil, queue: DispatchQueue = .main,
+                      completion: @escaping (Result<NewPostResponse, AFError>) -> Void)
+  -> DataRequest {
+    submit(kind: .link, subredditDisplayName: subreddit, title: title, isNsfw: isNsfw, isSpoiler: isSpoiler,
+           collectionId: collectionId, eventStart: eventStart, eventEnd: eventEnd, eventTimeZone: eventTimeZone,
+           flairId: flairId, flairText: flairText, resubmit: resubmit, notifyOfReplies: subscribe,
+           linkTo: linkTo, queue: queue, completion: completion)
+  }
+
+  @discardableResult
+  func submitTextPost(subredditDisplayName subreddit: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
+                      collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
+                      flairId: String? = nil, flairText: String? = nil, notifyOfReplies subscribe: Bool = true,
+                      markdown text: String? = nil, queue: DispatchQueue = .main,
+                      completion: @escaping (Result<NewPostResponse, AFError>) -> Void)
+  -> DataRequest {
+    submit(kind: .`self`, subredditDisplayName: subreddit, title: title, isNsfw: isNsfw, isSpoiler: isSpoiler,
+           collectionId: collectionId, eventStart: eventStart, eventEnd: eventEnd, eventTimeZone: eventTimeZone,
+           flairId: flairId, flairText: flairText, resubmit: false, notifyOfReplies: subscribe, markdown: text,
+           queue: queue, completion: completion)
+  }
+
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+  func submit(kind: NewPostType, subredditDisplayName subreddit: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
+              collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
+              flairId: String? = nil, flairText: String? = nil, resubmit: Bool = false,
+              notifyOfReplies subscribe: Bool = true, markdown text: String? = nil,
+              linkTo: URL? = nil, videoPosterUrl: URL? = nil, queue: DispatchQueue = .main)
+    -> AnyPublisher<NewPostResponse, AFError> {
+    let encoding = URLEncoding(boolEncoding: .numeric)
+    let dateFormatter = ISO8601DateFormatter()
+    let tempParameters: [String: Any?] = [
+      "api_type": "json",
+      "kind": kind,
+      "sr": subreddit,
+      "title": title,
+      "nsfw": isNsfw,
+      "spoiler": isSpoiler,
+      "collection_id": collectionId?.uuidString,
+      "event_start": eventStart == nil ? nil : dateFormatter.string(from: eventStart!),
+      "event_end": eventStart == nil ? nil : dateFormatter.string(from: eventEnd!),
+      "event_tz": eventTimeZone,
+      "flair_id": flairId,
+      "flair_text": flairText,
+      "resubmit": resubmit,
+      "sendreplies": subscribe,
+      "text": text,
+      "url": linkTo?.absoluteString,
+      "video_poster_url": videoPosterUrl?.absoluteString
+    ]
+    let parameters: Parameters = tempParameters.compactMapValues { $0 }
+
+    return session.request(PostRouter.submit, method: .post, parameters: parameters, encoding: encoding)
+      .publishDecodable(type: NewPostResponse.self, queue: queue, decoder: decoder)
+      .value()
+  }
+
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+  func submitLinkPost(subredditDisplayName subreddit: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
+                      collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
+                      flairId: String? = nil, flairText: String? = nil, resubmit: Bool = false,
+                      notifyOfReplies subscribe: Bool = true, linkTo: URL? = nil, queue: DispatchQueue = .main)
+  -> AnyPublisher<NewPostResponse, AFError> {
+    submit(kind: .link, subredditDisplayName: subreddit, title: title, isNsfw: isNsfw, isSpoiler: isSpoiler,
+           collectionId: collectionId, eventStart: eventStart, eventEnd: eventEnd, eventTimeZone: eventTimeZone,
+           flairId: flairId, flairText: flairText, resubmit: resubmit, notifyOfReplies: subscribe,
+           linkTo: linkTo, queue: queue)
+  }
+
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+  func submitTextPost(subredditDisplayName subreddit: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
+                      collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
+                      flairId: String? = nil, flairText: String? = nil, notifyOfReplies subscribe: Bool = true,
+                      markdown text: String? = nil, queue: DispatchQueue = .main)
+  -> AnyPublisher<NewPostResponse, AFError> {
+    submit(kind: .`self`, subredditDisplayName: subreddit, title: title, isNsfw: isNsfw, isSpoiler: isSpoiler,
+           collectionId: collectionId, eventStart: eventStart, eventEnd: eventEnd, eventTimeZone: eventTimeZone,
+           flairId: flairId, flairText: flairText, resubmit: false, notifyOfReplies: subscribe, markdown: text,
+           queue: queue)
+  }
 }
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
@@ -122,6 +250,8 @@ public extension Post {
       }.eraseToAnyPublisher()
   }
 }
+
+// MARK: Post Actions
 
 public extension Post {
   func upvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
