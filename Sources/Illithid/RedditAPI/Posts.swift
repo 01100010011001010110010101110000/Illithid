@@ -169,7 +169,7 @@ public extension Illithid {
   }
 
   @discardableResult
-  func submitTextPost(subredditDisplayName subreddit: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
+  func submitSelfPost(subredditDisplayName subreddit: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
                       collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
                       flairId: String? = nil, flairText: String? = nil, notifyOfReplies subscribe: Bool = true,
                       markdown text: String, queue: DispatchQueue = .main,
@@ -229,7 +229,7 @@ public extension Illithid {
   }
 
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-  func submitTextPost(subredditDisplayName subreddit: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
+  func submitSelfPost(subredditDisplayName subreddit: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
                       collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
                       flairId: String? = nil, flairText: String? = nil, notifyOfReplies subscribe: Bool = true,
                       markdown text: String, queue: DispatchQueue = .main)
