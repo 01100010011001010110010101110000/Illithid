@@ -127,7 +127,6 @@ public extension Illithid {
               completion: @escaping (Result<NewPostResponse, AFError>) -> Void)
     -> DataRequest {
     let encoding = URLEncoding(boolEncoding: .numeric)
-    let dateFormatter = ISO8601DateFormatter()
     let tempParameters: [String: Any?] = [
       "api_type": "json",
       "kind": kind,
@@ -136,8 +135,8 @@ public extension Illithid {
       "nsfw": isNsfw,
       "spoiler": isSpoiler,
       "collection_id": collectionId?.uuidString,
-      "event_start": eventStart == nil ? nil : dateFormatter.string(from: eventStart!),
-      "event_end": eventStart == nil ? nil : dateFormatter.string(from: eventEnd!),
+      "event_start": eventStart == nil ? nil : redditEventTimeFormatter.string(from: eventStart!),
+      "event_end": eventStart == nil ? nil : redditEventTimeFormatter.string(from: eventEnd!),
       "event_tz": eventTimeZone,
       "flair_id": flairId,
       "flair_text": flairText,

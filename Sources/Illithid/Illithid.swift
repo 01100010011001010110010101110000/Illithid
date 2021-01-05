@@ -35,6 +35,9 @@ open class Illithid: ObservableObject {
       logger = .releaseLogger(subsystem: "com.flayware.illithid")
     #endif
 
+    redditEventTimeFormatter = ISO8601DateFormatter()
+    redditEventTimeFormatter.formatOptions = [.withFullDate, .withTime, .withColonSeparatorInTime]
+
     accountManager = AccountManager(logger: logger)
     session = accountManager.makeSession(for: accountManager.currentAccount)
   }
@@ -66,6 +69,8 @@ open class Illithid: ObservableObject {
   // MARK: Internal
 
   internal let decoder: JSONDecoder = .init()
+
+  internal var redditEventTimeFormatter: ISO8601DateFormatter
 
   internal var session: Session
 
