@@ -355,3 +355,9 @@ public extension Account {
     }
   }
 }
+
+extension Account: PostAcceptor {
+  public var uploadTarget: String {
+    "u_\(name)"
+  }
+}
