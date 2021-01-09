@@ -16,7 +16,7 @@ public struct RedGfyWrapper: Codable, Hashable, Equatable {
 
   public let item: RedGfyItem
 
-  public static func == (lhs: GfyWrapper, rhs: GfyWrapper) -> Bool {
+  public static func == (lhs: RedGfyWrapper, rhs: RedGfyWrapper) -> Bool {
     lhs.item == rhs.item
   }
 
