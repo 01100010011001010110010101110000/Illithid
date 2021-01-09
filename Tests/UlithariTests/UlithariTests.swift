@@ -31,4 +31,25 @@ final class UlithariTests: XCTestCase {
     XCTAssertTrue(ulithari.imgurLinkType(albumLink)! == Ulithari.ImgurLinkType.album(id: "7osn4XS"))
     XCTAssertTrue(ulithari.imgurLinkType(galleryLink)! == Ulithari.ImgurLinkType.gallery(id: "q2cO84x"))
   }
+
+  func testRedGfy() {
+    let ulithari: Ulithari = .shared
+
+    let id: String = "scratchyfinishedairedaleterrier"
+    var item: RedGfyItem? = nil
+
+    let expectation = self.expectation(description: "Fetch Gfy")
+
+    _ = ulithari.fetchRedGif(id: id) { result in
+      switch result {
+      case let .success(fetched):
+        item = fetched
+      case let .failure(error):
+        print(error.localizedDescription)
+      }
+      expectation.fulfill()
+    }
+    waitForExpectations(timeout: 5, handler: nil)
+    XCTAssertTrue(item != nil && item!.gfyId == "scratchyfinishedairedaleterrier")
+  }
 }

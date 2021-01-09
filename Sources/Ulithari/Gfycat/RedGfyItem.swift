@@ -102,7 +102,7 @@ public struct RedGfyItem: Codable, Hashable, Equatable {
     mp4Size = try container.decode(Int.self, forKey: .mp4Size)
     createDate = try container.decode(Date.self, forKey: .createDate)
     source = try container.decode(Int.self, forKey: .source)
-    gifSize = try container.decode(Int.self, forKey: .gifSize)
+    gifSize = try container.decodeIfPresent(Int.self, forKey: .gifSize)
     contentUrls = try container.decode([String: GfyContent].self, forKey: .contentUrls)
   }
 
@@ -187,7 +187,7 @@ public struct RedGfyItem: Codable, Hashable, Equatable {
   public let mp4Size: Int
   public let createDate: Date
   public let source: Int
-  public let gifSize: Int
+  public let gifSize: Int?
   public let contentUrls: [String: GfyContent]
 
   public static func == (lhs: RedGfyItem, rhs: RedGfyItem) -> Bool {

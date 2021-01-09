@@ -89,10 +89,10 @@ public extension Ulithari {
 
   func fetchRedGif(id: String, queue: DispatchQueue = .main, completion: @escaping (Result<RedGfyItem, AFError>) -> Void) -> DataRequest {
     session.request(URL(string: "gfycats/\(id)", relativeTo: Self.redGifsBaseUrl)!).validate()
-      .responseDecodable(of: RedGfyItem.self, queue: queue, decoder: gfycatDecoder) { response in
+      .responseDecodable(of: RedGfyWrapper.self, queue: queue, decoder: gfycatDecoder) { response in
         switch response.result {
-        case let .success(item):
-          completion(.success(item))
+        case let .success(wrapper):
+          completion(.success(wrapper.item))
         case let .failure(error):
           completion(.failure(error))
         }
