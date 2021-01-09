@@ -87,19 +87,19 @@ public extension Ulithari {
     return fetchGfycat(id: gfyId, queue: queue, completion: completion)
   }
 
-  func fetchRedGif(id: String, queue: DispatchQueue = .main, completion: @escaping (Result<GfyItem, AFError>) -> Void) -> DataRequest {
+  func fetchRedGif(id: String, queue: DispatchQueue = .main, completion: @escaping (Result<RedGfyItem, AFError>) -> Void) -> DataRequest {
     session.request(URL(string: "gfycats/\(id)", relativeTo: Self.redGifsBaseUrl)!).validate()
-      .responseDecodable(of: GfyWrapper.self, queue: queue, decoder: gfycatDecoder) { response in
+      .responseDecodable(of: RedGfyItem.self, queue: queue, decoder: gfycatDecoder) { response in
         switch response.result {
-        case let .success(wrapper):
-          completion(.success(wrapper.item))
+        case let .success(item):
+          completion(.success(item))
         case let .failure(error):
           completion(.failure(error))
         }
       }
   }
 
-  func fetchRedGif(from url: URL, queue: DispatchQueue = .main, completion: @escaping (Result<GfyItem, AFError>) -> Void) -> DataRequest {
+  func fetchRedGif(from url: URL, queue: DispatchQueue = .main, completion: @escaping (Result<RedGfyItem, AFError>) -> Void) -> DataRequest {
     let redGifId = String(url.path.dropFirst())
     return fetchRedGif(id: redGifId, queue: queue, completion: completion)
   }

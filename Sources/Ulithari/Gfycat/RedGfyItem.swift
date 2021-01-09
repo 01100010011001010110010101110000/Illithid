@@ -1,27 +1,20 @@
-// Copyright (C) 2020 Tyler Gregory (@01100010011001010110010101110000)
 //
-// This program is free software: you can redistribute it and/or modify it under
-// the terms of the GNU General Public License as published by the Free Software
-// Foundation, either version 3 of the License, or (at your option) any later
-// version.
+//  File.swift
+//  
 //
-// This program is distributed in the hope that it will be useful, but WITHOUT ANY
-// WARRANTY; without even the implied warranty of  MERCHANTABILITY or FITNESS FOR
-// A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+//  Created by Tyler Gregory on 1/8/21.
 //
-// You should have received a copy of the GNU General Public License along with
-// this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import Foundation
 
 import Alamofire
 
-// MARK: - GfyWrapper
+// MARK: - RedGfyWrapper
 
-public struct GfyWrapper: Codable, Hashable, Equatable {
+public struct RedGfyWrapper: Codable, Hashable, Equatable {
   // MARK: Public
 
-  public let item: GfyItem
+  public let item: RedGfyItem
 
   public static func == (lhs: GfyWrapper, rhs: GfyWrapper) -> Bool {
     lhs.item == rhs.item
@@ -40,7 +33,7 @@ public struct GfyWrapper: Codable, Hashable, Equatable {
 
 // MARK: - GfyItem
 
-public struct GfyItem: Codable, Hashable, Equatable {
+public struct RedGfyItem: Codable, Hashable, Equatable {
   // MARK: Lifecycle
 
   public init(from decoder: Decoder) throws {
@@ -86,7 +79,6 @@ public struct GfyItem: Codable, Hashable, Equatable {
     webpURL = try container.decode(URL.self, forKey: .webpURL)
     mobileURL = try container.decode(URL.self, forKey: .mobileURL)
     mobilePosterURL = try container.decode(URL.self, forKey: .mobilePosterURL)
-    extraLemmas = try container.decode(String.self, forKey: .extraLemmas)
     thumb100PosterURL = try container.decode(URL.self, forKey: .thumb100PosterURL)
     miniURL = try container.decode(URL.self, forKey: .miniURL)
     gif100Px = try container.decode(String.self, forKey: .gif100Px)
@@ -96,12 +88,9 @@ public struct GfyItem: Codable, Hashable, Equatable {
     max2MBGIF = try container.decode(URL.self, forKey: .max2MBGIF)
     max1MBGIF = try container.decode(URL.self, forKey: .max1MBGIF)
     posterURL = try container.decode(URL.self, forKey: .posterURL)
-    languageText = try container.decode(String.self, forKey: .languageText)
     views = try container.decode(Int.self, forKey: .views)
-    gfyItemDescription = try container.decode(String.self, forKey: .gfyItemDescription)
     hasTransparency = try container.decode(Bool.self, forKey: .hasTransparency)
     hasAudio = try container.decode(Bool.self, forKey: .hasAudio)
-    gfyNumber = try container.decode(String.self, forKey: .gfyNumber)
     gfyId = try container.decode(String.self, forKey: .gfyId)
     gfyName = try container.decode(String.self, forKey: .gfyName)
     avgColor = try container.decode(String.self, forKey: .avgColor)
@@ -111,10 +100,9 @@ public struct GfyItem: Codable, Hashable, Equatable {
     frameRate = try container.decode(Double.self, forKey: .frameRate)
     numFrames = try container.decode(Int.self, forKey: .numFrames)
     mp4Size = try container.decode(Int.self, forKey: .mp4Size)
-    webmSize = try container.decode(Int.self, forKey: .webmSize)
     createDate = try container.decode(Date.self, forKey: .createDate)
-    md5 = try container.decodeIfPresent(String.self, forKey: .md5)
     source = try container.decode(Int.self, forKey: .source)
+    gifSize = try container.decode(Int.self, forKey: .gifSize)
     contentUrls = try container.decode([String: GfyContent].self, forKey: .contentUrls)
   }
 
@@ -173,7 +161,6 @@ public struct GfyItem: Codable, Hashable, Equatable {
   public let webpURL: URL
   public let mobileURL: URL
   public let mobilePosterURL: URL
-  public let extraLemmas: String
   public let thumb100PosterURL: URL
   public let miniURL: URL
   public let gif100Px: String
@@ -183,15 +170,12 @@ public struct GfyItem: Codable, Hashable, Equatable {
   public let max2MBGIF: URL
   public let max1MBGIF: URL
   public let posterURL: URL
-  public let languageText: String
   public let views: Int
   public let username: String
-  public let gfyItemDescription: String
   public let hasTransparency: Bool
   public let hasAudio: Bool
   public let likes: Int
   public let dislikes: Int
-  public let gfyNumber: String
   public let gfyId: String
   public let gfyName: String
   public let avgColor: String
@@ -201,13 +185,12 @@ public struct GfyItem: Codable, Hashable, Equatable {
   public let frameRate: Double
   public let numFrames: Int
   public let mp4Size: Int
-  public let webmSize: Int
   public let createDate: Date
-  public let md5: String?
   public let source: Int
+  public let gifSize: Int
   public let contentUrls: [String: GfyContent]
 
-  public static func == (lhs: GfyItem, rhs: GfyItem) -> Bool {
+  public static func == (lhs: RedGfyItem, rhs: RedGfyItem) -> Bool {
     lhs.gfyId == rhs.gfyId
   }
 
@@ -235,7 +218,6 @@ public struct GfyItem: Codable, Hashable, Equatable {
     case webpURL = "webpUrl"
     case mobileURL = "mobileUrl"
     case mobilePosterURL = "mobilePosterUrl"
-    case extraLemmas
     case thumb100PosterURL = "thumb100PosterUrl"
     case miniURL = "miniUrl"
     case gif100Px = "gif100px"
@@ -245,15 +227,12 @@ public struct GfyItem: Codable, Hashable, Equatable {
     case max2MBGIF = "max2mbGif"
     case max1MBGIF = "max1mbGif"
     case posterURL = "posterUrl"
-    case languageText
     case views
     case username
-    case gfyItemDescription = "description"
     case hasTransparency
     case hasAudio
     case likes
     case dislikes
-    case gfyNumber
     case gfyId
     case gfyName
     case avgColor
@@ -263,30 +242,9 @@ public struct GfyItem: Codable, Hashable, Equatable {
     case frameRate
     case numFrames
     case mp4Size
-    case webmSize
     case createDate
-    case md5
     case source
+    case gifSize
     case contentUrls = "content_urls"
-  }
-}
-
-// MARK: - GfyContent
-
-public struct GfyContent: Codable, Hashable {
-  // MARK: Public
-
-  public let url: URL
-  public let size: Int?
-  public let height: Int
-  public let width: Int
-
-  // MARK: Internal
-
-  enum CodingKeys: String, CodingKey {
-    case url
-    case size
-    case height
-    case width
   }
 }
