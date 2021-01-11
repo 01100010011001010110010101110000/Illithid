@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  PostAcceptor.swift
 //  
 //
 //  Created by Tyler Gregory on 1/7/21.
