@@ -72,7 +72,7 @@ public extension Illithid {
               formData.append(data, withName: key)
             }
             formData.append(imageData, withName: "file", fileName: nil, mimeType: mimeType as String)
-          }, with: request)
+          }, with: request, interceptor: nil)
             .publishData(queue: queue)
             .value()
             .map { data in
