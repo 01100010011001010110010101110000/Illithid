@@ -67,6 +67,7 @@ public extension Illithid {
           let request = try URLRequest(url: lease.lease.uploadUrl, method: .post)
           let imageData = try Data(contentsOf: fileUrl)
 
+          // TODO: Use a dedicated session for this
           return Session.default.upload(multipartFormData: { formData in
             lease.lease.parameters.forEach { key, value in
               guard let data = value.data(using: .utf8) else { return }
