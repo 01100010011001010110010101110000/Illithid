@@ -57,8 +57,8 @@ public extension Illithid {
     -> AnyPublisher<(AssetUploadLease, Data), AFError> {
     acquireMediaUploadLease(forFile: fileUrl, queue: queue)
       .flatMap { lease -> AnyPublisher<(AssetUploadLease, Data), AFError> in
-        let request = URLRequest(url: lease.lease.uploadUrl, method: .post)
         do {
+          let request = try URLRequest(url: lease.lease.uploadUrl, method: .post)
           let encodedRequest = try URLEncoding.httpBody.encode(request, with: lease.lease.parameters)
           return self.session.upload(fileUrl, with: encodedRequest)
             .publishData(queue: queue)
