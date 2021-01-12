@@ -29,7 +29,7 @@ enum UploadRouter: URLRequestConvertible {
   func asURLRequest() throws -> URLRequest {
     switch self {
     case let .mediaAssetLease(name, mime):
-      let request = try URLRequest(url: URL(string: "api/media/asset", relativeTo: Illithid.shared.baseURL)!, method: .get)
+      let request = try URLRequest(url: URL(string: "api/media/asset", relativeTo: Illithid.shared.baseURL)!, method: .post)
       return try URLEncoding.httpBody.encode(request, with: [
         "filepath": name,
         "mimetype": mime,
@@ -57,7 +57,7 @@ public extension Illithid {
     -> AnyPublisher<(AssetUploadLease, Data), AFError> {
     acquireMediaUploadLease(forFile: fileUrl, queue: queue)
       .flatMap { lease -> AnyPublisher<(AssetUploadLease, Data), AFError> in
-        let request = URLRequest(url: lease.lease.uploadUrl)
+        let request = URLRequest(url: lease.lease.uploadUrl, method: .post)
         do {
           let encodedRequest = try URLEncoding.httpBody.encode(request, with: lease.lease.parameters)
           return self.session.upload(fileUrl, with: encodedRequest)
