@@ -15,9 +15,9 @@
 import Foundation
 
 public struct AssetUploadLease: Decodable {
-  // MARK: Internal
+  // MARK: Public
 
-  struct AssetLease: Decodable {
+  public struct AssetLease: Decodable {
     // MARK: Lifecycle
 
     init(from decoder: Decoder) throws {
@@ -29,12 +29,12 @@ public struct AssetUploadLease: Decodable {
       })
     }
 
-    // MARK: Internal
+    // MARK: Public
 
-    let uploadUrl: URL
-    let parameters: [String: String]
+    public let uploadUrl: URL
+    public let parameters: [String: String]
 
-    var retrievalUrl: URL? {
+    public var retrievalUrl: URL? {
       guard let key = parameters["key"] else { return nil }
       return uploadUrl.appendingPathComponent(key, isDirectory: false)
     }
@@ -52,18 +52,18 @@ public struct AssetUploadLease: Decodable {
     }
   }
 
-  struct AssetDetails: Decodable {
-    // MARK: Internal
+  public struct AssetDetails: Decodable {
+    // MARK: Public
 
-    enum ProcessingState: String, Decodable {
+    public enum ProcessingState: String, Decodable {
       case incomplete
       case complete
     }
 
-    let assetId: String
-    let payload: AssetPayload
-    let processingState: ProcessingState
-    let websocketUrl: URL
+    public let assetId: String
+    public let payload: AssetPayload
+    public let processingState: ProcessingState
+    public let websocketUrl: URL
 
     // MARK: Private
 
@@ -75,10 +75,10 @@ public struct AssetUploadLease: Decodable {
     }
   }
 
-  struct AssetPayload: Decodable {
-    // MARK: Internal
+  public struct AssetPayload: Decodable {
+    // MARK: Public
 
-    let filePath: String
+    public let filePath: String
 
     // MARK: Private
 
@@ -87,8 +87,8 @@ public struct AssetUploadLease: Decodable {
     }
   }
 
-  let lease: AssetLease
-  let asset: AssetDetails
+  public let lease: AssetLease
+  public let asset: AssetDetails
 
   // MARK: Private
 
