@@ -57,10 +57,22 @@ public extension Illithid {
     -> AnyPublisher<(AssetUploadLease, Data), AFError> {
     acquireMediaUploadLease(forFile: fileUrl, queue: queue)
       .flatMap { lease -> AnyPublisher<(AssetUploadLease, Data), AFError> in
+        guard let uti = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, fileUrl.pathExtension as CFString, nil)?.takeRetainedValue(),
+              let mimeType = UTTypeCopyPreferredTagWithClass(uti, kUTTagClassMIMEType)?.takeRetainedValue() else {
+          return Fail(outputType: (AssetUploadLease, Data).self, failure: AFError.invalidURL(url: fileUrl))
+            .eraseToAnyPublisher()
+        }
+
         do {
           let request = try URLRequest(url: lease.lease.uploadUrl, method: .post)
-          let encodedRequest = try URLEncoding.httpBody.encode(request, with: lease.lease.parameters)
-          return self.session.upload(fileUrl, with: encodedRequest)
+          let imageData = try Data(contentsOf: fileUrl)
+          return self.session.upload(multipartFormData: { formData in
+            lease.lease.parameters.forEach { key, value in
+              guard let data = value.data(using: .utf8) else { return }
+              formData.append(data, withName: key)
+            }
+            formData.append(imageData, withName: "file", fileName: nil, mimeType: mimeType as String)
+          }, with: request)
             .publishData(queue: queue)
             .value()
             .map { data in
