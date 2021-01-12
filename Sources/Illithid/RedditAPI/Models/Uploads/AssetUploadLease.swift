@@ -22,7 +22,13 @@ public struct AssetUploadLease: Decodable {
 
     public init(from decoder: Decoder) throws {
       let container = try decoder.container(keyedBy: CodingKeys.self)
-      uploadUrl = try container.decode(URL.self, forKey: .uploadUrl)
+      var components = URLComponents(url: try container.decode(URL.self, forKey: .uploadUrl), resolvingAgainstBaseURL: false)
+      components?.scheme = "https"
+      guard let url = components?.url else {
+        throw DecodingError.dataCorruptedError(forKey: CodingKeys.uploadUrl,
+                                               in: container, debugDescription: "Upload URL is malformed")
+      }
+      uploadUrl = url
       let fields = try container.decode([Field].self, forKey: .fields)
       parameters = fields.reduce(into: [String: String](), { result, field in
         result[field.name] = field.value
