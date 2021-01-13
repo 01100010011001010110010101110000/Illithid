@@ -40,6 +40,8 @@ open class Illithid: ObservableObject {
 
     accountManager = AccountManager(logger: logger)
     session = accountManager.makeSession(for: accountManager.currentAccount)
+    unauthenticatedSession = Session(rootQueue: DispatchQueue(label: "com.flayware.illithid.unauthenticated.AFRootQueue"),
+                                     eventMonitors: [FireLogger(logger: logger)])
   }
 
   // MARK: Open
@@ -73,6 +75,8 @@ open class Illithid: ObservableObject {
   internal var redditEventTimeFormatter: ISO8601DateFormatter
 
   internal var session: Session
+
+  internal let unauthenticatedSession: Session
 
   // MARK: Private
 
