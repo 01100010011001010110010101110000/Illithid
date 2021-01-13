@@ -1,37 +1,60 @@
+// Copyright (C) 2020 Tyler Gregory (@01100010011001010110010101110000)
 //
-//  File.swift
-//  
+// This program is free software: you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later
+// version.
 //
-//  Created by Tyler Gregory on 1/1/21.
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of  MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 //
+// You should have received a copy of the GNU General Public License along with
+// this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import Foundation
 
+// MARK: - NewPostResponse
+
 public struct NewPostResponse: Codable {
-  let json: NewPostWrapper
+  // MARK: Public
 
-  enum CodingKeys: String, CodingKey {
-    case json
-  }
+  public struct NewPostWrapper: Codable {
+    // MARK: Public
 
-  struct NewPostWrapper: Codable {
-    let data: NewPostData
-    let errors: [[String]]
+    public let data: NewPostData
+    public let errors: [[String]]
 
-    enum CodingKeys: String, CodingKey {
+    // MARK: Private
+
+    private enum CodingKeys: String, CodingKey {
       case data
       case errors
     }
   }
+
+  public let json: NewPostWrapper
+
+  // MARK: Private
+
+  private enum CodingKeys: String, CodingKey {
+    case json
+  }
 }
 
-public struct NewPostData: Codable {
-  let id: ID36
-  let name: Fullname
-  let draftCount: Int
-  let url: URL
+// MARK: - NewPostData
 
-  enum CodingKeys: String, CodingKey {
+public struct NewPostData: Codable {
+  // MARK: Public
+
+  public let id: ID36
+  public let name: Fullname
+  public let draftCount: Int
+  public let url: URL
+
+  // MARK: Private
+
+  private enum CodingKeys: String, CodingKey {
     case id
     case name
     case url
