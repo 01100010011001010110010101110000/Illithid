@@ -47,10 +47,22 @@ public struct NewPostResponse: Codable {
 public struct NewPostData: Codable {
   // MARK: Public
 
-  public let id: ID36
-  public let name: Fullname
-  public let draftCount: Int
-  public let url: URL
+  /// The ID of the new post
+  /// - Note: `nil` when the post *is not* of type `link` or `self`
+  public let id: ID36?
+  /// The `Fullname` of the new post
+  /// - Note: `nil` when the post *is not* of type `link` or `self`
+  public let name: Fullname?
+  public let draftCount: Int?
+  /// The URL of the new post
+  /// - Note: `nil` when the post *is not* of type `link` or `self`
+  public let url: URL?
+  /// The websocket URL for retrieving the status of the post
+  /// - Note: `nil` when the post *is* of type `link` or `self`
+  public let websocketUrl: URL?
+  /// The URL linking to the user's submission page
+  /// - Note: `nil` when the post *is* of type `link` or `self`
+  public let userSubmittedPage: URL?
 
   // MARK: Private
 
@@ -59,5 +71,7 @@ public struct NewPostData: Codable {
     case name
     case url
     case draftCount = "drafts_count"
+    case websocketUrl = "websocket_url"
+    case userSubmittedPage = "user_submitted_page"
   }
 }
