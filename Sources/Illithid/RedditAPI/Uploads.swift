@@ -68,7 +68,7 @@ public extension Illithid {
           let imageData = try Data(contentsOf: fileUrl)
 
           // TODO: Use a dedicated session for this
-          return unauthenticatedSession.upload(multipartFormData: { formData in
+          return self.unauthenticatedSession.upload(multipartFormData: { formData in
             lease.lease.parameters.forEach { key, value in
               guard let data = value.data(using: .utf8) else { return }
               formData.append(data, withName: key)
