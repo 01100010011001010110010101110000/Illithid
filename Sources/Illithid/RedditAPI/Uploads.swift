@@ -53,13 +53,40 @@ public extension Illithid {
       .value()
   }
 
+  func receiveUploadResponse(lease: AssetUploadLease) -> AnyPublisher<MediaUploadResponse?, AFError> {
+    Future<MediaUploadResponse?, AFError> { promise in
+      let connection = URLSession.shared.webSocketTask(with: lease.asset.websocketUrl)
+      connection.resume()
+      connection.receive { result in
+        switch result {
+        case let .success(message):
+          switch message {
+          case let .string(string):
+            guard let data = string.data(using: .utf8) else { promise(.success(nil)); return }
+            do {
+              let response = try self.decoder.decode(MediaUploadResponse.self, from: data)
+              promise(.success(response))
+            } catch {
+              promise(.failure(AFError.responseSerializationFailed(reason: .decodingFailed(error: error))))
+            }
+          default:
+            break
+          }
+        case let .failure(error):
+          promise(.failure(error.asAFError ?? AFError.sessionTaskFailed(error: error)))
+        }
+      }
+    }
+    .eraseToAnyPublisher()
+  }
+
   func uploadMedia(fileUrl: URL, queue: DispatchQueue = .main)
-    -> AnyPublisher<(AssetUploadLease, Data), AFError> {
+    -> AnyPublisher<Data, AFError> {
     acquireMediaUploadLease(forFile: fileUrl, queue: queue)
-      .flatMap { lease -> AnyPublisher<(AssetUploadLease, Data), AFError> in
+      .flatMap { lease -> AnyPublisher<Data, AFError> in
         guard let uti = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, fileUrl.pathExtension as CFString, nil)?.takeRetainedValue(),
               let mimeType = UTTypeCopyPreferredTagWithClass(uti, kUTTagClassMIMEType)?.takeRetainedValue() else {
-          return Fail(outputType: (AssetUploadLease, Data).self, failure: AFError.invalidURL(url: fileUrl))
+          return Fail(outputType: Data.self, failure: AFError.invalidURL(url: fileUrl))
             .eraseToAnyPublisher()
         }
 
@@ -67,7 +94,6 @@ public extension Illithid {
           let request = try URLRequest(url: lease.lease.uploadUrl, method: .post)
           let imageData = try Data(contentsOf: fileUrl)
 
-          // TODO: Use a dedicated session for this
           return self.unauthenticatedSession.upload(multipartFormData: { formData in
             lease.lease.parameters.forEach { key, value in
               guard let data = value.data(using: .utf8) else { return }
@@ -77,12 +103,9 @@ public extension Illithid {
           }, with: request, interceptor: Interceptor())
             .publishData(queue: queue)
             .value()
-            .map { data in
-              (lease, data)
-            }
             .eraseToAnyPublisher()
         } catch {
-          return Fail(outputType: (AssetUploadLease, Data).self, failure: AFError.parameterEncodingFailed(reason: .customEncodingFailed(error: error)))
+          return Fail(outputType: Data.self, failure: AFError.parameterEncodingFailed(reason: .customEncodingFailed(error: error)))
             .eraseToAnyPublisher()
         }
       }

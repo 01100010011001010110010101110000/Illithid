@@ -75,3 +75,19 @@ public struct NewPostData: Codable {
     case userSubmittedPage = "user_submitted_page"
   }
 }
+
+// MARK: - MediaUploadResponse
+
+public struct MediaUploadResponse: Codable {
+  public enum Status: String, Codable {
+    case success
+    case failure
+  }
+
+  public struct Payload: Codable {
+    let redirect: URL
+  }
+
+  public let type: Status
+  public let payload: Payload?
+}
