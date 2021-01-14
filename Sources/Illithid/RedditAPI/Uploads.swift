@@ -39,7 +39,7 @@ enum UploadRouter: URLRequestConvertible {
 }
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-public extension Illithid {
+extension Illithid {
   func acquireMediaUploadLease(forFile fileUrl: URL, queue: DispatchQueue = .main)
     -> AnyPublisher<AssetUploadLease, AFError> {
     guard let uti = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, fileUrl.pathExtension as CFString, nil)?.takeRetainedValue(),
@@ -52,8 +52,12 @@ public extension Illithid {
       .publishDecodable(type: AssetUploadLease.self, queue: queue, decoder: decoder)
       .value()
   }
+}
 
-  func receiveUploadResponse(lease: AssetUploadLease) -> AnyPublisher<MediaUploadResponse?, AFError> {
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+public extension Illithid {
+  func receiveUploadResponse(lease: AssetUploadLease)
+    -> AnyPublisher<MediaUploadResponse?, AFError> {
     Future<MediaUploadResponse?, AFError> { promise in
       let connection = URLSession.shared.webSocketTask(with: lease.asset.websocketUrl)
       connection.resume()
@@ -81,12 +85,12 @@ public extension Illithid {
   }
 
   func uploadMedia(fileUrl: URL, queue: DispatchQueue = .main)
-    -> AnyPublisher<Data, AFError> {
+    -> AnyPublisher<(AssetUploadLease, Data), AFError> {
     acquireMediaUploadLease(forFile: fileUrl, queue: queue)
-      .flatMap { lease -> AnyPublisher<Data, AFError> in
+      .flatMap { lease -> AnyPublisher<(AssetUploadLease, Data), AFError> in
         guard let uti = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, fileUrl.pathExtension as CFString, nil)?.takeRetainedValue(),
               let mimeType = UTTypeCopyPreferredTagWithClass(uti, kUTTagClassMIMEType)?.takeRetainedValue() else {
-          return Fail(outputType: Data.self, failure: AFError.invalidURL(url: fileUrl))
+          return Fail(outputType: (AssetUploadLease, Data).self, failure: AFError.invalidURL(url: fileUrl))
             .eraseToAnyPublisher()
         }
 
@@ -103,9 +107,12 @@ public extension Illithid {
           }, with: request, interceptor: Interceptor())
             .publishData(queue: queue)
             .value()
+            .map { data in
+              (lease, data)
+            }
             .eraseToAnyPublisher()
         } catch {
-          return Fail(outputType: Data.self, failure: AFError.parameterEncodingFailed(reason: .customEncodingFailed(error: error)))
+          return Fail(outputType: (AssetUploadLease, Data).self, failure: AFError.parameterEncodingFailed(reason: .customEncodingFailed(error: error)))
             .eraseToAnyPublisher()
         }
       }
