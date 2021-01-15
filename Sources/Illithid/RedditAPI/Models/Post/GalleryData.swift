@@ -26,6 +26,12 @@ public struct GalleryDataItem: Codable, Identifiable {
   public let outboundUrl: URL?
 
   // MARK: Private
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(mediaId, forKey: .mediaId)
+    try container.encode(caption, forKey: .caption)
+    try container.encode(outboundUrl, forKey: .outboundUrl)
+  }
 
   private enum CodingKeys: String, CodingKey {
     case id

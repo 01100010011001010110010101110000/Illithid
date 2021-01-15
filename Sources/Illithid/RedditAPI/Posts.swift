@@ -123,13 +123,14 @@ public extension Illithid {
               collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
               flairId: String? = nil, flairText: String? = nil, resubmit: Bool = false,
               notifyOfReplies subscribe: Bool = true, markdown text: String? = nil,
-              linkTo: URL? = nil, videoPosterUrl: URL? = nil, queue: DispatchQueue = .main,
+              linkTo: URL? = nil, galleryItems: [GalleryDataItem]? = nil, videoPosterUrl: URL? = nil, queue: DispatchQueue = .main,
               completion: @escaping (Result<NewPostResponse, AFError>) -> Void)
     -> DataRequest {
     let encoding = URLEncoding(boolEncoding: .numeric)
     let tempParameters: [String: Any?] = [
       "api_type": "json",
       "kind": kind,
+      "items": galleryItems,
       "sr": subreddit,
       "title": title,
       "nsfw": isNsfw,
@@ -185,13 +186,14 @@ public extension Illithid {
               collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
               flairId: String? = nil, flairText: String? = nil, resubmit: Bool = false,
               notifyOfReplies subscribe: Bool = true, markdown text: String? = nil,
-              linkTo: URL? = nil, videoPosterUrl: URL? = nil, queue: DispatchQueue = .main)
+              linkTo: URL? = nil, galleryItems: [GalleryDataItem]? = nil, videoPosterUrl: URL? = nil, queue: DispatchQueue = .main)
     -> AnyPublisher<NewPostResponse, AFError> {
     let encoding = URLEncoding(boolEncoding: .numeric)
     let dateFormatter = ISO8601DateFormatter()
     let tempParameters: [String: Any?] = [
       "api_type": "json",
       "kind": kind,
+      "items": galleryItems,
       "sr": subreddit,
       "title": title,
       "nsfw": isNsfw,
