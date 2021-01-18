@@ -119,3 +119,9 @@ public extension Illithid {
       .eraseToAnyPublisher()
   }
 }
+
+public extension Illithid {
+  /// The maximum number of items a gallery post can contain
+  /// - Note: This is set by Reddit
+  static let maximumGalleryItems: Int = 20
+}

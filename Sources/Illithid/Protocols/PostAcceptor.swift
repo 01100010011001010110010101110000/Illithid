@@ -12,9 +12,30 @@ import Foundation
 
 import Alamofire
 
+public enum PostAcceptorType {
+  case account(Account)
+  case subreddit(Subreddit)
+}
+
 public protocol PostAcceptor {
   /// The name of the target subreddit when submitting the post to the Reddit API (i.e. the value of the `sr` field)
   var uploadTarget: String { get }
+
+  var displayName: String { get }
+
+  var permitsSelfPosts: Bool { get }
+
+  var permitsImagePosts: Bool { get }
+
+  var permitsGalleryPosts: Bool { get }
+
+  var permitsVideoPosts: Bool { get }
+
+  var permitsGifPosts: Bool { get }
+
+  var permitsLinkPosts: Bool { get }
+
+  var permitsPollPosts: Bool { get }
 
   func submitLinkPost(title: String, isNsfw: Bool, isSpoiler: Bool,
                       collectionId: UUID?, eventStart: Date?, eventEnd: Date?, eventTimeZone: String?,

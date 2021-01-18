@@ -360,4 +360,28 @@ extension Account: PostAcceptor {
   public var uploadTarget: String {
     "u_\(name)"
   }
+
+  public var displayName: String { name }
+
+  public var permitsPollPosts: Bool {
+    Illithid.shared.accountManager.currentAccount == self
+  }
+  public var permitsImagePosts: Bool {
+    Illithid.shared.accountManager.currentAccount == self
+  }
+  public var permitsLinkPosts: Bool {
+    Illithid.shared.accountManager.currentAccount == self
+  }
+  public var permitsGifPosts: Bool {
+    Illithid.shared.accountManager.currentAccount == self
+  }
+  public var permitsVideoPosts: Bool {
+    Illithid.shared.accountManager.currentAccount == self
+  }
+  public var permitsGalleryPosts: Bool {
+    Illithid.shared.accountManager.currentAccount == self
+  }
+  public var permitsSelfPosts: Bool {
+    Illithid.shared.accountManager.currentAccount == self
+  }
 }

@@ -183,4 +183,38 @@ extension Subreddit: PostAcceptor {
   public var uploadTarget: String {
     displayName
   }
+
+  public var permitsSelfPosts: Bool {
+    guard let type = submissionType else { return false }
+    return type != .link
+  }
+
+  public var permitsLinkPosts: Bool {
+    guard let type = submissionType else { return false }
+    return type != .`self`
+  }
+
+  public var permitsImagePosts: Bool {
+    guard let type = submissionType else { return false }
+    return type != .`self` && allowImages!
+  }
+
+  public var permitsGalleryPosts: Bool {
+    guard let type = submissionType else { return false }
+    return type != .`self` && allowGalleries!
+  }
+
+  public var permitsVideoPosts: Bool {
+    guard let type = submissionType else { return false }
+    return type != .`self` && allowVideos
+  }
+
+  public var permitsGifPosts: Bool {
+    guard let type = submissionType else { return false }
+    return type != .`self` && allowVideogifs
+  }
+
+  public var permitsPollPosts: Bool {
+    allowPolls ?? false
+  }
 }
