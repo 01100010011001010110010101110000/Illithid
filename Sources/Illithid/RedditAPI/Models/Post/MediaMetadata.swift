@@ -26,6 +26,7 @@ public struct MediaMetadata: Codable {
 
   public enum Status: String, Codable {
     case valid
+    case failed
   }
 
   /// The source attributes of a gallery item
@@ -51,9 +52,9 @@ public struct MediaMetadata: Codable {
     }
   }
 
-  public let id: String
+  public let id: String?
   public let status: Status
-  public let type: MediaType
+  public let type: MediaType?
   public let mimeType: String?
   public let previews: [MediaSource]?
   public let source: MediaSource?
