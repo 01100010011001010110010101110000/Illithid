@@ -27,6 +27,8 @@ enum PostRouter: URLConvertible {
   case userMultireddit(username: String, multiName: String, sort: PostSort)
   case frontPage(page: FrontPage, sort: PostSort)
   case submit
+  case submitGallery
+  case submitPoll
 
   // MARK: Internal
 
@@ -55,6 +57,10 @@ enum PostRouter: URLConvertible {
       return try page.asURL().appendingPathComponent("\(sort)")
     case .submit:
       return URL(string: "/api/submit", relativeTo: baseUrl)!
+    case .submitGallery:
+      return URL(string: "/api/submit_gallery_post", relativeTo: baseUrl)!
+    case .submitPoll:
+      return URL(string: "/api/submit_poll_post", relativeTo: baseUrl)!
     }
   }
 
@@ -67,6 +73,7 @@ enum PostRouter: URLConvertible {
 
 public extension Illithid {
   // MARK: Fetch Posts
+
   @discardableResult
   func fetchPosts(for subreddit: Subreddit, sortBy postSort: PostSort,
                   location: Location? = nil, topInterval: TopInterval? = nil,
@@ -123,14 +130,13 @@ public extension Illithid {
               collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
               flairId: String? = nil, flairText: String? = nil, resubmit: Bool = false,
               notifyOfReplies subscribe: Bool = true, markdown text: String? = nil,
-              linkTo: URL? = nil, galleryItems: [GalleryDataItem]? = nil, videoPosterUrl: URL? = nil, queue: DispatchQueue = .main,
+              linkTo: URL? = nil, videoPosterUrl: URL? = nil, queue: DispatchQueue = .main,
               completion: @escaping (Result<NewPostResponse, AFError>) -> Void)
     -> DataRequest {
     let encoding = URLEncoding(boolEncoding: .numeric)
     let tempParameters: [String: Any?] = [
       "api_type": "json",
       "kind": kind,
-      "items": galleryItems,
       "sr": subreddit,
       "title": title,
       "nsfw": isNsfw,
@@ -145,11 +151,44 @@ public extension Illithid {
       "sendreplies": subscribe,
       "text": text,
       "url": linkTo?.absoluteString,
-      "video_poster_url": videoPosterUrl?.absoluteString
+      "video_poster_url": videoPosterUrl?.absoluteString,
     ]
     let parameters: Parameters = tempParameters.compactMapValues { $0 }
 
     return session.request(PostRouter.submit, method: .post, parameters: parameters, encoding: encoding)
+      .validate()
+      .responseDecodable(of: NewPostResponse.self, queue: queue, decoder: decoder) { response in
+        completion(response.result)
+      }
+  }
+
+  @discardableResult
+  func submitGalleryPost(subredditDisplayName subreddit: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
+                         collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
+                         flairId: String? = nil, flairText: String? = nil, notifyOfReplies subscribe: Bool = true,
+                         galleryItems: [GalleryDataItem], queue: DispatchQueue = .main,
+                         completion: @escaping (Result<NewPostResponse, AFError>) -> Void)
+    -> DataRequest {
+    let encoding = JSONEncoding.default
+    let tempParameters: [String: Any?] = [
+      "api_type": "json",
+      "items": galleryItems.map { $0.asDictionary() },
+      "sr": subreddit,
+      "title": title,
+      "nsfw": isNsfw,
+      "spoiler": isSpoiler,
+      "collection_id": collectionId?.uuidString,
+      "event_start": eventStart == nil ? nil : redditEventTimeFormatter.string(from: eventStart!),
+      "event_end": eventStart == nil ? nil : redditEventTimeFormatter.string(from: eventEnd!),
+      "event_tz": eventTimeZone,
+      "flair_id": flairId,
+      "flair_text": flairText,
+      "sendreplies": subscribe,
+    ]
+    let parameters: Parameters = tempParameters.compactMapValues { $0 }
+
+    return session.request(PostRouter.submitGallery, method: .post, parameters: parameters, encoding: encoding)
+      .validate()
       .responseDecodable(of: NewPostResponse.self, queue: queue, decoder: decoder) { response in
         completion(response.result)
       }
@@ -161,7 +200,7 @@ public extension Illithid {
                       flairId: String? = nil, flairText: String? = nil, resubmit: Bool = false,
                       notifyOfReplies subscribe: Bool = true, linkTo: URL, queue: DispatchQueue = .main,
                       completion: @escaping (Result<NewPostResponse, AFError>) -> Void)
-  -> DataRequest {
+    -> DataRequest {
     submit(kind: .link, subredditDisplayName: subreddit, title: title, isNsfw: isNsfw, isSpoiler: isSpoiler,
            collectionId: collectionId, eventStart: eventStart, eventEnd: eventEnd, eventTimeZone: eventTimeZone,
            flairId: flairId, flairText: flairText, resubmit: resubmit, notifyOfReplies: subscribe,
@@ -174,7 +213,7 @@ public extension Illithid {
                       flairId: String? = nil, flairText: String? = nil, notifyOfReplies subscribe: Bool = true,
                       markdown text: String, queue: DispatchQueue = .main,
                       completion: @escaping (Result<NewPostResponse, AFError>) -> Void)
-  -> DataRequest {
+    -> DataRequest {
     submit(kind: .`self`, subredditDisplayName: subreddit, title: title, isNsfw: isNsfw, isSpoiler: isSpoiler,
            collectionId: collectionId, eventStart: eventStart, eventEnd: eventEnd, eventTimeZone: eventTimeZone,
            flairId: flairId, flairText: flairText, resubmit: false, notifyOfReplies: subscribe, markdown: text,
@@ -186,14 +225,13 @@ public extension Illithid {
               collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
               flairId: String? = nil, flairText: String? = nil, resubmit: Bool = false,
               notifyOfReplies subscribe: Bool = true, markdown text: String? = nil,
-              linkTo: URL? = nil, galleryItems: [GalleryDataItem]? = nil, videoPosterUrl: URL? = nil, queue: DispatchQueue = .main)
+              linkTo: URL? = nil, videoPosterUrl: URL? = nil, queue: DispatchQueue = .main)
     -> AnyPublisher<NewPostResponse, AFError> {
     let encoding = URLEncoding(boolEncoding: .numeric)
     let dateFormatter = ISO8601DateFormatter()
     let tempParameters: [String: Any?] = [
       "api_type": "json",
       "kind": kind,
-      "items": galleryItems,
       "sr": subreddit,
       "title": title,
       "nsfw": isNsfw,
@@ -208,11 +246,41 @@ public extension Illithid {
       "sendreplies": subscribe,
       "text": text,
       "url": linkTo?.absoluteString,
-      "video_poster_url": videoPosterUrl?.absoluteString
+      "video_poster_url": videoPosterUrl?.absoluteString,
     ]
     let parameters: Parameters = tempParameters.compactMapValues { $0 }
 
     return session.request(PostRouter.submit, method: .post, parameters: parameters, encoding: encoding)
+      .validate()
+      .publishDecodable(type: NewPostResponse.self, queue: queue, decoder: decoder)
+      .value()
+  }
+
+  func submitGalleryPost(subredditDisplayName subreddit: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
+                         collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
+                         flairId: String? = nil, flairText: String? = nil, notifyOfReplies subscribe: Bool = true,
+                         galleryItems: [GalleryDataItem], queue: DispatchQueue = .main)
+    -> AnyPublisher<NewPostResponse, AFError> {
+    let encoding = JSONEncoding.default
+    let tempParameters: [String: Any?] = [
+      "api_type": "json",
+      "items": galleryItems.map { $0.asDictionary() },
+      "sr": subreddit,
+      "title": title,
+      "nsfw": isNsfw,
+      "spoiler": isSpoiler,
+      "collection_id": collectionId?.uuidString,
+      "event_start": eventStart == nil ? nil : redditEventTimeFormatter.string(from: eventStart!),
+      "event_end": eventStart == nil ? nil : redditEventTimeFormatter.string(from: eventEnd!),
+      "event_tz": eventTimeZone,
+      "flair_id": flairId,
+      "flair_text": flairText,
+      "sendreplies": subscribe,
+    ]
+    let parameters: Parameters = tempParameters.compactMapValues { $0 }
+
+    return session.request(PostRouter.submitGallery, method: .post, parameters: parameters, encoding: encoding)
+      .validate()
       .publishDecodable(type: NewPostResponse.self, queue: queue, decoder: decoder)
       .value()
   }
@@ -222,7 +290,7 @@ public extension Illithid {
                       collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
                       flairId: String? = nil, flairText: String? = nil, resubmit: Bool = false,
                       notifyOfReplies subscribe: Bool = true, linkTo: URL, queue: DispatchQueue = .main)
-  -> AnyPublisher<NewPostResponse, AFError> {
+    -> AnyPublisher<NewPostResponse, AFError> {
     submit(kind: .link, subredditDisplayName: subreddit, title: title, isNsfw: isNsfw, isSpoiler: isSpoiler,
            collectionId: collectionId, eventStart: eventStart, eventEnd: eventEnd, eventTimeZone: eventTimeZone,
            flairId: flairId, flairText: flairText, resubmit: resubmit, notifyOfReplies: subscribe,
@@ -234,7 +302,7 @@ public extension Illithid {
                       collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
                       flairId: String? = nil, flairText: String? = nil, notifyOfReplies subscribe: Bool = true,
                       markdown text: String, queue: DispatchQueue = .main)
-  -> AnyPublisher<NewPostResponse, AFError> {
+    -> AnyPublisher<NewPostResponse, AFError> {
     submit(kind: .`self`, subredditDisplayName: subreddit, title: title, isNsfw: isNsfw, isSpoiler: isSpoiler,
            collectionId: collectionId, eventStart: eventStart, eventEnd: eventEnd, eventTimeZone: eventTimeZone,
            flairId: flairId, flairText: flairText, resubmit: false, notifyOfReplies: subscribe, markdown: text,

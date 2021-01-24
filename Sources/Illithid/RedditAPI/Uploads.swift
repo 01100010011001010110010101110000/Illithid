@@ -49,6 +49,8 @@ extension Illithid {
         .eraseToAnyPublisher()
     }
     return session.request(UploadRouter.mediaAssetLease(name: fileUrl.lastPathComponent.lowercased(), mimeType: mimeType as String))
+      .validate()
+      .validate()
       .publishDecodable(type: AssetUploadLease.self, queue: queue, decoder: decoder)
       .value()
   }
@@ -105,6 +107,7 @@ public extension Illithid {
             }
             formData.append(imageData, withName: "file", fileName: nil, mimeType: mimeType as String)
           }, with: request, interceptor: Interceptor())
+            .validate()
             .publishData(queue: queue)
             .value()
             .map { data in

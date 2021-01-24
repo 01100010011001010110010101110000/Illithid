@@ -56,6 +56,16 @@ public struct GalleryDataItem: Codable, Identifiable {
     try container.encode(outboundUrl, forKey: .outboundUrl)
   }
 
+  // MARK: Internal
+
+  internal func asDictionary() -> [String: String] {
+    [
+      "media_id": mediaId,
+      "caption": caption ?? "",
+      "outbound_url": outboundUrl?.absoluteString ?? "",
+    ]
+  }
+
   // MARK: Private
 
   private enum CodingKeys: String, CodingKey {
