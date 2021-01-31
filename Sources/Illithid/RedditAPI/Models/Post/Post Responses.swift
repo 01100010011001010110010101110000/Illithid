@@ -22,7 +22,9 @@ public struct NewPostResponse: Codable {
   public struct NewPostWrapper: Codable {
     // MARK: Public
 
-    public let data: NewPostData
+    /// The metadata of the newly created post
+    /// - Note: `nil` when `errors` is not empty
+    public let data: NewPostData?
     public let errors: [[String]]
 
     // MARK: Private

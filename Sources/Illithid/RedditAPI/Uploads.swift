@@ -15,6 +15,8 @@
 #if canImport(Combine)
   import Combine
 #endif
+import AppKit
+import CoreGraphics
 import Foundation
 
 import Alamofire
@@ -40,7 +42,7 @@ enum UploadRouter: URLRequestConvertible {
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 extension Illithid {
-  func acquireMediaUploadLease(forFile fileUrl: URL, queue: DispatchQueue = .main)
+  func acquireMediaUploadLease(for fileUrl: URL, queue: DispatchQueue = .main)
     -> AnyPublisher<AssetUploadLease, AFError> {
     guard let uti = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, fileUrl.pathExtension as CFString, nil)?.takeRetainedValue(),
           let mimeType = UTTypeCopyPreferredTagWithClass(uti, kUTTagClassMIMEType)?.takeRetainedValue(),
@@ -50,6 +52,13 @@ extension Illithid {
     }
     return session.request(UploadRouter.mediaAssetLease(name: fileUrl.lastPathComponent.lowercased(), mimeType: mimeType as String))
       .validate()
+      .publishDecodable(type: AssetUploadLease.self, queue: queue, decoder: decoder)
+      .value()
+  }
+
+  func acquireMediaUploadLease(named fileName: String, mimeType: String, queue: DispatchQueue = .main)
+    -> AnyPublisher<AssetUploadLease, AFError> {
+    session.request(UploadRouter.mediaAssetLease(name: fileName, mimeType: mimeType))
       .validate()
       .publishDecodable(type: AssetUploadLease.self, queue: queue, decoder: decoder)
       .value()
@@ -87,12 +96,12 @@ public extension Illithid {
   }
 
   func uploadMedia(fileUrl: URL, queue: DispatchQueue = .main)
-    -> AnyPublisher<(AssetUploadLease, Data), AFError> {
-    acquireMediaUploadLease(forFile: fileUrl, queue: queue)
-      .flatMap { lease -> AnyPublisher<(AssetUploadLease, Data), AFError> in
+    -> AnyPublisher<(lease: AssetUploadLease, uploadResponse: Data), AFError> {
+    acquireMediaUploadLease(for: fileUrl, queue: queue)
+      .flatMap { lease -> AnyPublisher<(lease: AssetUploadLease, uploadResponse: Data), AFError> in
         guard let uti = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, fileUrl.pathExtension as CFString, nil)?.takeRetainedValue(),
               let mimeType = UTTypeCopyPreferredTagWithClass(uti, kUTTagClassMIMEType)?.takeRetainedValue() else {
-          return Fail(outputType: (AssetUploadLease, Data).self, failure: AFError.invalidURL(url: fileUrl))
+          return Fail(outputType: (lease: AssetUploadLease, uploadResponse: Data).self, failure: AFError.invalidURL(url: fileUrl))
             .eraseToAnyPublisher()
         }
 
@@ -115,7 +124,39 @@ public extension Illithid {
             }
             .eraseToAnyPublisher()
         } catch {
-          return Fail(outputType: (AssetUploadLease, Data).self, failure: AFError.parameterEncodingFailed(reason: .customEncodingFailed(error: error)))
+          return Fail(outputType: (lease: AssetUploadLease, uploadResponse: Data).self, failure: AFError.parameterEncodingFailed(reason: .customEncodingFailed(error: error)))
+            .eraseToAnyPublisher()
+        }
+      }
+      .eraseToAnyPublisher()
+  }
+
+  func uploadMedia(image: CGImage, queue: DispatchQueue = .main)
+    -> AnyPublisher<(lease: AssetUploadLease, uploadResponse: Data), AFError> {
+    let mimeType = "image/png"
+    return acquireMediaUploadLease(named: UUID().uuidString, mimeType: mimeType, queue: queue)
+      .flatMap { lease -> AnyPublisher<(lease: AssetUploadLease, uploadResponse: Data), AFError> in
+        do {
+          let request = try URLRequest(url: lease.lease.uploadUrl, method: .post)
+          let bitmap = NSBitmapImageRep(cgImage: image)
+          let png = bitmap.representation(using: .png, properties: [:])!
+
+          return self.unauthenticatedSession.upload(multipartFormData: { formData in
+            lease.lease.parameters.forEach { key, value in
+              guard let data = value.data(using: .utf8) else { return }
+              formData.append(data, withName: key)
+            }
+            formData.append(png, withName: "file", fileName: nil, mimeType: mimeType as String)
+          }, with: request, interceptor: Interceptor())
+            .validate()
+            .publishData(queue: queue)
+            .value()
+            .map { data in
+              (lease, data)
+            }
+            .eraseToAnyPublisher()
+        } catch {
+          return Fail(outputType: (lease: AssetUploadLease, uploadResponse: Data).self, failure: AFError.parameterEncodingFailed(reason: .customEncodingFailed(error: error)))
             .eraseToAnyPublisher()
         }
       }
