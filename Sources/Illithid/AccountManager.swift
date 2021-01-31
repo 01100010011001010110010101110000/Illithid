@@ -190,7 +190,7 @@ public final class AccountManager: ObservableObject {
     ]
     let headers: HTTPHeaders = [
       .userAgent(userAgentComponents.joined(separator: ":")),
-      .accept("application.json"),
+      .accept("application/json"),
     ]
     alamoConfiguration.httpAdditionalHeaders = headers.dictionary
 

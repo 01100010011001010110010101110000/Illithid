@@ -35,8 +35,13 @@ open class Illithid: ObservableObject {
       logger = .releaseLogger(subsystem: "com.flayware.illithid")
     #endif
 
+    redditEventTimeFormatter = ISO8601DateFormatter()
+    redditEventTimeFormatter.formatOptions = [.withFullDate, .withTime, .withColonSeparatorInTime]
+
     accountManager = AccountManager(logger: logger)
     session = accountManager.makeSession(for: accountManager.currentAccount)
+    unauthenticatedSession = Session(rootQueue: DispatchQueue(label: "com.flayware.illithid.unauthenticated.AFRootQueue"),
+                                     eventMonitors: [FireLogger(logger: logger)])
   }
 
   // MARK: Open
@@ -67,7 +72,11 @@ open class Illithid: ObservableObject {
 
   internal let decoder: JSONDecoder = .init()
 
+  internal var redditEventTimeFormatter: ISO8601DateFormatter
+
   internal var session: Session
+
+  internal let unauthenticatedSession: Session
 
   // MARK: Private
 

@@ -16,14 +16,55 @@ import Foundation
 
 // MARK: - GalleryDataItem
 
-/// The object representing the ordered gallery view. The Media IDs here should be tied back to the post's `MediaMetadata` to get the content for each item
+/// The object representing the ordered gallery view
+/// - Note: `mediaId` should be tied back to the post's `MediaMetadata` to get the content for each item
 public struct GalleryDataItem: Codable, Identifiable {
+  // MARK: Lifecycle
+
+  public init(id: Int, mediaId: String, caption: String?, outboundUrl: URL?) {
+    self.id = id
+    self.mediaId = mediaId
+    self.caption = caption
+    self.outboundUrl = outboundUrl
+  }
+
+  /// A convenience initializer when preparing a gallery item for upload
+  ///
+  /// - Parameters:
+  ///   - mediaId: The `assetId` of the uploaded media after calling `Illithid.uploadMedia`
+  ///   - caption: The caption of the gallery item
+  ///   - outboundUrl: The URL the linked to by the gallery item's capton
+  /// - Remark: The `id` parameter exists only when fetching an existing gallery post from reddit, it is not needed for gallery post creation
+  public init(mediaId: String, caption: String?, outboundUrl: URL?) {
+    id = 0
+    self.mediaId = mediaId
+    self.caption = caption
+    self.outboundUrl = outboundUrl
+  }
+
   // MARK: Public
 
   public let id: Int
   public let mediaId: String
   public let caption: String?
   public let outboundUrl: URL?
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(mediaId, forKey: .mediaId)
+    try container.encode(caption, forKey: .caption)
+    try container.encode(outboundUrl, forKey: .outboundUrl)
+  }
+
+  // MARK: Internal
+
+  internal func asDictionary() -> [String: String] {
+    [
+      "media_id": mediaId,
+      "caption": caption ?? "",
+      "outbound_url": outboundUrl?.absoluteString ?? "",
+    ]
+  }
 
   // MARK: Private
 

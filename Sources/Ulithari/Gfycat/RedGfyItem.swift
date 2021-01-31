@@ -1,9 +1,16 @@
+// Copyright (C) 2020 Tyler Gregory (@01100010011001010110010101110000)
 //
-//  File.swift
-//  
+// This program is free software: you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later
+// version.
 //
-//  Created by Tyler Gregory on 1/8/21.
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of  MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 //
+// You should have received a copy of the GNU General Public License along with
+// this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import Foundation
 
@@ -31,7 +38,7 @@ public struct RedGfyWrapper: Codable, Hashable, Equatable {
   }
 }
 
-// MARK: - GfyItem
+// MARK: - RedGfyItem
 
 public struct RedGfyItem: Codable, Hashable, Equatable {
   // MARK: Lifecycle
@@ -72,21 +79,19 @@ public struct RedGfyItem: Codable, Hashable, Equatable {
     geoWhitelist = try container.decode([String].self, forKey: .geoWhitelist)
     published = try container.decode(Int.self, forKey: .published)
     nsfw = try container.decode(Nsfw.self, forKey: .nsfw)
-    gatekeeper = try container.decode(Int.self, forKey: .gatekeeper)
+    gatekeeper = try container.decodeIfPresent(Int.self, forKey: .gatekeeper)
     mp4URL = try container.decode(URL.self, forKey: .mp4URL)
     gifURL = try container.decode(URL.self, forKey: .gifURL)
-    webmURL = try container.decode(URL.self, forKey: .webmURL)
-    webpURL = try container.decode(URL.self, forKey: .webpURL)
     mobileURL = try container.decode(URL.self, forKey: .mobileURL)
     mobilePosterURL = try container.decode(URL.self, forKey: .mobilePosterURL)
     thumb100PosterURL = try container.decode(URL.self, forKey: .thumb100PosterURL)
     miniURL = try container.decode(URL.self, forKey: .miniURL)
-    gif100Px = try container.decode(String.self, forKey: .gif100Px)
+    gif100Px = try container.decodeIfPresent(URL.self, forKey: .gif100Px)
     miniPosterURL = try container.decode(URL.self, forKey: .miniPosterURL)
-    max5MBGIF = try container.decode(String.self, forKey: .max5MBGIF)
-    title = try container.decode(String.self, forKey: .title)
-    max2MBGIF = try container.decode(URL.self, forKey: .max2MBGIF)
-    max1MBGIF = try container.decode(URL.self, forKey: .max1MBGIF)
+    max5MBGIF = try container.decodeIfPresent(URL.self, forKey: .max5MBGIF)
+    title = try container.decodeIfPresent(String.self, forKey: .title)
+    max2MBGIF = try container.decodeIfPresent(URL.self, forKey: .max2MBGIF)
+    max1MBGIF = try container.decodeIfPresent(URL.self, forKey: .max1MBGIF)
     posterURL = try container.decode(URL.self, forKey: .posterURL)
     views = try container.decode(Int.self, forKey: .views)
     hasTransparency = try container.decode(Bool.self, forKey: .hasTransparency)
@@ -99,7 +104,6 @@ public struct RedGfyItem: Codable, Hashable, Equatable {
     height = try container.decode(Int.self, forKey: .height)
     frameRate = try container.decode(Double.self, forKey: .frameRate)
     numFrames = try container.decode(Int.self, forKey: .numFrames)
-    mp4Size = try container.decode(Int.self, forKey: .mp4Size)
     createDate = try container.decode(Date.self, forKey: .createDate)
     source = try container.decode(Int.self, forKey: .source)
     gifSize = try container.decodeIfPresent(Int.self, forKey: .gifSize)
@@ -154,21 +158,19 @@ public struct RedGfyItem: Codable, Hashable, Equatable {
   public let geoWhitelist: [String]
   public let published: Int
   public let nsfw: Nsfw
-  public let gatekeeper: Int
+  public let gatekeeper: Int?
   public let mp4URL: URL
   public let gifURL: URL
-  public let webmURL: URL
-  public let webpURL: URL
   public let mobileURL: URL
   public let mobilePosterURL: URL
   public let thumb100PosterURL: URL
   public let miniURL: URL
-  public let gif100Px: String
+  public let gif100Px: URL?
   public let miniPosterURL: URL
-  public let max5MBGIF: String
-  public let title: String
-  public let max2MBGIF: URL
-  public let max1MBGIF: URL
+  public let max5MBGIF: URL?
+  public let title: String?
+  public let max2MBGIF: URL?
+  public let max1MBGIF: URL?
   public let posterURL: URL
   public let views: Int
   public let username: String
@@ -184,7 +186,6 @@ public struct RedGfyItem: Codable, Hashable, Equatable {
   public let height: Int
   public let frameRate: Double
   public let numFrames: Int
-  public let mp4Size: Int
   public let createDate: Date
   public let source: Int
   public let gifSize: Int?
@@ -214,8 +215,6 @@ public struct RedGfyItem: Codable, Hashable, Equatable {
     case gatekeeper
     case mp4URL = "mp4Url"
     case gifURL = "gifUrl"
-    case webmURL = "webmUrl"
-    case webpURL = "webpUrl"
     case mobileURL = "mobileUrl"
     case mobilePosterURL = "mobilePosterUrl"
     case thumb100PosterURL = "thumb100PosterUrl"
@@ -241,7 +240,6 @@ public struct RedGfyItem: Codable, Hashable, Equatable {
     case height
     case frameRate
     case numFrames
-    case mp4Size
     case createDate
     case source
     case gifSize
