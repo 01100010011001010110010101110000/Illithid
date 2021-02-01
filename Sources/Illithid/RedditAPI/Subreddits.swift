@@ -24,6 +24,7 @@ import Alamofire
 enum SubredditRouter: URLConvertible {
   case subreddits(sort: SubredditSort)
   case moderators(subredditDisplayName: String)
+  case postRequirements(subredditDisplayName: String)
 
   // MARK: Internal
 
@@ -33,6 +34,8 @@ enum SubredditRouter: URLConvertible {
       return URL(string: "/subreddits/\(sort)", relativeTo: baseUrl)!
     case let .moderators(displayName):
       return URL(string: "/r/\(displayName)/about/moderators", relativeTo: baseUrl)!
+    case let .postRequirements(subredditDisplayName):
+      return URL(string: "/api/v1/\(subredditDisplayName)/post_requirements", relativeTo: baseUrl)!
     }
   }
 
@@ -60,6 +63,14 @@ public extension Illithid {
                 queryParameters: parameters, queue: queue) { result in
       completion(result)
     }
+  }
+
+  func postRequirements(for subredditName: String, queue: DispatchQueue = .main, completion: @escaping (Result<PostRequirements, AFError>) -> Void) -> DataRequest {
+    session.request(SubredditRouter.postRequirements(subredditDisplayName: subredditName))
+      .validate()
+      .responseDecodable(of: PostRequirements.self, queue: queue, decoder: decoder) { response in
+        completion(response.result)
+      }
   }
 }
 
@@ -178,6 +189,7 @@ public extension Subreddit {
   }
 }
 
+// MARK: - Subreddit + PostAcceptor
 
 extension Subreddit: PostAcceptor {
   public var uploadTarget: String {
