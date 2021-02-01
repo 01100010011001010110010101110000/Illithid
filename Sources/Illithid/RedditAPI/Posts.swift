@@ -130,7 +130,7 @@ public extension Illithid {
               collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
               flairId: String? = nil, flairText: String? = nil, resubmit: Bool = false,
               notifyOfReplies subscribe: Bool = true, markdown text: String? = nil,
-              linkTo: URL? = nil, videoPosterUrl: URL? = nil, queue: DispatchQueue = .main,
+              linkTo: URL? = nil, videoPosterUrl: URL? = nil, validateOnSubmit: Bool = true, queue: DispatchQueue = .main,
               completion: @escaping (Result<NewPostResponse, AFError>) -> Void)
     -> DataRequest {
     let encoding = URLEncoding(boolEncoding: .numeric)
@@ -152,6 +152,7 @@ public extension Illithid {
       "text": text,
       "url": linkTo?.absoluteString,
       "video_poster_url": videoPosterUrl?.absoluteString,
+      "validate_on_submit": validateOnSubmit,
     ]
     let parameters: Parameters = tempParameters.compactMapValues { $0 }
 
@@ -166,7 +167,7 @@ public extension Illithid {
   func submitGalleryPost(subredditDisplayName subreddit: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
                          collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
                          flairId: String? = nil, flairText: String? = nil, notifyOfReplies subscribe: Bool = true,
-                         galleryItems: [GalleryDataItem], queue: DispatchQueue = .main,
+                         galleryItems: [GalleryDataItem], validateOnSubmit: Bool = true, queue: DispatchQueue = .main,
                          completion: @escaping (Result<NewPostResponse, AFError>) -> Void)
     -> DataRequest {
     let encoding = JSONEncoding.default
@@ -184,6 +185,7 @@ public extension Illithid {
       "flair_id": flairId,
       "flair_text": flairText,
       "sendreplies": subscribe,
+      "validate_on_submit": validateOnSubmit,
     ]
     let parameters: Parameters = tempParameters.compactMapValues { $0 }
 
@@ -225,7 +227,7 @@ public extension Illithid {
               collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
               flairId: String? = nil, flairText: String? = nil, resubmit: Bool = false,
               notifyOfReplies subscribe: Bool = true, markdown text: String? = nil,
-              linkTo: URL? = nil, videoPosterUrl: URL? = nil, queue: DispatchQueue = .main)
+              linkTo: URL? = nil, videoPosterUrl: URL? = nil, validateOnSubmit: Bool = true, queue: DispatchQueue = .main)
     -> AnyPublisher<NewPostResponse, AFError> {
     let encoding = URLEncoding(boolEncoding: .numeric)
     let dateFormatter = ISO8601DateFormatter()
@@ -247,6 +249,7 @@ public extension Illithid {
       "text": text,
       "url": linkTo?.absoluteString,
       "video_poster_url": videoPosterUrl?.absoluteString,
+      "validate_on_submit": validateOnSubmit,
     ]
     let parameters: Parameters = tempParameters.compactMapValues { $0 }
 
@@ -256,10 +259,11 @@ public extension Illithid {
       .value()
   }
 
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
   func submitGalleryPost(subredditDisplayName subreddit: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
                          collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
                          flairId: String? = nil, flairText: String? = nil, notifyOfReplies subscribe: Bool = true,
-                         galleryItems: [GalleryDataItem], queue: DispatchQueue = .main)
+                         galleryItems: [GalleryDataItem], validateOnSubmit: Bool = true, queue: DispatchQueue = .main)
     -> AnyPublisher<NewPostResponse, AFError> {
     let encoding = JSONEncoding.default
     let tempParameters: [String: Any?] = [
@@ -276,6 +280,7 @@ public extension Illithid {
       "flair_id": flairId,
       "flair_text": flairText,
       "sendreplies": subscribe,
+      "validate_on_submit": validateOnSubmit,
     ]
     let parameters: Parameters = tempParameters.compactMapValues { $0 }
 
