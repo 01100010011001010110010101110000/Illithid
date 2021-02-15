@@ -117,6 +117,9 @@ public struct PostRequirements: Codable {
 
   private func titleIsValid(_ title: String) -> [ValidationFailure] {
     var failures: [ValidationFailure] = []
+    if title.isEmpty {
+      failures.append(.titleIsRequired)
+    }
     if let minimum = titleTextMinLength, title.count < minimum {
       failures.append(.titleTooShort(minLength: minimum))
     } else if let maximum = titleTextMaxLength, title.count > maximum {
@@ -151,7 +154,8 @@ public struct PostRequirements: Codable {
     case .required:
       if body?.isEmpty ?? true { failures.append(.bodyIsRequired) }
     case .notAllowed:
-      if body != nil { return [.bodyIsForbidden] }
+      // We return here because other body restrictions are not meaningful if a body is not allowed
+      if !(body?.isEmpty ?? false) { return [.bodyIsForbidden] }
     }
 
     if let minimum = bodyTextMinLength, (body?.count ?? 0) < minimum {
@@ -202,6 +206,9 @@ public struct PostRequirements: Codable {
 
 public extension PostRequirements {
   enum ValidationFailure {
+    /// The subreddit requires a title on its posts
+    /// - Note: This is not something configurable in a subreddit's settings, but all posts require a title
+    case titleIsRequired
     case titleTooShort(minLength: Int)
     case titleTooLong(maxLength: Int)
     case titleContainsBannedString(string: String)
