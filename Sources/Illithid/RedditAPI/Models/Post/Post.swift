@@ -28,6 +28,8 @@ public enum VoteDirection: Int, Codable {
   case clear = 0
   case up = 1
 
+  // MARK: Lifecycle
+
   /// Initializes `self` to the current vote direction in a comment
   public init(from comment: Comment) {
     if let likeDirection = comment.likes {
@@ -461,6 +463,8 @@ public extension Post {
   enum RemovedByCategory: String, Codable {
     /// Removed by a moderator of the `Subreddit` the `Post` is in
     case moderator
+    /// Removed by automod
+    case automod_filtered
     /// Removed due to a copyright notice
     case copyrightTakedown = "copyright_takedown"
     case reddit
