@@ -32,7 +32,16 @@ public enum VoteDirection: Int, Codable {
 
   /// Initializes `self` to the current vote direction in a comment
   public init(from comment: Comment) {
-    if let likeDirection = comment.likes {
+    self.init(likes: comment.likes)
+  }
+
+  /// Initializes `self` to the current vote direction in a post
+  public init(from post: Post) {
+    self.init(likes: post.likes)
+  }
+
+  private init(likes: Bool?) {
+    if let likeDirection = likes {
       self = likeDirection ? .up : .down
     } else {
       self = .clear
