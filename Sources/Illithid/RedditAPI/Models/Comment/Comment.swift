@@ -20,10 +20,6 @@ import Alamofire
 // MARK: - CommentsSort
 
 public enum CommentsSort: String, Codable, CaseIterable, Identifiable, Hashable {
-  public var id: Self.RawValue {
-    rawValue
-  }
-
   /// Reddit's internal name for `best`, returns the same results
   case confidence
   case best
@@ -34,6 +30,12 @@ public enum CommentsSort: String, Codable, CaseIterable, Identifiable, Hashable 
   case random
   case qa
   case live
+
+  // MARK: Public
+
+  public var id: Self.RawValue {
+    rawValue
+  }
 }
 
 // MARK: - Comment
@@ -88,10 +90,6 @@ public struct Comment: RedditObject {
     authorFlairRichtext = try container.decodeIfPresent([FlairRichtext].self, forKey: .authorFlairRichtext)
     collapsedReason = try? container.decodeIfPresent(String.self, forKey: .collapsedReason)
     bodyHtml = try container.decode(String.self, forKey: .bodyHtml)
-    attributedBody = NSMutableAttributedString(html: Data(bodyHtml.utf8), options: [
-      .documentType: NSAttributedString.DocumentType.html,
-      .characterEncoding: NSNumber(value: String.Encoding.utf8.rawValue),
-    ], documentAttributes: nil) ?? NSAttributedString()
     stickied = try container.decode(Bool.self, forKey: .stickied)
     subredditType = try container.decode(Subreddit.SubredditType.self, forKey: .subredditType)
     canGild = try container.decode(Bool.self, forKey: .canGild)
@@ -171,7 +169,6 @@ public struct Comment: RedditObject {
   public let authorFlairRichtext: [FlairRichtext]?
   public let collapsedReason: String?
   public let bodyHtml: String
-  public let attributedBody: NSAttributedString
   public let stickied: Bool
   public let subredditType: Subreddit.SubredditType
   public let canGild: Bool

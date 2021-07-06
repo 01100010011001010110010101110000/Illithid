@@ -21,14 +21,16 @@ import Alamofire
 // MARK: - SubredditSort
 
 public enum SubredditSort: String, Codable, CaseIterable, Identifiable, Hashable {
-  public var id: Self.RawValue {
-    rawValue
-  }
-  
   case popular
   case new
   case gold
   case `default`
+
+  // MARK: Public
+
+  public var id: Self.RawValue {
+    rawValue
+  }
 }
 
 // MARK: - Subreddit
@@ -89,10 +91,6 @@ public struct Subreddit: RedditObject {
     originalContentTagEnabled = try container.decodeIfPresent(Bool.self, forKey: .originalContentTagEnabled)
     submitText = try container.decodeIfPresent(String.self, forKey: .submitText)
     descriptionHtml = try container.decodeIfPresent(String.self, forKey: .descriptionHtml)
-    attributedDescription = NSMutableAttributedString(html: Data((descriptionHtml ?? "").utf8), options: [
-      .documentType: NSAttributedString.DocumentType.html,
-      .characterEncoding: NSNumber(value: String.Encoding.utf8.rawValue),
-    ], documentAttributes: nil)
     spoilersEnabled = try container.decodeIfPresent(Bool.self, forKey: .spoilersEnabled)
     headerTitle = try container.decodeIfPresent(String.self, forKey: .headerTitle)
     headerSize = try container.decodeIfPresent([Int].self, forKey: .headerSize)
@@ -114,10 +112,6 @@ public struct Subreddit: RedditObject {
     collapseDeletedComments = try container.decodeIfPresent(Bool.self, forKey: .collapseDeletedComments)
     emojisCustomSize = try container.decodeIfPresent([Int].self, forKey: .emojisCustomSize)
     publicDescriptionHtml = try container.decodeIfPresent(String.self, forKey: .publicDescriptionHtml)
-    attributedPublicDescription = NSMutableAttributedString(html: Data((publicDescriptionHtml ?? "").utf8), options: [
-      .documentType: NSAttributedString.DocumentType.html,
-      .characterEncoding: NSNumber(value: String.Encoding.utf8.rawValue),
-    ], documentAttributes: nil)
     allowVideos = try container.decode(Bool.self, forKey: .allowVideos)
     notificationLevel = try container.decodeIfPresent(NotificationLevel.self, forKey: .notificationLevel)
     canAssignLinkFlair = try container.decode(Bool.self, forKey: .canAssignLinkFlair)
@@ -207,7 +201,6 @@ public struct Subreddit: RedditObject {
   /// - Note: `nil` if the subreddit is private and the current user context does not have access
   public let advertiserCategory: String?
   public let description: String?
-  public let attributedDescription: NSAttributedString?
   public let publicDescription: String
   /// The number of minutes to hide the score of a new comment
   /// - Note: `nil` if the subreddit is private and the current user context does not have access
@@ -269,7 +262,6 @@ public struct Subreddit: RedditObject {
   public let collapseDeletedComments: Bool?
   public let emojisCustomSize: [Int]?
   public let publicDescriptionHtml: String?
-  public let attributedPublicDescription: NSAttributedString?
   public let allowVideos: Bool
   public let isCrosspostableSubreddit: Bool
   public let notificationLevel: NotificationLevel?

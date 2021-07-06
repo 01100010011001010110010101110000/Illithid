@@ -158,10 +158,6 @@ public struct Post: RedditObject {
 
     selftext = try container.decode(String.self, forKey: .selftext)
     selftextHtml = try container.decodeIfPresent(String.self, forKey: .selftextHtml)
-    attributedSelfText = NSMutableAttributedString(html: Data((selftextHtml ?? "").utf8), options: [
-      .documentType: NSAttributedString.DocumentType.html,
-      .characterEncoding: NSNumber(value: String.Encoding.utf8.rawValue),
-    ], documentAttributes: nil) ?? NSAttributedString()
 
     media = try container.decodeIfPresent(PostMedia.self, forKey: .media)
     secureMedia = try container.decodeIfPresent(PostMedia.self, forKey: .secureMedia)
@@ -218,7 +214,6 @@ public struct Post: RedditObject {
 
   public let selftext: String
   public let selftextHtml: String?
-  public let attributedSelfText: NSAttributedString
   public let secureMedia: PostMedia?
   public let media: PostMedia?
   public let domain: String
