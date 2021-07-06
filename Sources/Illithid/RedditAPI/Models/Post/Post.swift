@@ -75,6 +75,7 @@ public enum PostHint: String, Codable {
   case image
   case richVideo
   case hostedVideo
+  case gallery
 
   // MARK: Lifecycle
 
@@ -105,6 +106,7 @@ public enum PostHint: String, Codable {
     case image
     case richVideo = "rich:video"
     case hostedVideo = "hosted:video"
+    case gallery
   }
 }
 
