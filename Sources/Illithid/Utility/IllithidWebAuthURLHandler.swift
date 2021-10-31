@@ -25,6 +25,7 @@ final class IllithidWebAuthURLHandler: OAuthSwiftURLHandlerType {
   init(callbackURLScheme: String, anchor: ASWebAuthenticationPresentationContextProviding) {
     self.callbackURLScheme = callbackURLScheme
     self.anchor = anchor
+    sessionStartedSuccessfully = false
   }
 
   // MARK: Internal
@@ -45,8 +46,12 @@ final class IllithidWebAuthURLHandler: OAuthSwiftURLHandlerType {
       NSWorkspace.shared.open(successURL)
     }
     webAuthSession.presentationContextProvider = anchor
-    _ = webAuthSession.start()
+    sessionStartedSuccessfully = webAuthSession.start()
   }
+
+  // MARK: Private
+
+  private var sessionStartedSuccessfully: Bool
 }
 
 // MARK: - NSWindow + ASWebAuthenticationPresentationContextProviding

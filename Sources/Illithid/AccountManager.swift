@@ -159,6 +159,7 @@ public final class AccountManager: ObservableObject {
   public func removeAccount(toRemove account: Account) {
     // Remove account from in memory logged in accounts and from the savedAccounts entry in UserDefaults
     accounts.remove(account)
+    // FIXME: - Bug causing account == currentAccount to never evaluate to true
     if account == currentAccount { setAccount(nil) }
 
     // Remove credentials from the keychain
