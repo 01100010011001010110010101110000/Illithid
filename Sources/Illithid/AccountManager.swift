@@ -200,12 +200,19 @@ public final class AccountManager: ObservableObject {
     let oauth = OAuth2Swift(parameters: configuration.oauthParameters)!
     oauth.accessTokenBasicAuthentification = true
     oauth.client = OAuthSwiftClient(credential: credential)
+    let interceptor = IllithidRedditRequestInterceptor(oauth) { [self] result in
+      guard let currentAccount = self.currentAccount else { return }
+      switch result {
+      case let .success(credential):
+        try? self.write(token: credential, for: currentAccount)
+      }
+    }
 
     let cacher: ResponseCacher = .cache
     let session = Session(configuration: alamoConfiguration,
                           rootQueue: DispatchQueue(label: "com.flayware.illithid.AFRootQueue"),
                           serializationQueue: DispatchQueue(label: "com.flayware.illithid.AFSerializationQueue"),
-                          interceptor: IllithidRedditRequestInterceptor(oauth),
+                          interceptor: interceptor,
                           cachedResponseHandler: cacher,
                           eventMonitors: [FireLogger(logger: logger)])
 
