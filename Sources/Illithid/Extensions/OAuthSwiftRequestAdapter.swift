@@ -19,6 +19,20 @@ import OAuthSwift
 // MARK: - IllithidRedditRequestInterceptor
 
 final class IllithidRedditRequestInterceptor: OAuthSwift2RequestInterceptor {
+  // MARK: Lifecycle
+
+  init(_ oauthSwift: OAuth2Swift, onTokenRenewal: @escaping OAuthSwift.TokenRenewedHandler = { _ in }) {
+    self.onTokenRenewal = onTokenRenewal
+    super.init(oauthSwift)
+  }
+
+  override init(_ oauthSwift: OAuth2Swift) {
+    onTokenRenewal = { _ in }
+    super.init(oauthSwift)
+  }
+
+  // MARK: Internal
+
   override func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, Error>) -> Void) {
     super.adapt(urlRequest, for: session) { result in
       switch result {
@@ -39,6 +53,23 @@ final class IllithidRedditRequestInterceptor: OAuthSwift2RequestInterceptor {
       }
     }
   }
+
+  override func retry(_ request: Request, for: Session, dueTo: Error, completion: @escaping (RetryResult) -> Void) {
+    super.retry(request, for: `for`, dueTo: dueTo) { [weak self] result in
+      switch result {
+      case .retry, .retryWithDelay:
+        guard let self = self else { break }
+        self.onTokenRenewal(.success(self.oauth2Swift.client.credential))
+      default:
+        break
+      }
+      completion(result)
+    }
+  }
+
+  // MARK: Private
+
+  private let onTokenRenewal: OAuthSwift.TokenRenewedHandler
 }
 
 // MARK: - OAuthSwiftRequestInterceptor
@@ -149,7 +180,16 @@ open class OAuthSwift2RequestInterceptor: OAuthSwiftRequestInterceptor {
 
     isRefreshing = true
 
-    oauth2Swift.renewAccessToken(withRefreshToken: oauth2Swift.client.credential.oauthRefreshToken) { [weak self] result in
+    // TODO: - Remove once patch is merged: https://github.com/OAuthSwift/OAuthSwift/pull/681
+    var headers = OAuthSwift.Headers()
+    if oauth2Swift.accessTokenBasicAuthentification {
+      let authentication = "\(oauth2Swift.parameters["consumerKey"]!):".data(using: .utf8)
+      if let base64Encoded = authentication?.base64EncodedString() {
+        headers["Authorization"] = "Basic \(base64Encoded)"
+      }
+    }
+
+    oauth2Swift.renewAccessToken(withRefreshToken: oauth2Swift.client.credential.oauthRefreshToken, headers: headers) { [weak self] result in
       guard let strongSelf = self else { return }
 
       // map success result from TokenSuccess to Void, and failure from OAuthSwiftError to Error
