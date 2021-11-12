@@ -56,6 +56,16 @@ public struct GfyItem: Codable, Hashable, Equatable {
       throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath,
                                                               debugDescription: "Invalid username"))
     }
+
+    if let number = try? container.decode(Int.self, forKey: .gfyNumber) {
+      gfyNumber = number
+    } else if let string = try? container.decode(String.self, forKey: .gfyNumber), let number = Int(string) {
+      gfyNumber = number
+    } else {
+      throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath,
+                                                              debugDescription: "Could not decode number from gfyNumber"))
+    }
+
     if let number = try? container.decode(Int.self, forKey: .likes) {
       likes = number
     } else if let string = try? container.decode(String.self, forKey: .likes), let number = Int(string) {
@@ -64,19 +74,26 @@ public struct GfyItem: Codable, Hashable, Equatable {
       throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath,
                                                               debugDescription: "Could not decode number from likes"))
     }
-    if let number = try? container.decode(Int.self, forKey: .dislikes) {
-      dislikes = number
-    } else if let string = try? container.decode(String.self, forKey: .dislikes), let number = Int(string) {
-      dislikes = number
+
+    if container.contains(.dislikes) {
+      if let isNil = try? container.decodeNil(forKey: .dislikes), isNil {
+        dislikes = nil
+      } else if let number = try? container.decode(Int.self, forKey: .dislikes) {
+        dislikes = number
+      } else if let string = try? container.decode(String.self, forKey: .dislikes), let number = Int(string) {
+        dislikes = number
+      } else {
+        throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath,
+                                                                debugDescription: "Could not decode number from dislikes"))
+      }
     } else {
-      throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath,
-                                                              debugDescription: "Could not decode number from dislikes"))
+      dislikes = nil
     }
 
     tags = try container.decode([String].self, forKey: .tags)
     languageCategories = try container.decode([String].self, forKey: .languageCategories)
-    domainWhitelist = try container.decode([String].self, forKey: .domainWhitelist)
-    geoWhitelist = try container.decode([String].self, forKey: .geoWhitelist)
+    domainWhitelist = try container.decodeIfPresent([String].self, forKey: .domainWhitelist)
+    geoWhitelist = try container.decodeIfPresent([String].self, forKey: .geoWhitelist)
     published = try container.decode(Int.self, forKey: .published)
     nsfw = try container.decode(Nsfw.self, forKey: .nsfw)
     gatekeeper = try container.decode(Int.self, forKey: .gatekeeper)
@@ -86,7 +103,7 @@ public struct GfyItem: Codable, Hashable, Equatable {
     webpURL = try container.decode(URL.self, forKey: .webpURL)
     mobileURL = try container.decode(URL.self, forKey: .mobileURL)
     mobilePosterURL = try container.decode(URL.self, forKey: .mobilePosterURL)
-    extraLemmas = try container.decode(String.self, forKey: .extraLemmas)
+    extraLemmas = try container.decodeIfPresent(String.self, forKey: .extraLemmas)
     thumb100PosterURL = try container.decode(URL.self, forKey: .thumb100PosterURL)
     miniURL = try container.decode(URL.self, forKey: .miniURL)
     gif100Px = try container.decode(String.self, forKey: .gif100Px)
@@ -96,12 +113,11 @@ public struct GfyItem: Codable, Hashable, Equatable {
     max2MBGIF = try container.decode(URL.self, forKey: .max2MBGIF)
     max1MBGIF = try container.decode(URL.self, forKey: .max1MBGIF)
     posterURL = try container.decode(URL.self, forKey: .posterURL)
-    languageText = try container.decode(String.self, forKey: .languageText)
+    languageText = try container.decodeIfPresent(String.self, forKey: .languageText)
     views = try container.decode(Int.self, forKey: .views)
     gfyItemDescription = try container.decode(String.self, forKey: .gfyItemDescription)
     hasTransparency = try container.decode(Bool.self, forKey: .hasTransparency)
     hasAudio = try container.decode(Bool.self, forKey: .hasAudio)
-    gfyNumber = try container.decode(String.self, forKey: .gfyNumber)
     gfyId = try container.decode(String.self, forKey: .gfyId)
     gfyName = try container.decode(String.self, forKey: .gfyName)
     avgColor = try container.decode(String.self, forKey: .avgColor)
@@ -114,7 +130,7 @@ public struct GfyItem: Codable, Hashable, Equatable {
     webmSize = try container.decode(Int.self, forKey: .webmSize)
     createDate = try container.decode(Date.self, forKey: .createDate)
     md5 = try container.decodeIfPresent(String.self, forKey: .md5)
-    source = try container.decode(Int.self, forKey: .source)
+    source = try container.decodeIfPresent(Int.self, forKey: .source)
     contentUrls = try container.decode([String: GfyContent].self, forKey: .contentUrls)
   }
 
@@ -162,8 +178,8 @@ public struct GfyItem: Codable, Hashable, Equatable {
 
   public let tags: [String]
   public let languageCategories: [String]
-  public let domainWhitelist: [String]
-  public let geoWhitelist: [String]
+  public let domainWhitelist: [String]?
+  public let geoWhitelist: [String]?
   public let published: Int
   public let nsfw: Nsfw
   public let gatekeeper: Int
@@ -173,7 +189,7 @@ public struct GfyItem: Codable, Hashable, Equatable {
   public let webpURL: URL
   public let mobileURL: URL
   public let mobilePosterURL: URL
-  public let extraLemmas: String
+  public let extraLemmas: String?
   public let thumb100PosterURL: URL
   public let miniURL: URL
   public let gif100Px: String
@@ -183,15 +199,15 @@ public struct GfyItem: Codable, Hashable, Equatable {
   public let max2MBGIF: URL
   public let max1MBGIF: URL
   public let posterURL: URL
-  public let languageText: String
+  public let languageText: String?
   public let views: Int
   public let username: String
   public let gfyItemDescription: String
   public let hasTransparency: Bool
   public let hasAudio: Bool
   public let likes: Int
-  public let dislikes: Int
-  public let gfyNumber: String
+  public let dislikes: Int?
+  public let gfyNumber: Int
   public let gfyId: String
   public let gfyName: String
   public let avgColor: String
@@ -204,7 +220,7 @@ public struct GfyItem: Codable, Hashable, Equatable {
   public let webmSize: Int
   public let createDate: Date
   public let md5: String?
-  public let source: Int
+  public let source: Int?
   public let contentUrls: [String: GfyContent]
 
   public static func == (lhs: GfyItem, rhs: GfyItem) -> Bool {
