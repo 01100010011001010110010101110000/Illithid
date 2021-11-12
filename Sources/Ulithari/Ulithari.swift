@@ -51,6 +51,7 @@ open class Ulithari {
   public static let shared = Ulithari()
   public static let gfycatBaseUrl = URL(string: "https://api.gfycat.com/v1/")!
   public static let redGifsBaseUrl = URL(string: "https://api.redgifs.com/v1/")!
+  public static let redGifsV2BaseUrl = URL(string: "https://api.redgifs.com/v2/")!
   public static let imgurBaseUrl = URL(string: "https://api.imgur.com/3/")!
 
   public func configure(imgurClientId: String) {
@@ -102,6 +103,18 @@ public extension Ulithari {
   func fetchRedGif(from url: URL, queue: DispatchQueue = .main, completion: @escaping (Result<RedGfyItem, AFError>) -> Void) -> DataRequest {
     let redGifId = String(url.path.dropFirst())
     return fetchRedGif(id: redGifId, queue: queue, completion: completion)
+  }
+
+  func fetchRedGifV2(id: String, queue: DispatchQueue = .main, completion: @escaping (Result<RedGif, AFError>) -> Void) -> DataRequest {
+    session.request(URL(string: "gifs/\(id)", relativeTo: Self.redGifsV2BaseUrl)!).validate()
+           .responseDecodable(of: RedGif.self, queue: queue, decoder: gfycatDecoder) { response in
+             switch response.result {
+             case let .success(gif):
+               completion(.success(gif))
+             case let .failure(error):
+               completion(.failure(error))
+             }
+           }
   }
 }
 
