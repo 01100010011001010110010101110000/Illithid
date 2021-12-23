@@ -37,7 +37,7 @@ enum PostRouter: URLConvertible {
   ///
   /// - Remark: This is necessary to handle `FrontPage.random`, because Reddit handles that endpoint by replying with an HTTP 302 to a random subreddit,
   /// and without the `Authorization` header, we receive a 403 when following the redirect.
-  static let frontPageRedirector = Redirector(behavior: .modify({ (task, request, _) -> URLRequest? in
+  static let frontPageRedirector = Redirector(behavior: .modify({ task, request, _ -> URLRequest? in
     if request.url?.host == "oauth.reddit.com",
        let authzHeader = task.originalRequest?.headers["Authorization"] {
       var newRequest = request
@@ -328,24 +328,49 @@ public extension Post {
 // MARK: Post Actions
 
 public extension Post {
-  func upvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
+  @discardableResult
+  func upvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
     Illithid.shared.vote(fullname: name, direction: .up, queue: queue, completion: completion)
   }
 
-  func downvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
+  func upvote() async throws -> Data {
+    try await Illithid.shared.vote(post: self, direction: .up, automaticallyCancelling: true).value
+  }
+
+  @discardableResult
+  func downvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
     Illithid.shared.vote(fullname: name, direction: .down, queue: queue, completion: completion)
   }
 
-  func clearVote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
+  func downvote() async throws -> Data {
+    try await Illithid.shared.vote(post: self, direction: .down, automaticallyCancelling: true).value
+  }
+
+  @discardableResult
+  func clearVote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
     Illithid.shared.vote(fullname: name, direction: .clear, queue: queue, completion: completion)
   }
 
-  func save(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
+  func clearVote() async throws -> Data {
+    try await Illithid.shared.vote(post: self, direction: .clear, automaticallyCancelling: true).value
+  }
+
+  @discardableResult
+  func save(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
     Illithid.shared.save(fullname: name, queue: queue, completion: completion)
   }
 
-  func unsave(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
+  func save() async throws -> Data {
+    try await Illithid.shared.save(post: self, automaticallyCancelling: true).value
+  }
+
+  @discardableResult
+  func unsave(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
     Illithid.shared.unsave(fullname: name, queue: queue, completion: completion)
+  }
+
+  func unsave() async throws -> Data {
+    try await Illithid.shared.unsave(fullname: name, automaticallyCancelling: true).value
   }
 }
 
