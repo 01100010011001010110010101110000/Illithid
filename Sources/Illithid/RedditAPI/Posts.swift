@@ -333,6 +333,7 @@ public extension Post {
     Illithid.shared.vote(fullname: name, direction: .up, queue: queue, completion: completion)
   }
 
+  @discardableResult
   func upvote() async throws -> Data {
     try await Illithid.shared.vote(post: self, direction: .up, automaticallyCancelling: true).value
   }
@@ -342,6 +343,7 @@ public extension Post {
     Illithid.shared.vote(fullname: name, direction: .down, queue: queue, completion: completion)
   }
 
+  @discardableResult
   func downvote() async throws -> Data {
     try await Illithid.shared.vote(post: self, direction: .down, automaticallyCancelling: true).value
   }
@@ -351,6 +353,7 @@ public extension Post {
     Illithid.shared.vote(fullname: name, direction: .clear, queue: queue, completion: completion)
   }
 
+  @discardableResult
   func clearVote() async throws -> Data {
     try await Illithid.shared.vote(post: self, direction: .clear, automaticallyCancelling: true).value
   }
@@ -360,6 +363,7 @@ public extension Post {
     Illithid.shared.save(fullname: name, queue: queue, completion: completion)
   }
 
+  @discardableResult
   func save() async throws -> Data {
     try await Illithid.shared.save(post: self, automaticallyCancelling: true).value
   }
@@ -369,6 +373,7 @@ public extension Post {
     Illithid.shared.unsave(fullname: name, queue: queue, completion: completion)
   }
 
+  @discardableResult
   func unsave() async throws -> Data {
     try await Illithid.shared.unsave(fullname: name, automaticallyCancelling: true).value
   }
