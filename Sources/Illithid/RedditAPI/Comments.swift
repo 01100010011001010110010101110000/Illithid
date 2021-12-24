@@ -187,57 +187,7 @@ public extension Illithid {
 
 // MARK: - Comment + Votable, Savable
 
-extension Comment: Votable, Savable {
-  @discardableResult
-  public func upvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
-    Illithid.shared.vote(fullname: fullname, direction: .up, queue: queue, completion: completion)
-  }
-
-  @discardableResult
-  public func upvote() async throws -> Data {
-    try await Illithid.shared.vote(comment: self, direction: .up, automaticallyCancelling: true).value
-  }
-
-  @discardableResult
-  public func downvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
-    Illithid.shared.vote(fullname: fullname, direction: .down, queue: queue, completion: completion)
-  }
-
-  @discardableResult
-  public func downvote() async throws -> Data {
-    try await Illithid.shared.vote(comment: self, direction: .up, automaticallyCancelling: true).value
-  }
-
-  @discardableResult
-  public func clearVote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
-    Illithid.shared.vote(fullname: fullname, direction: .clear, queue: queue, completion: completion)
-  }
-
-  @discardableResult
-  public func clearVote() async throws -> Data {
-    try await Illithid.shared.vote(comment: self, direction: .up, automaticallyCancelling: true).value
-  }
-
-  @discardableResult
-  public func save(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
-    Illithid.shared.save(fullname: fullname, queue: queue, completion: completion)
-  }
-
-  @discardableResult
-  public func save() async throws -> Data {
-    try await Illithid.shared.vote(comment: self, direction: .up, automaticallyCancelling: true).value
-  }
-
-  @discardableResult
-  public func unsave(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
-    Illithid.shared.unsave(fullname: fullname, queue: queue, completion: completion)
-  }
-
-  @discardableResult
-  public func unsave() async throws -> Data {
-    try await Illithid.shared.vote(comment: self, direction: .up, automaticallyCancelling: true).value
-  }
-}
+extension Comment: Votable, Savable {}
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public extension Comment {

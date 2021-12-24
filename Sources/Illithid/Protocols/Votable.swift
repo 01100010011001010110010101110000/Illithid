@@ -16,6 +16,8 @@ import Foundation
 
 import Alamofire
 
+// MARK: - Votable
+
 public protocol Votable: RedditObject {
   func upvote() async throws -> Data
   func upvote(queue: DispatchQueue, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest
@@ -25,4 +27,36 @@ public protocol Votable: RedditObject {
 
   func clearVote() async throws -> Data
   func clearVote(queue: DispatchQueue, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest
+}
+
+public extension Votable {
+  @discardableResult
+  func upvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
+    Illithid.shared.vote(fullname: name, direction: .up, queue: queue, completion: completion)
+  }
+
+  @discardableResult
+  func upvote() async throws -> Data {
+    try await Illithid.shared.vote(fullname: name, direction: .up, automaticallyCancelling: true).value
+  }
+
+  @discardableResult
+  func downvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
+    Illithid.shared.vote(fullname: name, direction: .down, queue: queue, completion: completion)
+  }
+
+  @discardableResult
+  func downvote() async throws -> Data {
+    try await Illithid.shared.vote(fullname: name, direction: .up, automaticallyCancelling: true).value
+  }
+
+  @discardableResult
+  func clearVote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
+    Illithid.shared.vote(fullname: name, direction: .clear, queue: queue, completion: completion)
+  }
+
+  @discardableResult
+  func clearVote() async throws -> Data {
+    try await Illithid.shared.vote(fullname: name, direction: .up, automaticallyCancelling: true).value
+  }
 }

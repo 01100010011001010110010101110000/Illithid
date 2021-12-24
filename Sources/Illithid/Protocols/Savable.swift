@@ -16,10 +16,34 @@ import Foundation
 
 import Alamofire
 
+// MARK: - Savable
+
 public protocol Savable: RedditObject {
   func save() async throws -> Data
   func save(queue: DispatchQueue, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest
 
   func unsave() async throws -> Data
   func unsave(queue: DispatchQueue, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest
+}
+
+public extension Savable {
+  @discardableResult
+  func save(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
+    Illithid.shared.save(fullname: name, queue: queue, completion: completion)
+  }
+
+  @discardableResult
+  func save() async throws -> Data {
+    try await Illithid.shared.vote(fullname: name, direction: .up, automaticallyCancelling: true).value
+  }
+
+  @discardableResult
+  func unsave(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
+    Illithid.shared.unsave(fullname: name, queue: queue, completion: completion)
+  }
+
+  @discardableResult
+  func unsave() async throws -> Data {
+    try await Illithid.shared.vote(fullname: name, direction: .up, automaticallyCancelling: true).value
+  }
 }
