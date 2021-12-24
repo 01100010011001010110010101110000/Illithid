@@ -19,6 +19,8 @@ import Alamofire
 // MARK: - Savable
 
 public protocol Savable: RedditObject {
+  var saved: Bool { get }
+
   func save(queue: DispatchQueue, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest
 
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
