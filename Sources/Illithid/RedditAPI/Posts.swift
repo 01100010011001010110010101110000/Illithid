@@ -325,10 +325,6 @@ public extension Post {
   }
 }
 
-// MARK: - Post + Votable, Savable
-
-extension Post: Votable, Savable {}
-
 public extension Post {
   @discardableResult
   static func fetch(name: Fullname, queue: DispatchQueue = .main, completion: @escaping (Result<Post, Error>) -> Void) -> DataRequest {

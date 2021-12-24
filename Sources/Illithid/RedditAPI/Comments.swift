@@ -168,7 +168,7 @@ public extension Illithid {
     }
   }
 
-  func postComment(replyingTo parent: Fullname, body: String, queue: DispatchQueue = .main)
+  func postComment(replyingTo parent: Fullname, markdown body: String, queue: DispatchQueue = .main)
     -> AnyPublisher<Comment, AFError> {
     let parameterEncoding = URLEncoding(boolEncoding: .numeric)
     let parameters: Parameters = [
@@ -183,11 +183,22 @@ public extension Illithid {
       .publishDecodable(type: Comment.self, queue: queue, decoder: decoder)
       .value()
   }
+
+  func postComment(replyingTo parent: Fullname, markdown body: String, automaticallyCanceling: Bool = false)
+    -> DataTask<Comment> {
+    let parameterEncoding = URLEncoding(boolEncoding: .numeric)
+    let parameters: Parameters = [
+      "api_type": "json",
+      "return_rtjson": true,
+      "text": body,
+      "thing_id": parent,
+    ]
+
+    return session.request(CommentRouter.submitComment, method: .post,
+                           parameters: parameters, encoding: parameterEncoding)
+      .serializingDecodable(Comment.self, automaticallyCancelling: automaticallyCanceling, decoder: decoder)
+  }
 }
-
-// MARK: - Comment + Votable, Savable
-
-extension Comment: Votable, Savable {}
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public extension Comment {
@@ -236,19 +247,5 @@ public extension Comment {
         completion(.failure(error))
       }
     }
-  }
-}
-
-@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-public extension Comment {
-  func reply(body: String, queue: DispatchQueue = .main) -> AnyPublisher<Comment, AFError> {
-    Illithid.shared.postComment(replyingTo: name, body: body, queue: queue)
-  }
-}
-
-@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-public extension Post {
-  func reply(body: String, queue: DispatchQueue = .main) -> AnyPublisher<Comment, AFError> {
-    Illithid.shared.postComment(replyingTo: name, body: body, queue: queue)
   }
 }

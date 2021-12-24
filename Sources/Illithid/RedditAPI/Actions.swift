@@ -216,3 +216,11 @@ public extension Illithid {
     changeSubscription(of: [subreddit], action: action, queue: queue, completion: completion)
   }
 }
+
+// MARK: - Comment + Votable, Savable, Replyable
+
+extension Comment: Votable, Savable, Replyable {}
+
+// MARK: - Post + Votable, Savable, Replyable
+
+extension Post: Votable, Savable, Replyable {}
