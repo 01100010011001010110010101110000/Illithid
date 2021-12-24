@@ -19,11 +19,15 @@ import Alamofire
 // MARK: - Savable
 
 public protocol Savable: RedditObject {
-  func save() async throws -> Data
   func save(queue: DispatchQueue, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest
 
-  func unsave() async throws -> Data
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+  func save() async throws -> Data
+
   func unsave(queue: DispatchQueue, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest
+
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+  func unsave() async throws -> Data
 }
 
 public extension Savable {
@@ -33,6 +37,7 @@ public extension Savable {
   }
 
   @discardableResult
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
   func save() async throws -> Data {
     try await Illithid.shared.vote(fullname: name, direction: .up, automaticallyCancelling: true).value
   }
@@ -43,6 +48,7 @@ public extension Savable {
   }
 
   @discardableResult
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
   func unsave() async throws -> Data {
     try await Illithid.shared.vote(fullname: name, direction: .up, automaticallyCancelling: true).value
   }

@@ -19,14 +19,20 @@ import Alamofire
 // MARK: - Votable
 
 public protocol Votable: RedditObject {
-  func upvote() async throws -> Data
   func upvote(queue: DispatchQueue, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest
 
-  func downvote() async throws -> Data
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+  func upvote() async throws -> Data
+
   func downvote(queue: DispatchQueue, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest
 
-  func clearVote() async throws -> Data
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+  func downvote() async throws -> Data
+
   func clearVote(queue: DispatchQueue, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest
+
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+  func clearVote() async throws -> Data
 }
 
 public extension Votable {
@@ -36,6 +42,7 @@ public extension Votable {
   }
 
   @discardableResult
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
   func upvote() async throws -> Data {
     try await Illithid.shared.vote(fullname: name, direction: .up, automaticallyCancelling: true).value
   }
@@ -46,6 +53,7 @@ public extension Votable {
   }
 
   @discardableResult
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
   func downvote() async throws -> Data {
     try await Illithid.shared.vote(fullname: name, direction: .up, automaticallyCancelling: true).value
   }
@@ -56,6 +64,7 @@ public extension Votable {
   }
 
   @discardableResult
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
   func clearVote() async throws -> Data {
     try await Illithid.shared.vote(fullname: name, direction: .up, automaticallyCancelling: true).value
   }
