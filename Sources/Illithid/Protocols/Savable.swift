@@ -41,7 +41,7 @@ public extension Savable {
   @discardableResult
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
   func save() async throws -> Data {
-    try await Illithid.shared.vote(fullname: name, direction: .up, automaticallyCancelling: true).value
+    try await Illithid.shared.save(fullname: name, automaticallyCancelling: true).value
   }
 
   @discardableResult
@@ -52,6 +52,6 @@ public extension Savable {
   @discardableResult
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
   func unsave() async throws -> Data {
-    try await Illithid.shared.vote(fullname: name, direction: .up, automaticallyCancelling: true).value
+    try await Illithid.shared.unsave(fullname: name, automaticallyCancelling: true).value
   }
 }
