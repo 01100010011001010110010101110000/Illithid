@@ -200,7 +200,7 @@ public struct ListingParameters {
 /// The base36, non-kind qualified, ID of a Reddit object. IDs are guaranteed to be unique within a `Kind` type
 /// - SeeAlso: [Reddit's `fullname` documentation](https://www.reddit.com/dev/api#fullnames)
 public typealias ID36 = String
-/// The ID36 of an object fully qualifies by prepending it with its type, e.g. `t3_15bfi0`
+/// The ID36 of an object fully qualified by prepending it with its type, e.g. `t3_15bfi0`
 /// - SeeAlso: [Reddit's `fullname` documentation](https://www.reddit.com/dev/api#fullnames)
 public typealias Fullname = String
 
@@ -209,8 +209,9 @@ public typealias Fullname = String
 /// The base class for all user-generated content on Reddit
 public protocol RedditObject: Codable, Identifiable, Hashable {
   /// The object's unique identifier
-  var id: String { get }
+  var id: ID36 { get }
 
   /// The object's full name
-  var name: String { get }
+  /// - Note: Composed of the object's type and `Kind`: `<kind>_<id>`
+  var name: Fullname { get }
 }

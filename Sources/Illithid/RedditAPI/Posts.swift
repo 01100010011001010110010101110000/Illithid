@@ -325,56 +325,56 @@ public extension Post {
   }
 }
 
-// MARK: Post Actions
+// MARK: - Post + Votable, Savable
 
-public extension Post {
+extension Post: Votable, Savable {
   @discardableResult
-  func upvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
+  public func upvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
     Illithid.shared.vote(fullname: name, direction: .up, queue: queue, completion: completion)
   }
 
   @discardableResult
-  func upvote() async throws -> Data {
+  public func upvote() async throws -> Data {
     try await Illithid.shared.vote(post: self, direction: .up, automaticallyCancelling: true).value
   }
 
   @discardableResult
-  func downvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
+  public func downvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
     Illithid.shared.vote(fullname: name, direction: .down, queue: queue, completion: completion)
   }
 
   @discardableResult
-  func downvote() async throws -> Data {
+  public func downvote() async throws -> Data {
     try await Illithid.shared.vote(post: self, direction: .down, automaticallyCancelling: true).value
   }
 
   @discardableResult
-  func clearVote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
+  public func clearVote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
     Illithid.shared.vote(fullname: name, direction: .clear, queue: queue, completion: completion)
   }
 
   @discardableResult
-  func clearVote() async throws -> Data {
+  public func clearVote() async throws -> Data {
     try await Illithid.shared.vote(post: self, direction: .clear, automaticallyCancelling: true).value
   }
 
   @discardableResult
-  func save(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
+  public func save(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
     Illithid.shared.save(fullname: name, queue: queue, completion: completion)
   }
 
   @discardableResult
-  func save() async throws -> Data {
+  public func save() async throws -> Data {
     try await Illithid.shared.save(post: self, automaticallyCancelling: true).value
   }
 
   @discardableResult
-  func unsave(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
+  public func unsave(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
     Illithid.shared.unsave(fullname: name, queue: queue, completion: completion)
   }
 
   @discardableResult
-  func unsave() async throws -> Data {
+  public func unsave() async throws -> Data {
     try await Illithid.shared.unsave(fullname: name, automaticallyCancelling: true).value
   }
 }

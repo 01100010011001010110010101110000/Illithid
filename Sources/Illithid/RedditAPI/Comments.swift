@@ -111,7 +111,7 @@ public extension Illithid {
                            parameters: encodedParameters, encoding: queryEncoding)
       .publishDecodable(type: [Listing].self, queue: queue, decoder: decoder)
       .value()
-      .mapError { (error) -> AFError in
+      .mapError { error -> AFError in
         self.logger.errorMessage { "Error fetching comments: \(error)" }
         return error
       }
@@ -175,7 +175,7 @@ public extension Illithid {
       "api_type": "json",
       "return_rtjson": true,
       "text": body,
-      "thing_id": parent
+      "thing_id": parent,
     ]
 
     return session.request(CommentRouter.submitComment, method: .post,
@@ -185,30 +185,57 @@ public extension Illithid {
   }
 }
 
-public extension Comment {
+// MARK: - Comment + Votable, Savable
+
+extension Comment: Votable, Savable {
   @discardableResult
-  func upvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
+  public func upvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
     Illithid.shared.vote(fullname: fullname, direction: .up, queue: queue, completion: completion)
   }
 
   @discardableResult
-  func downvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
+  public func upvote() async throws -> Data {
+    try await Illithid.shared.vote(comment: self, direction: .up, automaticallyCancelling: true).value
+  }
+
+  @discardableResult
+  public func downvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
     Illithid.shared.vote(fullname: fullname, direction: .down, queue: queue, completion: completion)
   }
 
   @discardableResult
-  func clearVote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
+  public func downvote() async throws -> Data {
+    try await Illithid.shared.vote(comment: self, direction: .up, automaticallyCancelling: true).value
+  }
+
+  @discardableResult
+  public func clearVote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
     Illithid.shared.vote(fullname: fullname, direction: .clear, queue: queue, completion: completion)
   }
 
   @discardableResult
-  func save(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
+  public func clearVote() async throws -> Data {
+    try await Illithid.shared.vote(comment: self, direction: .up, automaticallyCancelling: true).value
+  }
+
+  @discardableResult
+  public func save(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
     Illithid.shared.save(fullname: fullname, queue: queue, completion: completion)
   }
 
   @discardableResult
-  func unsave(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
+  public func save() async throws -> Data {
+    try await Illithid.shared.vote(comment: self, direction: .up, automaticallyCancelling: true).value
+  }
+
+  @discardableResult
+  public func unsave(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
     Illithid.shared.unsave(fullname: fullname, queue: queue, completion: completion)
+  }
+
+  @discardableResult
+  public func unsave() async throws -> Data {
+    try await Illithid.shared.vote(comment: self, direction: .up, automaticallyCancelling: true).value
   }
 }
 
