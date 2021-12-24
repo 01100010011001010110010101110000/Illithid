@@ -27,7 +27,7 @@ public protocol Replyable: RedditObject {
   /// - Throws: An `AFError` if a network error was encountered
   /// - Returns: The newly created reply `Comment`
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-  func reply(markdown body: String, automaticallyCancelling: Bool) async throws -> Comment
+  func reply(markdown body: String, automaticallyCancelling: Bool) -> DataTask<Comment>
 
   /// Reply to the `Replyable` with a new comment
   ///
@@ -41,8 +41,8 @@ public protocol Replyable: RedditObject {
 
 public extension Replyable {
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-  func reply(markdown body: String, automaticallyCancelling: Bool = false) async throws -> Comment {
-    try await Illithid.shared.postComment(replyingTo: name, markdown: body, automaticallyCanceling: automaticallyCancelling).value
+  func reply(markdown body: String, automaticallyCancelling: Bool = false) -> DataTask<Comment> {
+    Illithid.shared.postComment(replyingTo: name, markdown: body, automaticallyCanceling: automaticallyCancelling)
   }
 
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)

@@ -21,18 +21,24 @@ import Alamofire
 public protocol Votable: RedditObject {
   var likes: Bool? { get }
 
+  @discardableResult
   func upvote(queue: DispatchQueue, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest
 
+  @discardableResult
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
   func upvote() async throws -> Data
 
+  @discardableResult
   func downvote(queue: DispatchQueue, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest
 
+  @discardableResult
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
   func downvote() async throws -> Data
 
+  @discardableResult
   func clearVote(queue: DispatchQueue, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest
 
+  @discardableResult
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
   func clearVote() async throws -> Data
 }
