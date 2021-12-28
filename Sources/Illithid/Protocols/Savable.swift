@@ -24,12 +24,12 @@ public protocol Savable: RedditObject {
   func save(queue: DispatchQueue, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest
 
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-  func save() async throws -> Data
+  func save() -> DataTask<Data>
 
   func unsave(queue: DispatchQueue, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest
 
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-  func unsave() async throws -> Data
+  func unsave() -> DataTask<Data>
 }
 
 public extension Savable {
@@ -40,8 +40,8 @@ public extension Savable {
 
   @discardableResult
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-  func save() async throws -> Data {
-    try await Illithid.shared.save(fullname: name, automaticallyCancelling: true).value
+  func save() -> DataTask<Data> {
+    Illithid.shared.save(fullname: name, automaticallyCancelling: true)
   }
 
   @discardableResult
@@ -51,7 +51,7 @@ public extension Savable {
 
   @discardableResult
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-  func unsave() async throws -> Data {
-    try await Illithid.shared.unsave(fullname: name, automaticallyCancelling: true).value
+  func unsave() -> DataTask<Data> {
+    Illithid.shared.unsave(fullname: name, automaticallyCancelling: true)
   }
 }

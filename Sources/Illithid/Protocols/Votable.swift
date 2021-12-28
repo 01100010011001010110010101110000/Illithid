@@ -26,21 +26,21 @@ public protocol Votable: RedditObject {
 
   @discardableResult
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-  func upvote() async throws -> Data
+  func upvote() -> DataTask<Data>
 
   @discardableResult
   func downvote(queue: DispatchQueue, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest
 
   @discardableResult
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-  func downvote() async throws -> Data
+  func downvote() -> DataTask<Data>
 
   @discardableResult
   func clearVote(queue: DispatchQueue, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest
 
   @discardableResult
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-  func clearVote() async throws -> Data
+  func clearVote() -> DataTask<Data>
 }
 
 public extension Votable {
@@ -51,8 +51,8 @@ public extension Votable {
 
   @discardableResult
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-  func upvote() async throws -> Data {
-    try await Illithid.shared.vote(fullname: name, direction: .up, automaticallyCancelling: true).value
+  func upvote() -> DataTask<Data> {
+    Illithid.shared.vote(fullname: name, direction: .up, automaticallyCancelling: true)
   }
 
   @discardableResult
@@ -62,8 +62,8 @@ public extension Votable {
 
   @discardableResult
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-  func downvote() async throws -> Data {
-    try await Illithid.shared.vote(fullname: name, direction: .down, automaticallyCancelling: true).value
+  func downvote() -> DataTask<Data> {
+    Illithid.shared.vote(fullname: name, direction: .down, automaticallyCancelling: true)
   }
 
   @discardableResult
@@ -73,7 +73,7 @@ public extension Votable {
 
   @discardableResult
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-  func clearVote() async throws -> Data {
-    try await Illithid.shared.vote(fullname: name, direction: .clear, automaticallyCancelling: true).value
+  func clearVote() -> DataTask<Data> {
+    Illithid.shared.vote(fullname: name, direction: .clear, automaticallyCancelling: true)
   }
 }
