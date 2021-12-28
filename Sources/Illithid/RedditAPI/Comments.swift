@@ -210,8 +210,15 @@ public extension Comment {
       .eraseToAnyPublisher()
   }
 
-  static func fetch(name: Fullname, automaticallyCancelling: Bool = false) -> DataTask<Listing> {
-    Illithid.shared.info(name: name, automaticallyCancelling: automaticallyCancelling)
+  static func fetch(name: Fullname, automaticallyCancelling: Bool = false) async throws -> Comment {
+    let result = await Illithid.shared.info(name: name, automaticallyCancelling: automaticallyCancelling).result
+    switch result {
+    case let .success(listing):
+      if let comment = listing.comments.first { return comment }
+      else { throw Illithid.NotFound(lookingFor: name) }
+    case let .failure(error):
+      throw error
+    }
   }
 }
 

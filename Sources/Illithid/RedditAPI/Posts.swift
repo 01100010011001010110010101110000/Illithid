@@ -323,6 +323,17 @@ public extension Post {
         listing.posts.last
       }.eraseToAnyPublisher()
   }
+
+  static func fetch(name: Fullname, automaticallyCancelling: Bool = false) async throws -> Post {
+    let result = await Illithid.shared.info(name: name, automaticallyCancelling: automaticallyCancelling).result
+    switch result {
+    case let .success(listing):
+      if let post = listing.posts.first { return post }
+      else { throw Illithid.NotFound(lookingFor: name) }
+    case let .failure(error):
+      throw error
+    }
+  }
 }
 
 public extension Post {
