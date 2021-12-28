@@ -40,11 +40,23 @@ public protocol Replyable: RedditObject {
 }
 
 public extension Replyable {
+  /// Reply to the `Replyable` with a new comment
+  ///
+  /// - Parameter body: The MarkDown string comprising the reply comment
+  /// - Parameter automaticallyCancelling: If true the AF request is automatically canceled when the task is canceled
+  /// - Throws: An `AFError` if a network error was encountered
+  /// - Returns: The newly created reply `Comment`
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
   func reply(markdown body: String, automaticallyCancelling: Bool = false) -> DataTask<Comment> {
     Illithid.shared.postComment(replyingTo: name, markdown: body, automaticallyCanceling: automaticallyCancelling)
   }
 
+  /// Reply to the `Replyable` with a new comment
+  ///
+  /// - Parameters:
+  ///   - body: The MarkDown string comprising the reply comment
+  ///   - queue: The `DispatchQueue` on which the `DataResponse` will be published
+  /// - Returns: An `AnyPublisher` containing either the newly created reply `Comment`, or an `AFError`
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
   func reply(markdown body: String, queue: DispatchQueue = .main) -> AnyPublisher<Comment, AFError> {
     Illithid.shared.postComment(replyingTo: name, markdown: body, queue: queue)

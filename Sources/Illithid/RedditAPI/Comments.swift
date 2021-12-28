@@ -209,11 +209,15 @@ public extension Comment {
       }
       .eraseToAnyPublisher()
   }
+
+  static func fetch(name: Fullname, automaticallyCancelling: Bool = false) -> DataTask<Listing> {
+    Illithid.shared.info(name: name, automaticallyCancelling: automaticallyCancelling)
+  }
 }
 
 public extension Comment {
   /// Fetches a comment using its `Fullname` from Reddit's info endpoint
-  /// - Warning: This **will not** return a comment's replies; replies will always be empty. For that, you must use the fetch the comment using its permalink
+  /// - Warning: This **will not** return a comment's replies; replies will always be empty. For that, you must fetch the comment using its permalink
   @discardableResult
   static func fetch(name: Fullname, queue: DispatchQueue = .main, completion: @escaping (Result<Comment, Error>) -> Void) -> DataRequest {
     Illithid.shared.info(name: name, queue: queue) { result in
