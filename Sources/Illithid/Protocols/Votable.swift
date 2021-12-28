@@ -24,21 +24,18 @@ public protocol Votable: RedditObject {
   @discardableResult
   func upvote(queue: DispatchQueue, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest
 
-  @discardableResult
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
   func upvote() -> DataTask<Data>
 
   @discardableResult
   func downvote(queue: DispatchQueue, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest
 
-  @discardableResult
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
   func downvote() -> DataTask<Data>
 
   @discardableResult
   func clearVote(queue: DispatchQueue, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest
 
-  @discardableResult
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
   func clearVote() -> DataTask<Data>
 }
@@ -49,7 +46,6 @@ public extension Votable {
     Illithid.shared.vote(fullname: name, direction: .up, queue: queue, completion: completion)
   }
 
-  @discardableResult
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
   func upvote() -> DataTask<Data> {
     Illithid.shared.vote(fullname: name, direction: .up, automaticallyCancelling: true)
@@ -60,7 +56,6 @@ public extension Votable {
     Illithid.shared.vote(fullname: name, direction: .down, queue: queue, completion: completion)
   }
 
-  @discardableResult
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
   func downvote() -> DataTask<Data> {
     Illithid.shared.vote(fullname: name, direction: .down, automaticallyCancelling: true)
@@ -71,7 +66,6 @@ public extension Votable {
     Illithid.shared.vote(fullname: name, direction: .clear, queue: queue, completion: completion)
   }
 
-  @discardableResult
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
   func clearVote() -> DataTask<Data> {
     Illithid.shared.vote(fullname: name, direction: .clear, automaticallyCancelling: true)

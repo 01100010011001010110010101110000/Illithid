@@ -38,7 +38,6 @@ public extension Savable {
     Illithid.shared.save(fullname: name, queue: queue, completion: completion)
   }
 
-  @discardableResult
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
   func save() -> DataTask<Data> {
     Illithid.shared.save(fullname: name, automaticallyCancelling: true)
@@ -49,7 +48,6 @@ public extension Savable {
     Illithid.shared.unsave(fullname: name, queue: queue, completion: completion)
   }
 
-  @discardableResult
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
   func unsave() -> DataTask<Data> {
     Illithid.shared.unsave(fullname: name, automaticallyCancelling: true)
