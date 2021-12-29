@@ -484,3 +484,41 @@ public extension Post {
     }
   }
 }
+
+public extension Post {
+  /// Marks the `Post` as visited
+  ///
+  /// - Parameters:
+  ///   - queue: The `DispatchQueue` on which `completion` will be called
+  ///   - completion: A closure to execute when the request has finished
+  /// - Returns: The `DataRequest` which holds the request
+  /// - Note: The current user *must* be a Reddit premium subscriber for this to work
+  func visit(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void)
+    -> DataRequest {
+    Illithid.shared.storeVisits(to: [name], queue: queue, completion: completion)
+  }
+
+  /// Marks the `Post` as visited
+  ///
+  /// - Parameters:
+  ///   - automaticallyCancelling: If `true`, automatically cancels the network request when the `Task` is cancelled
+  /// - Returns: The `DataRequest` which holds the request
+  /// - Note: The current user *must* be a Reddit premium subscriber for this to work
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+  func visit(automaticallyCancelling: Bool = false)
+    -> DataTask<Data> {
+    Illithid.shared.storeVisits(to: [name], automaticallyCancelling: automaticallyCancelling)
+  }
+
+  /// Marks the `Post` as visited
+  ///
+  /// - Parameters:
+  ///   - queue: The `DispatchQueue` on which the `DataResponse` will be published
+  /// - Returns: The `AnyPublisher` which holds the request
+  /// - Note: The current user *must* be a Reddit premium subscriber for this to work
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+  func visit(queue: DispatchQueue = .main)
+    -> AnyPublisher<Data, AFError> {
+    Illithid.shared.storeVisits(to: [name], queue: queue)
+  }
+}
