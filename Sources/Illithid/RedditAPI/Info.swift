@@ -31,6 +31,18 @@ public extension Illithid {
   }
 
   func info(name: Fullname, queue: DispatchQueue = .main) -> AnyPublisher<Listing, AFError> { info(names: [name], queue: queue) }
+
+  func info(names: [Fullname], automaticallyCancelling: Bool = false) -> DataTask<Listing> {
+    let endpoint = URL(string: "/api/info", relativeTo: baseURL)!
+    let infoParameters: Parameters = ["id": names.joined(separator: ",")]
+
+    return session.request(endpoint, method: .get, parameters: infoParameters)
+      .serializingDecodable(Listing.self, automaticallyCancelling: automaticallyCancelling, decoder: decoder)
+  }
+
+  func info(name: Fullname, automaticallyCancelling: Bool = false) -> DataTask<Listing> {
+    info(names: [name], automaticallyCancelling: automaticallyCancelling)
+  }
 }
 
 public extension Illithid {

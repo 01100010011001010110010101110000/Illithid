@@ -30,14 +30,8 @@ public enum VoteDirection: Int, Codable {
 
   // MARK: Lifecycle
 
-  /// Initializes `self` to the current vote direction in a comment
-  public init(from comment: Comment) {
-    self.init(likes: comment.likes)
-  }
-
-  /// Initializes `self` to the current vote direction in a post
-  public init(from post: Post) {
-    self.init(likes: post.likes)
+  public init<T: Votable>(from votable: T) {
+    self.init(likes: votable.likes)
   }
 
   private init(likes: Bool?) {
@@ -435,7 +429,7 @@ public extension Post {
       previews.append(Preview.Source(url: thumbnail!, width: thumbnailWidth!, height: thumbnailHeight!))
     }
     // Add regular preview images
-    if let preview = self.preview?.images.first {
+    if let preview = preview?.images.first {
       previews.append(contentsOf: preview.resolutions)
       previews.append(preview.source)
     }

@@ -37,7 +37,7 @@ enum PostRouter: URLConvertible {
   ///
   /// - Remark: This is necessary to handle `FrontPage.random`, because Reddit handles that endpoint by replying with an HTTP 302 to a random subreddit,
   /// and without the `Authorization` header, we receive a 403 when following the redirect.
-  static let frontPageRedirector = Redirector(behavior: .modify({ (task, request, _) -> URLRequest? in
+  static let frontPageRedirector = Redirector(behavior: .modify({ task, request, _ -> URLRequest? in
     if request.url?.host == "oauth.reddit.com",
        let authzHeader = task.originalRequest?.headers["Authorization"] {
       var newRequest = request
@@ -323,29 +323,16 @@ public extension Post {
         listing.posts.last
       }.eraseToAnyPublisher()
   }
-}
 
-// MARK: Post Actions
-
-public extension Post {
-  func upvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
-    Illithid.shared.vote(fullname: name, direction: .up, queue: queue, completion: completion)
-  }
-
-  func downvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
-    Illithid.shared.vote(fullname: name, direction: .down, queue: queue, completion: completion)
-  }
-
-  func clearVote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
-    Illithid.shared.vote(fullname: name, direction: .clear, queue: queue, completion: completion)
-  }
-
-  func save(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
-    Illithid.shared.save(fullname: name, queue: queue, completion: completion)
-  }
-
-  func unsave(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) {
-    Illithid.shared.unsave(fullname: name, queue: queue, completion: completion)
+  static func fetch(name: Fullname, automaticallyCancelling: Bool = false) async throws -> Post {
+    let result = await Illithid.shared.info(name: name, automaticallyCancelling: automaticallyCancelling).result
+    switch result {
+    case let .success(listing):
+      if let post = listing.posts.first { return post }
+      else { throw Illithid.NotFound(lookingFor: name) }
+    case let .failure(error):
+      throw error
+    }
   }
 }
 

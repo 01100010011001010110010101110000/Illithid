@@ -75,15 +75,25 @@ public extension Illithid {
   @discardableResult
   func vote(comment: Comment, direction: VoteDirection, queue: DispatchQueue = .main,
             completion: @escaping (Result<Data, AFError>) -> Void)
-  -> DataRequest {
+    -> DataRequest {
     vote(fullname: comment.name, direction: direction, queue: queue, completion: completion)
+  }
+
+  func vote(comment: Comment, direction: VoteDirection, automaticallyCancelling: Bool = false)
+    -> DataTask<Data> {
+    vote(fullname: comment.name, direction: direction, automaticallyCancelling: automaticallyCancelling)
   }
 
   @discardableResult
   func vote(post: Post, direction: VoteDirection, queue: DispatchQueue = .main,
             completion: @escaping (Result<Data, AFError>) -> Void)
-  -> DataRequest {
+    -> DataRequest {
     vote(fullname: post.name, direction: direction, queue: queue, completion: completion)
+  }
+
+  func vote(post: Post, direction: VoteDirection, automaticallyCancelling: Bool = false)
+    -> DataTask<Data> {
+    vote(fullname: post.name, direction: direction, automaticallyCancelling: automaticallyCancelling)
   }
 
   @discardableResult
@@ -97,6 +107,13 @@ public extension Illithid {
       }
   }
 
+  func vote(fullname: Fullname, direction: VoteDirection, automaticallyCancelling: Bool = false)
+    -> DataTask<Data> {
+    session.request(ActionRouter.vote(id: fullname, dir: direction))
+      .validate()
+      .serializingData(automaticallyCancelling: automaticallyCancelling)
+  }
+
   @discardableResult
   func save(comment: Comment, queue: DispatchQueue = .main,
             completion: @escaping (Result<Data, AFError>) -> Void)
@@ -104,11 +121,21 @@ public extension Illithid {
     save(fullname: comment.name, queue: queue, completion: completion)
   }
 
+  func save(comment: Comment, automaticallyCancelling: Bool = false)
+    -> DataTask<Data> {
+    save(fullname: comment.name, automaticallyCancelling: automaticallyCancelling)
+  }
+
   @discardableResult
   func save(post: Post, queue: DispatchQueue = .main,
             completion: @escaping (Result<Data, AFError>) -> Void)
     -> DataRequest {
     save(fullname: post.name, queue: queue, completion: completion)
+  }
+
+  func save(post: Post, automaticallyCancelling: Bool = false)
+    -> DataTask<Data> {
+    save(fullname: post.name, automaticallyCancelling: automaticallyCancelling)
   }
 
   @discardableResult
@@ -122,6 +149,13 @@ public extension Illithid {
       }
   }
 
+  func save(fullname: Fullname, automaticallyCancelling: Bool = false)
+    -> DataTask<Data> {
+    session.request(ActionRouter.save(id: fullname))
+      .validate()
+      .serializingData(automaticallyCancelling: automaticallyCancelling)
+  }
+
   @discardableResult
   func unsave(comment: Comment, queue: DispatchQueue = .main,
               completion: @escaping (Result<Data, AFError>) -> Void)
@@ -129,11 +163,21 @@ public extension Illithid {
     unsave(fullname: comment.name, queue: queue, completion: completion)
   }
 
+  func unsave(comment: Comment, automaticallyCancelling: Bool = false)
+    -> DataTask<Data> {
+    unsave(fullname: comment.name, automaticallyCancelling: automaticallyCancelling)
+  }
+
   @discardableResult
-  func unsave(post: Comment, queue: DispatchQueue = .main,
+  func unsave(post: Post, queue: DispatchQueue = .main,
               completion: @escaping (Result<Data, AFError>) -> Void)
     -> DataRequest {
     unsave(fullname: post.name, queue: queue, completion: completion)
+  }
+
+  func unsave(post: Post, automaticallyCancelling: Bool = false)
+    -> DataTask<Data> {
+    unsave(fullname: post.name, automaticallyCancelling: automaticallyCancelling)
   }
 
   @discardableResult
@@ -145,6 +189,13 @@ public extension Illithid {
       .responseData(queue: queue) { response in
         completion(response.result)
       }
+  }
+
+  func unsave(fullname: Fullname, automaticallyCancelling: Bool = false)
+    -> DataTask<Data> {
+    session.request(ActionRouter.unsave(id: fullname))
+      .validate()
+      .serializingData(automaticallyCancelling: automaticallyCancelling)
   }
 
   @discardableResult
@@ -165,3 +216,11 @@ public extension Illithid {
     changeSubscription(of: [subreddit], action: action, queue: queue, completion: completion)
   }
 }
+
+// MARK: - Comment + Votable, Savable, Replyable
+
+extension Comment: Votable, Savable, Replyable {}
+
+// MARK: - Post + Votable, Savable, Replyable
+
+extension Post: Votable, Savable, Replyable {}

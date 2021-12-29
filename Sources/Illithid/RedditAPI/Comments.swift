@@ -111,7 +111,7 @@ public extension Illithid {
                            parameters: encodedParameters, encoding: queryEncoding)
       .publishDecodable(type: [Listing].self, queue: queue, decoder: decoder)
       .value()
-      .mapError { (error) -> AFError in
+      .mapError { error -> AFError in
         self.logger.errorMessage { "Error fetching comments: \(error)" }
         return error
       }
@@ -168,14 +168,14 @@ public extension Illithid {
     }
   }
 
-  func postComment(replyingTo parent: Fullname, body: String, queue: DispatchQueue = .main)
+  func postComment(replyingTo parent: Fullname, markdown body: String, queue: DispatchQueue = .main)
     -> AnyPublisher<Comment, AFError> {
     let parameterEncoding = URLEncoding(boolEncoding: .numeric)
     let parameters: Parameters = [
       "api_type": "json",
       "return_rtjson": true,
       "text": body,
-      "thing_id": parent
+      "thing_id": parent,
     ]
 
     return session.request(CommentRouter.submitComment, method: .post,
@@ -183,32 +183,20 @@ public extension Illithid {
       .publishDecodable(type: Comment.self, queue: queue, decoder: decoder)
       .value()
   }
-}
 
-public extension Comment {
-  @discardableResult
-  func upvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
-    Illithid.shared.vote(fullname: fullname, direction: .up, queue: queue, completion: completion)
-  }
+  func postComment(replyingTo parent: Fullname, markdown body: String, automaticallyCanceling: Bool = false)
+    -> DataTask<Comment> {
+    let parameterEncoding = URLEncoding(boolEncoding: .numeric)
+    let parameters: Parameters = [
+      "api_type": "json",
+      "return_rtjson": true,
+      "text": body,
+      "thing_id": parent,
+    ]
 
-  @discardableResult
-  func downvote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
-    Illithid.shared.vote(fullname: fullname, direction: .down, queue: queue, completion: completion)
-  }
-
-  @discardableResult
-  func clearVote(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
-    Illithid.shared.vote(fullname: fullname, direction: .clear, queue: queue, completion: completion)
-  }
-
-  @discardableResult
-  func save(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
-    Illithid.shared.save(fullname: fullname, queue: queue, completion: completion)
-  }
-
-  @discardableResult
-  func unsave(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest {
-    Illithid.shared.unsave(fullname: fullname, queue: queue, completion: completion)
+    return session.request(CommentRouter.submitComment, method: .post,
+                           parameters: parameters, encoding: parameterEncoding)
+      .serializingDecodable(Comment.self, automaticallyCancelling: automaticallyCanceling, decoder: decoder)
   }
 }
 
@@ -221,11 +209,22 @@ public extension Comment {
       }
       .eraseToAnyPublisher()
   }
+
+  static func fetch(name: Fullname, automaticallyCancelling: Bool = false) async throws -> Comment {
+    let result = await Illithid.shared.info(name: name, automaticallyCancelling: automaticallyCancelling).result
+    switch result {
+    case let .success(listing):
+      if let comment = listing.comments.first { return comment }
+      else { throw Illithid.NotFound(lookingFor: name) }
+    case let .failure(error):
+      throw error
+    }
+  }
 }
 
 public extension Comment {
   /// Fetches a comment using its `Fullname` from Reddit's info endpoint
-  /// - Warning: This **will not** return a comment's replies; replies will always be empty. For that, you must use the fetch the comment using its permalink
+  /// - Warning: This **will not** return a comment's replies; replies will always be empty. For that, you must fetch the comment using its permalink
   @discardableResult
   static func fetch(name: Fullname, queue: DispatchQueue = .main, completion: @escaping (Result<Comment, Error>) -> Void) -> DataRequest {
     Illithid.shared.info(name: name, queue: queue) { result in
@@ -259,19 +258,5 @@ public extension Comment {
         completion(.failure(error))
       }
     }
-  }
-}
-
-@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-public extension Comment {
-  func reply(body: String, queue: DispatchQueue = .main) -> AnyPublisher<Comment, AFError> {
-    Illithid.shared.postComment(replyingTo: name, body: body, queue: queue)
-  }
-}
-
-@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-public extension Post {
-  func reply(body: String, queue: DispatchQueue = .main) -> AnyPublisher<Comment, AFError> {
-    Illithid.shared.postComment(replyingTo: name, body: body, queue: queue)
   }
 }
