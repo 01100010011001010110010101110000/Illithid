@@ -20,6 +20,7 @@ import Alamofire
 
 public protocol Votable: RedditObject {
   var likes: Bool? { get }
+  var ups: Int { get }
 
   @discardableResult
   func upvote(queue: DispatchQueue, completion: @escaping (Result<Data, AFError>) -> Void) -> DataRequest
