@@ -40,7 +40,9 @@ final class IllithidRedditRequestInterceptor: OAuthSwift2RequestInterceptor {
         do {
           // Without this some API responses come back URL encoded
           if request.url?.host?.hasSuffix("reddit.com") ?? false {
-            let request = try URLEncoding.queryString.encode(request, with: ["raw_json": true])
+            let request = try URLEncoding(boolEncoding: .numeric).encode(request, with: [
+              "raw_json": true,
+            ])
             completion(.success(request))
           } else {
             completion(.success(request))
