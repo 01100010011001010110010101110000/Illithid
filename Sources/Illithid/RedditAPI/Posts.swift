@@ -22,14 +22,14 @@ import Willow
 
 // MARK: - PostRouter
 
-enum PostRouter: URLConvertible {
-  case subreddit(displayName: String, sort: PostSort)
-  case userMultireddit(username: String, multiName: String, sort: PostSort)
-  case frontPage(page: FrontPage, sort: PostSort)
-  case submit
-  case submitGallery
-  case submitPoll
-  case storeVisit
+enum PostRouter: URLRequestConvertible {
+  case subreddit(displayName: String, sort: PostSort, topInterval: TopInterval?, location: Location?, listing: ListingParameters)
+  case userMultireddit(username: String, multiName: String, sort: PostSort, topInterval: TopInterval?, location: Location?, listing: ListingParameters)
+  case frontPage(page: FrontPage, sort: PostSort, topInterval: TopInterval?, location: Location?, listing: ListingParameters)
+  case submit(parameters: BaseNewPostParameters)
+  case submitGallery(parameters: GalleryPostParameters)
+  case submitPoll(parameters: PollPostParameters)
+  case storeVisit(fullnames: [Fullname])
 
   // MARK: Internal
 
@@ -39,31 +39,42 @@ enum PostRouter: URLConvertible {
   /// - Remark: This is necessary to handle `FrontPage.random`, because Reddit handles that endpoint by replying with an HTTP 302 to a random subreddit,
   /// and without the `Authorization` header, we receive a 403 when following the redirect.
   static let frontPageRedirector = Redirector(behavior: .modify({ task, request, _ -> URLRequest? in
+    let authzHeaderName = "Authorization"
     if request.url?.host == "oauth.reddit.com",
-       let authzHeader = task.originalRequest?.headers["Authorization"] {
+       let authzHeader = task.originalRequest?.headers[authzHeaderName] {
       var newRequest = request
-      newRequest.setValue(authzHeader, forHTTPHeaderField: "Authorization")
+      newRequest.setValue(authzHeader, forHTTPHeaderField: authzHeaderName)
       return newRequest
     }
     return request
   }))
 
-  func asURL() throws -> URL {
+  func asURLRequest() throws -> URLRequest {
     switch self {
-    case let .subreddit(displayName, sort):
-      return URL(string: "/r/\(displayName)/\(sort)", relativeTo: baseUrl)!
-    case let .userMultireddit(username, multiName, sort):
-      return URL(string: "/user/\(username)/m/\(multiName)/\(sort)", relativeTo: baseUrl)!
-    case let .frontPage(page, sort):
-      return try page.asURL().appendingPathComponent("\(sort)")
-    case .submit:
-      return URL(string: "/api/submit", relativeTo: baseUrl)!
-    case .submitGallery:
-      return URL(string: "/api/submit_gallery_post", relativeTo: baseUrl)!
-    case .submitPoll:
-      return URL(string: "/api/submit_poll_post", relativeTo: baseUrl)!
-    case .storeVisit:
-      return URL(string: "/api/store_visits", relativeTo: baseUrl)!
+    case let .subreddit(displayName, sort, topInterval, location, params):
+      return try constructSubredditPostsRequest(url: URL(string: "/r/\(displayName)/\(sort)", relativeTo: baseUrl)!, sort: sort,
+                                                topInterval: topInterval, location: location, listingParameters: params)
+    case let .userMultireddit(username, multiName, sort, topInterval, location, params):
+      return try constructSubredditPostsRequest(url: URL(string: "/user/\(username)/m/\(multiName)/\(sort)", relativeTo: baseUrl)!, sort: sort,
+                                                topInterval: topInterval, location: location, listingParameters: params)
+    case let .frontPage(page, sort, topInterval, location, params):
+      return try constructSubredditPostsRequest(url: page.asURL().appendingPathComponent("\(sort)"), sort: sort,
+                                                topInterval: topInterval, location: location, listingParameters: params)
+    case let .submit(parameters):
+      let request = try URLRequest(url: URL(string: "/api/submit", relativeTo: baseUrl)!, method: .post)
+      return try URLEncoding(boolEncoding: .numeric).encode(request, with: parameters.toParameters())
+    case let .submitGallery(parameters):
+      let request = try URLRequest(url: URL(string: "/api/submit_gallery_post", relativeTo: baseUrl)!, method: .post)
+      return try JSONEncoding.default.encode(request, with: parameters.toParameters())
+    case let .submitPoll(parameters):
+      let request = try URLRequest(url: URL(string: "/api/submit_poll_post", relativeTo: baseUrl)!, method: .post)
+      return try JSONEncoding.default.encode(request, with: parameters.toParameters())
+    case let .storeVisit(names):
+      let request = try URLRequest(url: URL(string: "/api/store_visits", relativeTo: baseUrl)!, method: .post)
+      let parameters: Parameters = [
+        "links": names.joined(separator: ","),
+      ]
+      return try URLEncoding(boolEncoding: .numeric).encode(request, with: parameters)
     }
   }
 
@@ -71,6 +82,16 @@ enum PostRouter: URLConvertible {
 
   private var baseUrl: URL {
     Illithid.shared.baseURL
+  }
+
+  private func constructSubredditPostsRequest(url: URL, sort _: PostSort, topInterval: TopInterval?,
+                                              location: Location?, listingParameters: ListingParameters)
+    throws -> URLRequest {
+    let request = try URLRequest(url: url, method: .get)
+    var parameters = listingParameters.toParameters()
+    if let interval = topInterval { parameters["t"] = interval }
+    if let location = location { parameters["g"] = location }
+    return try URLEncoding(boolEncoding: .numeric).encode(request, with: parameters)
   }
 }
 
@@ -83,12 +104,10 @@ public extension Illithid {
                   params: ListingParameters = .init(), queue: DispatchQueue = .main,
                   completion: @escaping (Result<Listing, AFError>) -> Void)
     -> DataRequest {
-    let url = PostRouter.subreddit(displayName: subreddit.displayName, sort: postSort)
-    var parameters = params.toParameters()
-    if let interval = topInterval { parameters["t"] = interval }
-    if let location = location { parameters["g"] = location }
+    let request = PostRouter.subreddit(displayName: subreddit.displayName, sort: postSort,
+                                       topInterval: topInterval, location: location, listing: params)
 
-    return readListing(url: url, queryParameters: parameters, queue: queue) { result in
+    return readListing(request: request, queue: queue) { result in
       completion(result)
     }
   }
@@ -99,12 +118,10 @@ public extension Illithid {
                   params: ListingParameters = .init(), queue: DispatchQueue = .main,
                   completion: @escaping (Result<Listing, AFError>) -> Void)
     -> DataRequest {
-    let url = PostRouter.userMultireddit(username: multireddit.owner, multiName: multireddit.name, sort: postSort)
-    var parameters = params.toParameters()
-    if let interval = topInterval { parameters["t"] = interval }
-    if let location = location { parameters["g"] = location }
+    let request = PostRouter.userMultireddit(username: multireddit.owner, multiName: multireddit.name,
+                                             sort: postSort, topInterval: topInterval, location: location, listing: params)
 
-    return readListing(url: url, queryParameters: parameters, queue: queue) { result in
+    return readListing(request: request, queue: queue) { result in
       completion(result)
     }
   }
@@ -115,13 +132,10 @@ public extension Illithid {
                   params: ListingParameters = .init(), queue: DispatchQueue = .main,
                   completion: @escaping (Result<Listing, AFError>) -> Void)
     -> DataRequest {
-    let url = PostRouter.frontPage(page: frontPage, sort: postSort)
-    var parameters = params.toParameters()
+    let request = PostRouter.frontPage(page: frontPage, sort: postSort, topInterval: topInterval,
+                                       location: location, listing: params)
 
-    if let interval = topInterval { parameters["t"] = interval }
-    if let location = location { parameters["g"] = location }
-
-    return readListing(url: url, queryParameters: parameters, redirectHandler: PostRouter.frontPageRedirector, queue: queue) { result in
+    return readListing(request: request, redirectHandler: PostRouter.frontPageRedirector, queue: queue) { result in
       completion(result)
     }
   }
@@ -129,37 +143,10 @@ public extension Illithid {
   // MARK: Submit Posts
 
   @discardableResult
-  func submit(kind: NewPostType, subredditDisplayName subreddit: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
-              collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
-              flairId: String? = nil, flairText: String? = nil, resubmit: Bool = false,
-              notifyOfReplies subscribe: Bool = true, markdown text: String? = nil,
-              linkTo: URL? = nil, videoPosterUrl: URL? = nil, validateOnSubmit: Bool = true, queue: DispatchQueue = .main,
+  func submit(parameters: BaseNewPostParameters, queue: DispatchQueue = .main,
               completion: @escaping (Result<NewPostResponse, AFError>) -> Void)
     -> DataRequest {
-    let encoding = URLEncoding(boolEncoding: .numeric)
-    let tempParameters: [String: Any?] = [
-      "api_type": "json",
-      "kind": kind,
-      "sr": subreddit,
-      "title": title,
-      "nsfw": isNsfw,
-      "spoiler": isSpoiler,
-      "collection_id": collectionId?.uuidString,
-      "event_start": eventStart == nil ? nil : redditEventTimeFormatter.string(from: eventStart!),
-      "event_end": eventStart == nil ? nil : redditEventTimeFormatter.string(from: eventEnd!),
-      "event_tz": eventTimeZone,
-      "flair_id": flairId,
-      "flair_text": flairText,
-      "resubmit": resubmit,
-      "sendreplies": subscribe,
-      "text": text,
-      "url": linkTo?.absoluteString,
-      "video_poster_url": videoPosterUrl?.absoluteString,
-      "validate_on_submit": validateOnSubmit,
-    ]
-    let parameters: Parameters = tempParameters.compactMapValues { $0 }
-
-    return session.request(PostRouter.submit, method: .post, parameters: parameters, encoding: encoding)
+    session.request(PostRouter.submit(parameters: parameters))
       .validate()
       .responseDecodable(of: NewPostResponse.self, queue: queue, decoder: decoder) { response in
         completion(response.result)
@@ -167,32 +154,10 @@ public extension Illithid {
   }
 
   @discardableResult
-  func submitGalleryPost(subredditDisplayName subreddit: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
-                         collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
-                         flairId: String? = nil, flairText: String? = nil, notifyOfReplies subscribe: Bool = true,
-                         galleryItems: [GalleryDataItem], validateOnSubmit: Bool = true, queue: DispatchQueue = .main,
+  func submitGalleryPost(parameters: GalleryPostParameters, queue: DispatchQueue = .main,
                          completion: @escaping (Result<NewPostResponse, AFError>) -> Void)
     -> DataRequest {
-    let encoding = JSONEncoding.default
-    let tempParameters: [String: Any?] = [
-      "api_type": "json",
-      "items": galleryItems.map { $0.asDictionary() },
-      "sr": subreddit,
-      "title": title,
-      "nsfw": isNsfw,
-      "spoiler": isSpoiler,
-      "collection_id": collectionId?.uuidString,
-      "event_start": eventStart == nil ? nil : redditEventTimeFormatter.string(from: eventStart!),
-      "event_end": eventStart == nil ? nil : redditEventTimeFormatter.string(from: eventEnd!),
-      "event_tz": eventTimeZone,
-      "flair_id": flairId,
-      "flair_text": flairText,
-      "sendreplies": subscribe,
-      "validate_on_submit": validateOnSubmit,
-    ]
-    let parameters: Parameters = tempParameters.compactMapValues { $0 }
-
-    return session.request(PostRouter.submitGallery, method: .post, parameters: parameters, encoding: encoding)
+    session.request(PostRouter.submitGallery(parameters: parameters))
       .validate()
       .responseDecodable(of: NewPostResponse.self, queue: queue, decoder: decoder) { response in
         completion(response.result)
@@ -200,121 +165,67 @@ public extension Illithid {
   }
 
   @discardableResult
-  func submitLinkPost(subredditDisplayName subreddit: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
-                      collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
-                      flairId: String? = nil, flairText: String? = nil, resubmit: Bool = false,
-                      notifyOfReplies subscribe: Bool = true, linkTo: URL, queue: DispatchQueue = .main,
+  func submitPollPost(parameters: PollPostParameters, queue: DispatchQueue = .main,
                       completion: @escaping (Result<NewPostResponse, AFError>) -> Void)
     -> DataRequest {
-    submit(kind: .link, subredditDisplayName: subreddit, title: title, isNsfw: isNsfw, isSpoiler: isSpoiler,
-           collectionId: collectionId, eventStart: eventStart, eventEnd: eventEnd, eventTimeZone: eventTimeZone,
-           flairId: flairId, flairText: flairText, resubmit: resubmit, notifyOfReplies: subscribe,
-           linkTo: linkTo, queue: queue, completion: completion)
+    session.request(PostRouter.submitPoll(parameters: parameters))
+      .validate()
+      .responseDecodable(of: NewPostResponse.self, queue: queue, decoder: decoder) { response in
+        completion(response.result)
+      }
   }
 
   @discardableResult
-  func submitSelfPost(subredditDisplayName subreddit: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
-                      collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
-                      flairId: String? = nil, flairText: String? = nil, notifyOfReplies subscribe: Bool = true,
-                      markdown text: String, queue: DispatchQueue = .main,
+  func submitLinkPost(parameters: LinkPostParameters, queue: DispatchQueue = .main,
                       completion: @escaping (Result<NewPostResponse, AFError>) -> Void)
     -> DataRequest {
-    submit(kind: .`self`, subredditDisplayName: subreddit, title: title, isNsfw: isNsfw, isSpoiler: isSpoiler,
-           collectionId: collectionId, eventStart: eventStart, eventEnd: eventEnd, eventTimeZone: eventTimeZone,
-           flairId: flairId, flairText: flairText, resubmit: false, notifyOfReplies: subscribe, markdown: text,
-           queue: queue, completion: completion)
+    submit(parameters: parameters, queue: queue, completion: completion)
+  }
+
+  @discardableResult
+  func submitSelfPost(parameters: SelfPostParameters, queue: DispatchQueue = .main,
+                      completion: @escaping (Result<NewPostResponse, AFError>) -> Void)
+    -> DataRequest {
+    submit(parameters: parameters, queue: queue, completion: completion)
   }
 
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-  func submit(kind: NewPostType, subredditDisplayName subreddit: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
-              collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
-              flairId: String? = nil, flairText: String? = nil, resubmit: Bool = false,
-              notifyOfReplies subscribe: Bool = true, markdown text: String? = nil,
-              linkTo: URL? = nil, videoPosterUrl: URL? = nil, validateOnSubmit: Bool = true, queue: DispatchQueue = .main)
+  func submit(parameters: BaseNewPostParameters, validateOnSubmit _: Bool = true, queue: DispatchQueue = .main)
     -> AnyPublisher<NewPostResponse, AFError> {
-    let encoding = URLEncoding(boolEncoding: .numeric)
-    let dateFormatter = ISO8601DateFormatter()
-    let tempParameters: [String: Any?] = [
-      "api_type": "json",
-      "kind": kind,
-      "sr": subreddit,
-      "title": title,
-      "nsfw": isNsfw,
-      "spoiler": isSpoiler,
-      "collection_id": collectionId?.uuidString,
-      "event_start": eventStart == nil ? nil : dateFormatter.string(from: eventStart!),
-      "event_end": eventStart == nil ? nil : dateFormatter.string(from: eventEnd!),
-      "event_tz": eventTimeZone,
-      "flair_id": flairId,
-      "flair_text": flairText,
-      "resubmit": resubmit,
-      "sendreplies": subscribe,
-      "text": text,
-      "url": linkTo?.absoluteString,
-      "video_poster_url": videoPosterUrl?.absoluteString,
-      "validate_on_submit": validateOnSubmit,
-    ]
-    let parameters: Parameters = tempParameters.compactMapValues { $0 }
-
-    return session.request(PostRouter.submit, method: .post, parameters: parameters, encoding: encoding)
+    session.request(PostRouter.submit(parameters: parameters))
       .validate()
       .publishDecodable(type: NewPostResponse.self, queue: queue, decoder: decoder)
       .value()
   }
 
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-  func submitGalleryPost(subredditDisplayName subreddit: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
-                         collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
-                         flairId: String? = nil, flairText: String? = nil, notifyOfReplies subscribe: Bool = true,
-                         galleryItems: [GalleryDataItem], validateOnSubmit: Bool = true, queue: DispatchQueue = .main)
+  func submitGalleryPost(parameters: GalleryPostParameters, queue: DispatchQueue = .main)
     -> AnyPublisher<NewPostResponse, AFError> {
-    let encoding = JSONEncoding.default
-    let tempParameters: [String: Any?] = [
-      "api_type": "json",
-      "items": galleryItems.map { $0.asDictionary() },
-      "sr": subreddit,
-      "title": title,
-      "nsfw": isNsfw,
-      "spoiler": isSpoiler,
-      "collection_id": collectionId?.uuidString,
-      "event_start": eventStart == nil ? nil : redditEventTimeFormatter.string(from: eventStart!),
-      "event_end": eventStart == nil ? nil : redditEventTimeFormatter.string(from: eventEnd!),
-      "event_tz": eventTimeZone,
-      "flair_id": flairId,
-      "flair_text": flairText,
-      "sendreplies": subscribe,
-      "validate_on_submit": validateOnSubmit,
-    ]
-    let parameters: Parameters = tempParameters.compactMapValues { $0 }
-
-    return session.request(PostRouter.submitGallery, method: .post, parameters: parameters, encoding: encoding)
+    session.request(PostRouter.submitGallery(parameters: parameters))
       .validate()
       .publishDecodable(type: NewPostResponse.self, queue: queue, decoder: decoder)
       .value()
   }
 
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-  func submitLinkPost(subredditDisplayName subreddit: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
-                      collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
-                      flairId: String? = nil, flairText: String? = nil, resubmit: Bool = false,
-                      notifyOfReplies subscribe: Bool = true, linkTo: URL, queue: DispatchQueue = .main)
+  func submitPollPost(parameters: PollPostParameters, queue: DispatchQueue = .main)
     -> AnyPublisher<NewPostResponse, AFError> {
-    submit(kind: .link, subredditDisplayName: subreddit, title: title, isNsfw: isNsfw, isSpoiler: isSpoiler,
-           collectionId: collectionId, eventStart: eventStart, eventEnd: eventEnd, eventTimeZone: eventTimeZone,
-           flairId: flairId, flairText: flairText, resubmit: resubmit, notifyOfReplies: subscribe,
-           linkTo: linkTo, queue: queue)
+    session.request(PostRouter.submitPoll(parameters: parameters))
+      .validate()
+      .publishDecodable(type: NewPostResponse.self, queue: queue, decoder: decoder)
+      .value()
   }
 
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-  func submitSelfPost(subredditDisplayName subreddit: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
-                      collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
-                      flairId: String? = nil, flairText: String? = nil, notifyOfReplies subscribe: Bool = true,
-                      markdown text: String, queue: DispatchQueue = .main)
+  func submitLinkPost(parameters: LinkPostParameters, queue: DispatchQueue = .main)
     -> AnyPublisher<NewPostResponse, AFError> {
-    submit(kind: .`self`, subredditDisplayName: subreddit, title: title, isNsfw: isNsfw, isSpoiler: isSpoiler,
-           collectionId: collectionId, eventStart: eventStart, eventEnd: eventEnd, eventTimeZone: eventTimeZone,
-           flairId: flairId, flairText: flairText, resubmit: false, notifyOfReplies: subscribe, markdown: text,
-           queue: queue)
+    submit(parameters: parameters, queue: queue)
+  }
+
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+  func submitSelfPost(parameters: SelfPostParameters, queue: DispatchQueue = .main)
+    -> AnyPublisher<NewPostResponse, AFError> {
+    submit(parameters: parameters, queue: queue)
   }
 
   /// Marks `Posts` as visited
@@ -328,12 +239,7 @@ public extension Illithid {
   @discardableResult
   func storeVisits(to fullnames: [Fullname], queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void)
     -> DataRequest {
-    let encoding = URLEncoding(boolEncoding: .numeric)
-    let parameters: Parameters = [
-      "links": fullnames.joined(separator: ","),
-    ]
-
-    return session.request(PostRouter.storeVisit, method: .post, parameters: parameters, encoding: encoding)
+    session.request(PostRouter.storeVisit(fullnames: fullnames))
       .validate()
       .responseData(queue: queue) { completion($0.result) }
   }
@@ -348,12 +254,7 @@ public extension Illithid {
   @discardableResult
   func storeVisits(to fullnames: [Fullname], queue: DispatchQueue = .main)
     -> AnyPublisher<Data, AFError> {
-    let encoding = URLEncoding(boolEncoding: .numeric)
-    let parameters: Parameters = [
-      "links": fullnames.joined(separator: ","),
-    ]
-
-    return session.request(PostRouter.storeVisit, method: .post, parameters: parameters, encoding: encoding)
+    session.request(PostRouter.storeVisit(fullnames: fullnames))
       .validate()
       .publishData(queue: queue)
       .value()
@@ -369,12 +270,7 @@ public extension Illithid {
   @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
   func storeVisits(to fullnames: [Fullname], automaticallyCancelling: Bool = false)
     -> DataTask<Data> {
-    let encoding = URLEncoding(boolEncoding: .numeric)
-    let parameters: Parameters = [
-      "links": fullnames.joined(separator: ","),
-    ]
-
-    return session.request(PostRouter.storeVisit, method: .post, parameters: parameters, encoding: encoding)
+    session.request(PostRouter.storeVisit(fullnames: fullnames))
       .validate()
       .serializingData(automaticallyCancelling: automaticallyCancelling)
   }
