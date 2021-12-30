@@ -29,6 +29,7 @@ enum PostRouter: URLConvertible {
   case submit
   case submitGallery
   case submitPoll
+  case storeVisit
 
   // MARK: Internal
 
@@ -61,6 +62,8 @@ enum PostRouter: URLConvertible {
       return URL(string: "/api/submit_gallery_post", relativeTo: baseUrl)!
     case .submitPoll:
       return URL(string: "/api/submit_poll_post", relativeTo: baseUrl)!
+    case .storeVisit:
+      return URL(string: "/api/store_visits", relativeTo: baseUrl)!
     }
   }
 
@@ -313,6 +316,68 @@ public extension Illithid {
            flairId: flairId, flairText: flairText, resubmit: false, notifyOfReplies: subscribe, markdown: text,
            queue: queue)
   }
+
+  /// Marks `Posts` as visited
+  ///
+  /// - Parameters:
+  ///   - fullnames: An array of `Post` `Fullnames` to mark as visited
+  ///   - queue: The `DispatchQueue` on which the completion handler is called
+  ///   - completion: A closure to execute when the request has finished
+  /// - Returns: The `DataRequest` which holds the request
+  /// - Note: The current user *must* be a Reddit premium subscriber for this to work
+  @discardableResult
+  func storeVisits(to fullnames: [Fullname], queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void)
+    -> DataRequest {
+    let encoding = URLEncoding(boolEncoding: .numeric)
+    let parameters: Parameters = [
+      "links": fullnames.joined(separator: ","),
+    ]
+
+    return session.request(PostRouter.storeVisit, method: .post, parameters: parameters, encoding: encoding)
+      .validate()
+      .responseData(queue: queue) { completion($0.result) }
+  }
+
+  /// Marks `Posts` as visited
+  ///
+  /// - Parameters:
+  ///   - fullnames: An array of `Post` `Fullnames` to mark as visited
+  ///   - queue: The `DispatchQueue` on which the `DataResponse` is published
+  /// - Returns: The `AnyPublisher` which holds the request
+  /// - Note: The current user *must* be a Reddit premium subscriber for this to work
+  @discardableResult
+  func storeVisits(to fullnames: [Fullname], queue: DispatchQueue = .main)
+    -> AnyPublisher<Data, AFError> {
+    let encoding = URLEncoding(boolEncoding: .numeric)
+    let parameters: Parameters = [
+      "links": fullnames.joined(separator: ","),
+    ]
+
+    return session.request(PostRouter.storeVisit, method: .post, parameters: parameters, encoding: encoding)
+      .validate()
+      .publishData(queue: queue)
+      .value()
+  }
+
+  /// Marks `Posts` as visited
+  ///
+  /// - Parameters:
+  ///   - fullnames: An array of `Post` `Fullnames` to mark as visited
+  ///   - automaticallyCancelling: If `true`, automatically cancels the network request when the `Task` is cancelled
+  /// - Returns: The `DataTask` which holds the request
+  /// - Note: The current user *must* be a Reddit premium subscriber for this to work
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+  func storeVisits(to fullnames: [Fullname], automaticallyCancelling: Bool = false)
+    -> DataTask<Data> {
+    let encoding = URLEncoding(boolEncoding: .numeric)
+    let parameters: Parameters = [
+      "links": fullnames.joined(separator: ","),
+    ]
+
+    return session.request(PostRouter.storeVisit, method: .post, parameters: parameters, encoding: encoding)
+      .validate()
+      .serializingData(automaticallyCancelling: automaticallyCancelling)
+  }
 }
 
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
@@ -359,6 +424,7 @@ public extension Post {
   ///   - location:
   ///   - topInterval: The interval in which to search for top `Posts` when `postSort` is `.top`
   ///   - params: Default parameters applicable to every `Listing` returning endpoint on Reddit
+  ///   - queue: The `DispatchQueue` on which the completion handler will be called
   ///   - completion: The callback function to execute when we get the `Post` `Listing` back from Reddit
   @discardableResult
   static func all(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
@@ -375,6 +441,7 @@ public extension Post {
   ///   - location:
   ///   - topInterval: The interval in which to search for top `Posts` when `postSort` is `.top`
   ///   - params: Default parameters applicable to every `Listing` returning endpoint on Reddit
+  ///   - queue: The `DispatchQueue` on which the completion handler will be called
   ///   - completion: The callback function to execute when we get the `Post` `Listing` back from Reddit
   @discardableResult
   static func popular(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
@@ -390,6 +457,7 @@ public extension Post {
   ///   - location:
   ///   - topInterval: The interval in which to search for top `Posts` when `postSort` is `.top`
   ///   - params: Default parameters applicable to every `Listing` returning endpoint on Reddit
+  ///   - queue: The `DispatchQueue` on which the completion handler will be called
   ///   - completion: The callback function to execute when we get the `Post` `Listing` back from Reddit
   @discardableResult
   static func random(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
@@ -414,5 +482,43 @@ public extension Post {
         completion(.failure(error))
       }
     }
+  }
+}
+
+public extension Post {
+  /// Marks the `Post` as visited
+  ///
+  /// - Parameters:
+  ///   - queue: The `DispatchQueue` on which `completion` will be called
+  ///   - completion: A closure to execute when the request has finished
+  /// - Returns: The `DataRequest` which holds the request
+  /// - Note: The current user *must* be a Reddit premium subscriber for this to work
+  func visit(queue: DispatchQueue = .main, completion: @escaping (Result<Data, AFError>) -> Void)
+    -> DataRequest {
+    Illithid.shared.storeVisits(to: [name], queue: queue, completion: completion)
+  }
+
+  /// Marks the `Post` as visited
+  ///
+  /// - Parameters:
+  ///   - automaticallyCancelling: If `true`, automatically cancels the network request when the `Task` is cancelled
+  /// - Returns: The `DataRequest` which holds the request
+  /// - Note: The current user *must* be a Reddit premium subscriber for this to work
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+  func visit(automaticallyCancelling: Bool = false)
+    -> DataTask<Data> {
+    Illithid.shared.storeVisits(to: [name], automaticallyCancelling: automaticallyCancelling)
+  }
+
+  /// Marks the `Post` as visited
+  ///
+  /// - Parameters:
+  ///   - queue: The `DispatchQueue` on which the `DataResponse` will be published
+  /// - Returns: The `AnyPublisher` which holds the request
+  /// - Note: The current user *must* be a Reddit premium subscriber for this to work
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+  func visit(queue: DispatchQueue = .main)
+    -> AnyPublisher<Data, AFError> {
+    Illithid.shared.storeVisits(to: [name], queue: queue)
   }
 }

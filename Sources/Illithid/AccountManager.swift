@@ -60,8 +60,9 @@ public final class AccountManager: ObservableObject {
   // MARK: Account login
 
   /// Used to login a new user to Reddit
-  /// - Parameter anchor: The `NSWindow` or `UIWindow` to use as an anchor for presenting the authentication dialog
-  /// - Parameter completion: The method to call when authentication has completed
+  /// - Parameters:
+  ///   - anchor: The `NSWindow` or `UIWindow` to use as an anchor for presenting the authentication dialog
+  ///   - completion: The method to call when authentication has completed
   public func addAccount(anchor: ASWebAuthenticationPresentationContextProviding,
                          completion: @escaping (_ account: Account) -> Void = { _ in }) {
     let oauth = OAuth2Swift(parameters: configuration.oauthParameters)!
@@ -235,8 +236,9 @@ public final class AccountManager: ObservableObject {
    Fetches the account data for a new account when the OAuth2 conversation is complete
    and persists its data to the keychain and `UserDefaults`
 
-   - Parameter oauth: The account's newly populated OAuth2Swift object
-
+   - Parameters:
+     - oauth: The account's newly populated OAuth2Swift object
+     - completion: A completion handler to call when the request completes
    - Precondition: The `authorize` method must have returned successfully on `oauth` prior to invocation
 
    */
