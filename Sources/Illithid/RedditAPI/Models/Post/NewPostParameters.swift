@@ -58,6 +58,29 @@ private extension BaseNewPostParameters {
 // MARK: - SelfPostParameters
 
 public struct SelfPostParameters: BaseNewPostParameters {
+  // MARK: Lifecycle
+
+  public init(targetSubredditDisplayName: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
+              collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
+              flairId: String? = nil, flairText: String? = nil, notifyOfReplies: Bool = true,
+              validateOnSubmit: Bool = true, markdownBody: String) {
+    self.targetSubredditDisplayName = targetSubredditDisplayName
+    self.title = title
+    self.isNsfw = isNsfw
+    self.isSpoiler = isSpoiler
+    self.collectionId = collectionId
+    self.eventStart = eventStart
+    self.eventEnd = eventEnd
+    self.eventTimeZone = eventTimeZone
+    self.flairId = flairId
+    self.flairText = flairText
+    self.notifyOfReplies = notifyOfReplies
+    self.validateOnSubmit = validateOnSubmit
+    self.markdownBody = markdownBody
+  }
+
+  // MARK: Public
+
   public let targetSubredditDisplayName: String
   public let title: String
   public let isNsfw: Bool
@@ -86,6 +109,30 @@ public struct SelfPostParameters: BaseNewPostParameters {
 // MARK: - LinkPostParameters
 
 public struct LinkPostParameters: BaseNewPostParameters {
+  // MARK: Lifecycle
+
+  public init(targetSubredditDisplayName: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
+              collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
+              flairId: String? = nil, flairText: String? = nil, notifyOfReplies: Bool = true,
+              validateOnSubmit: Bool = true, resubmit: Bool, linkingTo: URL) {
+    self.targetSubredditDisplayName = targetSubredditDisplayName
+    self.title = title
+    self.isNsfw = isNsfw
+    self.isSpoiler = isSpoiler
+    self.collectionId = collectionId
+    self.eventStart = eventStart
+    self.eventEnd = eventEnd
+    self.eventTimeZone = eventTimeZone
+    self.flairId = flairId
+    self.flairText = flairText
+    self.notifyOfReplies = notifyOfReplies
+    self.validateOnSubmit = validateOnSubmit
+    self.resubmit = resubmit
+    self.linkingTo = linkingTo
+  }
+
+  // MARK: Public
+
   public let targetSubredditDisplayName: String
   public let title: String
   public let isNsfw: Bool
@@ -142,6 +189,29 @@ public struct GalleryPostParameters: BaseNewPostParameters {
 // MARK: - ImagePostParameters
 
 public struct ImagePostParameters: BaseNewPostParameters {
+  // MARK: Lifecycle
+
+  public init(targetSubredditDisplayName: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
+              collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
+              flairId: String? = nil, flairText: String? = nil, notifyOfReplies: Bool = true,
+              validateOnSubmit: Bool = true, imageAssetUrl: URL) {
+    self.targetSubredditDisplayName = targetSubredditDisplayName
+    self.title = title
+    self.isNsfw = isNsfw
+    self.isSpoiler = isSpoiler
+    self.collectionId = collectionId
+    self.eventStart = eventStart
+    self.eventEnd = eventEnd
+    self.eventTimeZone = eventTimeZone
+    self.flairId = flairId
+    self.flairText = flairText
+    self.notifyOfReplies = notifyOfReplies
+    self.validateOnSubmit = validateOnSubmit
+    self.imageAssetUrl = imageAssetUrl
+  }
+
+  // MARK: Public
+
   public let targetSubredditDisplayName: String
   public let title: String
   public let isNsfw: Bool
@@ -170,6 +240,30 @@ public struct ImagePostParameters: BaseNewPostParameters {
 // MARK: - VideoPostParameters
 
 public struct VideoPostParameters: BaseNewPostParameters {
+  // MARK: Lifecycle
+
+  public init(targetSubredditDisplayName: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
+              collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
+              flairId: String? = nil, flairText: String? = nil, notifyOfReplies: Bool = true,
+              validateOnSubmit: Bool = true, videoAssetUrl: URL, videoPosterAssetUrl: URL) {
+    self.targetSubredditDisplayName = targetSubredditDisplayName
+    self.title = title
+    self.isNsfw = isNsfw
+    self.isSpoiler = isSpoiler
+    self.collectionId = collectionId
+    self.eventStart = eventStart
+    self.eventEnd = eventEnd
+    self.eventTimeZone = eventTimeZone
+    self.flairId = flairId
+    self.flairText = flairText
+    self.notifyOfReplies = notifyOfReplies
+    self.validateOnSubmit = validateOnSubmit
+    self.videoAssetUrl = videoAssetUrl
+    self.videoPosterAssetUrl = videoPosterAssetUrl
+  }
+
+  // MARK: Public
+
   public let targetSubredditDisplayName: String
   public let title: String
   public let isNsfw: Bool
@@ -200,6 +294,30 @@ public struct VideoPostParameters: BaseNewPostParameters {
 // MARK: - VideoGifPostParameters
 
 public struct VideoGifPostParameters: BaseNewPostParameters {
+  // MARK: Lifecycle
+
+  public init(targetSubredditDisplayName: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
+              collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
+              flairId: String? = nil, flairText: String? = nil, notifyOfReplies: Bool = true,
+              validateOnSubmit: Bool = true, videoAssetUrl: URL, videoPosterAssetUrl: URL) {
+    self.targetSubredditDisplayName = targetSubredditDisplayName
+    self.title = title
+    self.isNsfw = isNsfw
+    self.isSpoiler = isSpoiler
+    self.collectionId = collectionId
+    self.eventStart = eventStart
+    self.eventEnd = eventEnd
+    self.eventTimeZone = eventTimeZone
+    self.flairId = flairId
+    self.flairText = flairText
+    self.notifyOfReplies = notifyOfReplies
+    self.validateOnSubmit = validateOnSubmit
+    self.videoAssetUrl = videoAssetUrl
+    self.videoPosterAssetUrl = videoPosterAssetUrl
+  }
+
+  // MARK: Public
+
   public let targetSubredditDisplayName: String
   public let title: String
   public let isNsfw: Bool
