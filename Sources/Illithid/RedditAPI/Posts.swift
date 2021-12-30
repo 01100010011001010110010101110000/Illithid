@@ -330,7 +330,7 @@ public extension Illithid {
     -> DataRequest {
     let encoding = URLEncoding(boolEncoding: .numeric)
     let parameters: Parameters = [
-      "links": fullnames,
+      "links": fullnames.joined(separator: ","),
     ]
 
     return session.request(PostRouter.storeVisit, method: .post, parameters: parameters, encoding: encoding)
@@ -350,7 +350,7 @@ public extension Illithid {
     -> AnyPublisher<Data, AFError> {
     let encoding = URLEncoding(boolEncoding: .numeric)
     let parameters: Parameters = [
-      "links": fullnames,
+      "links": fullnames.joined(separator: ","),
     ]
 
     return session.request(PostRouter.storeVisit, method: .post, parameters: parameters, encoding: encoding)
@@ -371,7 +371,7 @@ public extension Illithid {
     -> DataTask<Data> {
     let encoding = URLEncoding(boolEncoding: .numeric)
     let parameters: Parameters = [
-      "links": fullnames,
+      "links": fullnames.joined(separator: ","),
     ]
 
     return session.request(PostRouter.storeVisit, method: .post, parameters: parameters, encoding: encoding)
