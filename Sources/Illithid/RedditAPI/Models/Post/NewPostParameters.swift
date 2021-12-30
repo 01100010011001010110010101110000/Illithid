@@ -160,32 +160,6 @@ public struct LinkPostParameters: BaseNewPostParameters {
   }
 }
 
-// MARK: - GalleryPostParameters
-
-public struct GalleryPostParameters: BaseNewPostParameters {
-  public let targetSubredditDisplayName: String
-  public let title: String
-  public let isNsfw: Bool
-  public let isSpoiler: Bool
-  public let collectionId: UUID?
-  public let eventStart: Date?
-  public let eventEnd: Date?
-  public let eventTimeZone: String?
-  public let flairId: String?
-  public let flairText: String?
-  public let notifyOfReplies: Bool
-  public let validateOnSubmit: Bool
-
-  public let galleryItems: [GalleryDataItem]
-
-  public func toParameters() -> Parameters {
-    toCommonParams().merging(
-      [
-        "items": galleryItems.map { $0.asDictionary() },
-      ]) { $1 }
-  }
-}
-
 // MARK: - ImagePostParameters
 
 public struct ImagePostParameters: BaseNewPostParameters {
@@ -341,6 +315,107 @@ public struct VideoGifPostParameters: BaseNewPostParameters {
         "kind": kind,
         "url": videoAssetUrl,
         "video_poster_url": videoPosterAssetUrl,
+      ]) { $1 }
+  }
+}
+
+// MARK: - GalleryPostParameters
+
+public struct GalleryPostParameters: BaseNewPostParameters {
+  // MARK: Lifecycle
+
+  public init(targetSubredditDisplayName: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
+              collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
+              flairId: String? = nil, flairText: String? = nil, notifyOfReplies: Bool = true,
+              validateOnSubmit: Bool = true, galleryItems: [GalleryDataItem]) {
+    self.targetSubredditDisplayName = targetSubredditDisplayName
+    self.title = title
+    self.isNsfw = isNsfw
+    self.isSpoiler = isSpoiler
+    self.collectionId = collectionId
+    self.eventStart = eventStart
+    self.eventEnd = eventEnd
+    self.eventTimeZone = eventTimeZone
+    self.flairId = flairId
+    self.flairText = flairText
+    self.notifyOfReplies = notifyOfReplies
+    self.validateOnSubmit = validateOnSubmit
+    self.galleryItems = galleryItems
+  }
+
+  // MARK: Public
+
+  public let targetSubredditDisplayName: String
+  public let title: String
+  public let isNsfw: Bool
+  public let isSpoiler: Bool
+  public let collectionId: UUID?
+  public let eventStart: Date?
+  public let eventEnd: Date?
+  public let eventTimeZone: String?
+  public let flairId: String?
+  public let flairText: String?
+  public let notifyOfReplies: Bool
+  public let validateOnSubmit: Bool
+
+  public let galleryItems: [GalleryDataItem]
+
+  public func toParameters() -> Parameters {
+    toCommonParams().merging(
+      [
+        "items": galleryItems.map { $0.asDictionary() },
+      ]) { $1 }
+  }
+}
+
+// MARK: - PollPostParameters
+
+public struct PollPostParameters: BaseNewPostParameters {
+  // MARK: Lifecycle
+
+  public init(targetSubredditDisplayName: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
+              collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
+              flairId: String? = nil, flairText: String? = nil, notifyOfReplies: Bool = true,
+              validateOnSubmit: Bool = true, choices: [String], duration: UInt) {
+    self.targetSubredditDisplayName = targetSubredditDisplayName
+    self.title = title
+    self.isNsfw = isNsfw
+    self.isSpoiler = isSpoiler
+    self.collectionId = collectionId
+    self.eventStart = eventStart
+    self.eventEnd = eventEnd
+    self.eventTimeZone = eventTimeZone
+    self.flairId = flairId
+    self.flairText = flairText
+    self.notifyOfReplies = notifyOfReplies
+    self.validateOnSubmit = validateOnSubmit
+    self.choices = choices
+    self.duration = duration
+  }
+
+  // MARK: Public
+
+  public let targetSubredditDisplayName: String
+  public let title: String
+  public let isNsfw: Bool
+  public let isSpoiler: Bool
+  public let collectionId: UUID?
+  public let eventStart: Date?
+  public let eventEnd: Date?
+  public let eventTimeZone: String?
+  public let flairId: String?
+  public let flairText: String?
+  public let notifyOfReplies: Bool
+  public let validateOnSubmit: Bool
+
+  public let choices: [String]
+  public let duration: UInt
+
+  public func toParameters() -> Parameters {
+    toCommonParams().merging(
+      [
+        "choices": choices,
+        "duration": duration,
       ]) { $1 }
   }
 }
