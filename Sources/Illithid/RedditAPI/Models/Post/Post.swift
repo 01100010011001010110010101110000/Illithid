@@ -15,10 +15,6 @@
 import Combine
 import Foundation
 
-#if canImport(SwiftUI)
-  import SwiftUI
-#endif
-
 import Alamofire
 
 // MARK: - VoteDirection
@@ -468,18 +464,5 @@ public extension Post {
     /// Removed due to a copyright notice
     case copyrightTakedown = "copyright_takedown"
     case reddit
-  }
-}
-
-@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-public extension Post {
-  var linkFlairBackgroundSwiftUiColor: Color? {
-    guard !linkFlairBackgroundColor.isEmpty else { return nil }
-    return Color(hex: linkFlairBackgroundColor)
-  }
-
-  var authorFlairBackgroundSwiftUiColor: Color? {
-    guard let color = authorFlairBackgroundColor, !color.isEmpty else { return nil }
-    return Color(hex: color)
   }
 }
