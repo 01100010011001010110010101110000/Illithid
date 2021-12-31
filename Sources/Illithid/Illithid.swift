@@ -122,6 +122,28 @@ internal extension Illithid {
       .responseDecodable(of: Listing.self, queue: queue, decoder: decoder) { completion($0.result) }
   }
 
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+  func readListing(url: Alamofire.URLConvertible, queryParameters: Parameters? = nil, listingParameters: ListingParameters = .init(),
+                   redirectHandler: Redirector = .follow, automaticallyCancelling: Bool = false)
+    -> DataTask<Listing> {
+    let _parameters = listingParameters.toParameters()
+      .merging(queryParameters ?? [:], uniquingKeysWith: { $1 })
+    return session.request(url, method: .get, parameters: _parameters, encoding: URLEncoding(boolEncoding: .numeric))
+      .redirect(using: redirectHandler)
+      .validate()
+      .serializingDecodable(Listing.self, automaticallyCancelling: automaticallyCancelling, decoder: decoder)
+  }
+
+  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+  func readListing(request: Alamofire.URLRequestConvertible, redirectHandler: Redirector = .follow,
+                   automaticallyCancelling: Bool = false)
+    -> DataTask<Listing> {
+    session.request(request)
+      .redirect(using: redirectHandler)
+      .validate()
+      .serializingDecodable(Listing.self, automaticallyCancelling: automaticallyCancelling, decoder: decoder)
+  }
+
   /// Reads all `Listings` from `url`
   /// - Parameters:
   ///   - url: The `Listing` returning endpoint from which to read a listing
