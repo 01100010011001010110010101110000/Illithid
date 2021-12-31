@@ -114,7 +114,7 @@ public struct LinkPostParameters: BaseNewPostParameters {
   public init(targetSubredditDisplayName: String, title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
               collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
               flairId: String? = nil, flairText: String? = nil, notifyOfReplies: Bool = true,
-              validateOnSubmit: Bool = true, resubmit: Bool, linkingTo: URL) {
+              validateOnSubmit: Bool = true, resubmit: Bool = true, linkingTo: URL) {
     self.targetSubredditDisplayName = targetSubredditDisplayName
     self.title = title
     self.isNsfw = isNsfw
