@@ -12,15 +12,20 @@
 // You should have received a copy of the GNU General Public License along with
 // this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import AuthenticationServices
-import Combine
+#if canImport(AuthenticationServices)
+  import AuthenticationServices
+#endif
+#if canImport(Combine)
+  import Combine
+#endif
 import Foundation
-import SwiftUI
 
 import Alamofire
 import KeychainAccess
 import OAuthSwift
 import Willow
+
+// MARK: - AccountManager
 
 /// `AccountManager` is the class responsible for Reddit account management, including adding, deleting, and switching accounts
 public final class AccountManager: ObservableObject {
