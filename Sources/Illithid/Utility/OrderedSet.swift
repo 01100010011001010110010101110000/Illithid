@@ -14,7 +14,7 @@
 
 // MARK: - OrderedSet
 
-/// A data structure which guarantees unique membership and preserves lement ordering
+/// A data structure which guarantees unique membership and preserves element ordering
 public struct OrderedSet<E: Hashable>: RandomAccessCollection, Equatable, Hashable {
   // MARK: Lifecycle
 
