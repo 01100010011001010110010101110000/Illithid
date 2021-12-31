@@ -1,21 +1,32 @@
+// Copyright (C) 2020 Tyler Gregory (@01100010011001010110010101110000)
 //
-//  PostAcceptor.swift
-//  
+// This program is free software: you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later
+// version.
 //
-//  Created by Tyler Gregory on 1/7/21.
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of  MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 //
+// You should have received a copy of the GNU General Public License along with
+// this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #if canImport(Combine)
-import Combine
+  import Combine
 #endif
 import Foundation
 
 import Alamofire
 
+// MARK: - PostAcceptorType
+
 public enum PostAcceptorType {
   case account(Account)
   case subreddit(Subreddit)
 }
+
+// MARK: - PostAcceptor
 
 public protocol PostAcceptor {
   /// The name of the target subreddit when submitting the post to the Reddit API (i.e. the value of the `sr` field)
@@ -36,86 +47,4 @@ public protocol PostAcceptor {
   var permitsLinkPosts: Bool { get }
 
   var permitsPollPosts: Bool { get }
-
-  func submitLinkPost(title: String, isNsfw: Bool, isSpoiler: Bool,
-                      collectionId: UUID?, eventStart: Date?, eventEnd: Date?, eventTimeZone: String?,
-                      flairId: String?, flairText: String?, resubmit: Bool,
-                      notifyOfReplies subscribe: Bool, linkTo: URL, queue: DispatchQueue,
-                      completion: @escaping (Result<NewPostResponse, AFError>) -> Void)
-  -> DataRequest
-
-  func submitSelfPost(title: String, isNsfw: Bool, isSpoiler: Bool,
-                      collectionId: UUID?, eventStart: Date?, eventEnd: Date?, eventTimeZone: String?,
-                      flairId: String?, flairText: String?, notifyOfReplies subscribe: Bool,
-                      markdown text: String, queue: DispatchQueue,
-                      completion: @escaping (Result<NewPostResponse, AFError>) -> Void)
-  -> DataRequest
-
-  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-  func submitLinkPost(title: String, isNsfw: Bool, isSpoiler: Bool,
-                      collectionId: UUID?, eventStart: Date?, eventEnd: Date?, eventTimeZone: String?,
-                      flairId: String?, flairText: String?, resubmit: Bool,
-                      notifyOfReplies subscribe: Bool, linkTo: URL, queue: DispatchQueue)
-  -> AnyPublisher<NewPostResponse, AFError>
-
-  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-  func submitSelfPost(title: String, isNsfw: Bool, isSpoiler: Bool,
-                      collectionId: UUID?, eventStart: Date?, eventEnd: Date?, eventTimeZone: String?,
-                      flairId: String?, flairText: String?, notifyOfReplies subscribe: Bool,
-                      markdown text: String, queue: DispatchQueue)
-  -> AnyPublisher<NewPostResponse, AFError>
-}
-
-public extension PostAcceptor {
-
-  @discardableResult
-  func submitLinkPost(title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
-                      collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
-                      flairId: String? = nil, flairText: String? = nil, resubmit: Bool = false,
-                      notifyOfReplies subscribe: Bool = true, linkTo: URL, queue: DispatchQueue = .main,
-                      completion: @escaping (Result<NewPostResponse, AFError>) -> Void)
-  -> DataRequest {
-    Illithid.shared.submit(kind: .link, subredditDisplayName: uploadTarget, title: title, isNsfw: isNsfw, isSpoiler: isSpoiler,
-           collectionId: collectionId, eventStart: eventStart, eventEnd: eventEnd, eventTimeZone: eventTimeZone,
-           flairId: flairId, flairText: flairText, resubmit: resubmit, notifyOfReplies: subscribe,
-           linkTo: linkTo, queue: queue, completion: completion)
-  }
-
-
-  @discardableResult
-  func submitSelfPost(title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
-                      collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
-                      flairId: String? = nil, flairText: String? = nil, notifyOfReplies subscribe: Bool = true,
-                      markdown text: String, queue: DispatchQueue = .main,
-                      completion: @escaping (Result<NewPostResponse, AFError>) -> Void)
-  -> DataRequest {
-    Illithid.shared.submit(kind: .`self`, subredditDisplayName: uploadTarget, title: title, isNsfw: isNsfw, isSpoiler: isSpoiler,
-           collectionId: collectionId, eventStart: eventStart, eventEnd: eventEnd, eventTimeZone: eventTimeZone,
-           flairId: flairId, flairText: flairText, resubmit: false, notifyOfReplies: subscribe, markdown: text,
-           queue: queue, completion: completion)
-  }
-
-  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-  func submitLinkPost(title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
-                      collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
-                      flairId: String? = nil, flairText: String? = nil, resubmit: Bool = false,
-                      notifyOfReplies subscribe: Bool = true, linkTo: URL, queue: DispatchQueue = .main)
-  -> AnyPublisher<NewPostResponse, AFError> {
-    Illithid.shared.submit(kind: .link, subredditDisplayName: uploadTarget, title: title, isNsfw: isNsfw, isSpoiler: isSpoiler,
-           collectionId: collectionId, eventStart: eventStart, eventEnd: eventEnd, eventTimeZone: eventTimeZone,
-           flairId: flairId, flairText: flairText, resubmit: resubmit, notifyOfReplies: subscribe,
-           linkTo: linkTo, queue: queue)
-  }
-
-  @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
-  func submitSelfPost(title: String, isNsfw: Bool = false, isSpoiler: Bool = false,
-                      collectionId: UUID? = nil, eventStart: Date? = nil, eventEnd: Date? = nil, eventTimeZone: String? = nil,
-                      flairId: String? = nil, flairText: String? = nil, notifyOfReplies subscribe: Bool = true,
-                      markdown text: String, queue: DispatchQueue = .main)
-  -> AnyPublisher<NewPostResponse, AFError> {
-    Illithid.shared.submit(kind: .`self`, subredditDisplayName: uploadTarget, title: title, isNsfw: isNsfw, isSpoiler: isSpoiler,
-           collectionId: collectionId, eventStart: eventStart, eventEnd: eventEnd, eventTimeZone: eventTimeZone,
-           flairId: flairId, flairText: flairText, resubmit: false, notifyOfReplies: subscribe, markdown: text,
-           queue: queue)
-  }
 }
