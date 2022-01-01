@@ -19,6 +19,7 @@
   import Combine
 #endif
 import Foundation
+import OrderedCollections
 
 import Alamofire
 import KeychainAccess
@@ -51,7 +52,7 @@ public final class AccountManager: ObservableObject {
       objectWillChange.send()
     }
     didSet {
-      let data = try! encoder.encode(accounts.contents)
+      let data = try! encoder.encode(accounts)
       defaults.set(data, forKey: "RedditAccounts")
     }
   }
@@ -280,11 +281,10 @@ public final class AccountManager: ObservableObject {
     }
   }
 
-  private func loadAccounts() -> [Account] {
+  private func loadAccounts() -> OrderedSet<Account> {
     guard let accountData = defaults.data(forKey: "RedditAccounts") else { return [] }
     do {
-      let accounts = try decoder.decode([Account].self, from: accountData)
-      return accounts
+      return try decoder.decode(OrderedSet<Account>.self, from: accountData)
     } catch {
       logger.errorMessage("Unable to decode saved accounts: \(error)")
       return []
