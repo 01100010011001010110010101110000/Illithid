@@ -75,10 +75,9 @@ public extension RedGif {
     public struct Urls: Codable {
       // MARK: Lifecycle
 
-      public init(sd: URL, hd: URL, gif: URL, poster: URL, thumbnail: URL, videoThumbnail: URL) {
+      public init(sd: URL, hd: URL, poster: URL, thumbnail: URL, videoThumbnail: URL) {
         self.sd = sd
         self.hd = hd
-        self.gif = gif
         self.poster = poster
         self.thumbnail = thumbnail
         self.videoThumbnail = videoThumbnail
@@ -88,7 +87,6 @@ public extension RedGif {
 
       public let sd: URL
       public let hd: URL
-      public let gif: URL
       public let poster: URL
       public let thumbnail: URL
       public let videoThumbnail: URL
@@ -98,7 +96,6 @@ public extension RedGif {
       enum CodingKeys: String, CodingKey {
         case sd
         case hd
-        case gif
         case poster
         case thumbnail
         case videoThumbnail = "vthumbnail"
