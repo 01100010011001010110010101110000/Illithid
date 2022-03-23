@@ -81,6 +81,10 @@ extension Subreddit: PostProvider {
     over18 ?? false
   }
 
+  public var postsPath: String {
+    "/r/\(displayName)"
+  }
+
   public func posts(sortBy sort: PostSort, location: Location?, topInterval: TopInterval?,
                     parameters: ListingParameters, queue: DispatchQueue = .main,
                     completion: @escaping (Result<Listing, AFError>) -> Void)

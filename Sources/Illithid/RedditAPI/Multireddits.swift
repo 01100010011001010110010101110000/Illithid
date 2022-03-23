@@ -77,6 +77,10 @@ extension Multireddit: PostProvider {
     over18 ?? false
   }
 
+  public var postsPath: String {
+    "/user/\(owner)/m/\(name)"
+  }
+
   @discardableResult
   public func posts(sortBy sort: PostSort, location: Location?, topInterval: TopInterval?,
                     parameters: ListingParameters, queue _: DispatchQueue = .main,

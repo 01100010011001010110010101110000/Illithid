@@ -23,9 +23,7 @@ import Willow
 // MARK: - PostRouter
 
 enum PostRouter: URLRequestConvertible {
-  case subreddit(displayName: String, sort: PostSort, topInterval: TopInterval?, location: Location?, listing: ListingParameters)
-  case userMultireddit(username: String, multiName: String, sort: PostSort, topInterval: TopInterval?, location: Location?, listing: ListingParameters)
-  case frontPage(page: FrontPage, sort: PostSort, topInterval: TopInterval?, location: Location?, listing: ListingParameters)
+  case postsFromPostProvider(provider: PostProvider, sort: PostSort, topInterval: TopInterval?, location: Location?, listing: ListingParameters)
   case submit(parameters: BaseNewPostParameters)
   case submitGallery(parameters: GalleryPostParameters)
   case submitPoll(parameters: PollPostParameters)
@@ -51,15 +49,12 @@ enum PostRouter: URLRequestConvertible {
 
   func asURLRequest() throws -> URLRequest {
     switch self {
-    case let .subreddit(displayName, sort, topInterval, location, params):
-      return try constructSubredditPostsRequest(url: URL(string: "/r/\(displayName)/\(sort)", relativeTo: baseUrl)!, sort: sort,
-                                                topInterval: topInterval, location: location, listingParameters: params)
-    case let .userMultireddit(username, multiName, sort, topInterval, location, params):
-      return try constructSubredditPostsRequest(url: URL(string: "/user/\(username)/m/\(multiName)/\(sort)", relativeTo: baseUrl)!, sort: sort,
-                                                topInterval: topInterval, location: location, listingParameters: params)
-    case let .frontPage(page, sort, topInterval, location, params):
-      return try constructSubredditPostsRequest(url: page.asURL().appendingPathComponent("\(sort)"), sort: sort,
-                                                topInterval: topInterval, location: location, listingParameters: params)
+    case let .postsFromPostProvider(provider, sort, topInterval,
+                                    location, params):
+      return try constructPostsFetchRequest(
+        url: URL(string: provider.postsPath, relativeTo: Illithid.shared.baseURL)!.appendingPathComponent(sort.rawValue),
+        topInterval: topInterval, location: location, listingParameters: params
+      )
     case let .submit(parameters):
       let request = try URLRequest(url: URL(string: "/api/submit", relativeTo: baseUrl)!, method: .post)
       return try URLEncoding(boolEncoding: .numeric).encode(request, with: parameters.toParameters())
@@ -84,8 +79,8 @@ enum PostRouter: URLRequestConvertible {
     Illithid.shared.baseURL
   }
 
-  private func constructSubredditPostsRequest(url: URL, sort _: PostSort, topInterval: TopInterval?,
-                                              location: Location?, listingParameters: ListingParameters)
+  private func constructPostsFetchRequest(url: URL, topInterval: TopInterval?,
+                                          location: Location?, listingParameters: ListingParameters)
     throws -> URLRequest {
     let request = try URLRequest(url: url, method: .get)
     var parameters = listingParameters.toParameters()
@@ -99,43 +94,15 @@ public extension Illithid {
   // MARK: Fetch Posts
 
   @discardableResult
-  func fetchPosts(for subreddit: Subreddit, sortBy postSort: PostSort,
-                  location: Location? = nil, topInterval: TopInterval? = nil,
-                  params: ListingParameters = .init(), queue: DispatchQueue = .main,
-                  completion: @escaping (Result<Listing, AFError>) -> Void)
+  func fetchPosts<Provider: PostProvider>(for provider: Provider, sortBy postSort: PostSort,
+                                          location: Location? = nil, topInterval: TopInterval? = nil,
+                                          params: ListingParameters = .init(), queue: DispatchQueue = .main,
+                                          completion: @escaping (Result<Listing, AFError>) -> Void)
     -> DataRequest {
-    let request = PostRouter.subreddit(displayName: subreddit.displayName, sort: postSort,
-                                       topInterval: topInterval, location: location, listing: params)
+    let request = PostRouter.postsFromPostProvider(provider: provider, sort: postSort,
+                                                   topInterval: topInterval, location: location, listing: params)
 
     return readListing(request: request, queue: queue) { result in
-      completion(result)
-    }
-  }
-
-  @discardableResult
-  func fetchPosts(for multireddit: Multireddit, sortBy postSort: PostSort,
-                  location: Location? = nil, topInterval: TopInterval? = nil,
-                  params: ListingParameters = .init(), queue: DispatchQueue = .main,
-                  completion: @escaping (Result<Listing, AFError>) -> Void)
-    -> DataRequest {
-    let request = PostRouter.userMultireddit(username: multireddit.owner, multiName: multireddit.name,
-                                             sort: postSort, topInterval: topInterval, location: location, listing: params)
-
-    return readListing(request: request, queue: queue) { result in
-      completion(result)
-    }
-  }
-
-  @discardableResult
-  func fetchPosts(for frontPage: FrontPage, sortBy postSort: PostSort,
-                  location: Location? = nil, topInterval: TopInterval? = nil,
-                  params: ListingParameters = .init(), queue: DispatchQueue = .main,
-                  completion: @escaping (Result<Listing, AFError>) -> Void)
-    -> DataRequest {
-    let request = PostRouter.frontPage(page: frontPage, sort: postSort, topInterval: topInterval,
-                                       location: location, listing: params)
-
-    return readListing(request: request, redirectHandler: PostRouter.frontPageRedirector, queue: queue) { result in
       completion(result)
     }
   }
@@ -326,7 +293,7 @@ public extension Post {
   static func all(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
                   params: ListingParameters = .init(), queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void)
     -> DataRequest {
-    Illithid.shared.fetchPosts(for: .all, sortBy: postSort, location: location, topInterval: topInterval,
+    Illithid.shared.fetchPosts(for: FrontPage.all, sortBy: postSort, location: location, topInterval: topInterval,
                                params: params, queue: queue, completion: completion)
   }
 
@@ -343,7 +310,7 @@ public extension Post {
   static func popular(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
                       params: ListingParameters = .init(), queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void)
     -> DataRequest {
-    Illithid.shared.fetchPosts(for: .popular, sortBy: postSort, location: location, topInterval: topInterval,
+    Illithid.shared.fetchPosts(for: FrontPage.popular, sortBy: postSort, location: location, topInterval: topInterval,
                                params: params, queue: queue, completion: completion)
   }
 
@@ -359,7 +326,7 @@ public extension Post {
   static func random(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
                      params: ListingParameters = .init(), queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void)
     -> DataRequest {
-    Illithid.shared.fetchPosts(for: .random, sortBy: postSort, location: location, topInterval: topInterval,
+    Illithid.shared.fetchPosts(for: FrontPage.random, sortBy: postSort, location: location, topInterval: topInterval,
                                params: params, queue: queue, completion: completion)
   }
 }

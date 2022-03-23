@@ -39,12 +39,7 @@ public enum FrontPage: String, Codable, URLConvertible, Identifiable, CaseIterab
   }
 
   public func asURL() throws -> URL {
-    switch self {
-    case .all, .popular, .random:
-      return URL(string: "/r/\(self)/", relativeTo: Illithid.shared.baseURL)!
-    default:
-      return URL(string: "/", relativeTo: Illithid.shared.baseURL)!
-    }
+    URL(string: postsPath, relativeTo: Illithid.shared.baseURL)!
   }
 }
 
@@ -61,6 +56,15 @@ extension FrontPage: PostProvider {
 
   public var id: String {
     try! asURL().absoluteString
+  }
+
+  public var postsPath: String {
+    switch self {
+    case .all, .popular, .random:
+      return "/r/\(self)/"
+    default:
+      return "/"
+    }
   }
 
   public func posts(sortBy sort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
