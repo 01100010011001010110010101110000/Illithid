@@ -292,55 +292,6 @@ public extension Post {
       }
     }
   }
-
-  /// Fetches `Posts` from `r/all`, a metasubreddit which contains posts from all `Subreddits`
-  /// - Parameters:
-  ///   - postSort: The `PostSort` by which to sort the `Posts`
-  ///   - location:
-  ///   - topInterval: The interval in which to search for top `Posts` when `postSort` is `.top`
-  ///   - params: Default parameters applicable to every `Listing` returning endpoint on Reddit
-  ///   - queue: The `DispatchQueue` on which the completion handler will be called
-  ///   - completion: The callback function to execute when we get the `Post` `Listing` back from Reddit
-  @discardableResult
-  static func all(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
-                  params: ListingParameters = .init(), queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void)
-    -> DataRequest {
-    Illithid.shared.fetchPosts(for: FrontPage.all, sortBy: postSort, location: location, topInterval: topInterval,
-                               params: params, queue: queue, completion: completion)
-  }
-
-  /// Fetches `Posts` from `r/popular`, which is a subset of the posts from `r/all` and is the default front page for non-authenticated users
-  /// The announcement of `r/popular` and further details may be found [here](https://www.reddit.com/r/announcements/comments/5u9pl5)
-  /// - Parameters:
-  ///   - postSort: The `PostSort` by which to sort the `Posts`
-  ///   - location:
-  ///   - topInterval: The interval in which to search for top `Posts` when `postSort` is `.top`
-  ///   - params: Default parameters applicable to every `Listing` returning endpoint on Reddit
-  ///   - queue: The `DispatchQueue` on which the completion handler will be called
-  ///   - completion: The callback function to execute when we get the `Post` `Listing` back from Reddit
-  @discardableResult
-  static func popular(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
-                      params: ListingParameters = .init(), queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void)
-    -> DataRequest {
-    Illithid.shared.fetchPosts(for: FrontPage.popular, sortBy: postSort, location: location, topInterval: topInterval,
-                               params: params, queue: queue, completion: completion)
-  }
-
-  /// Fetches `Posts` from a random `Subreddit`
-  /// - Parameters:
-  ///   - postSort: The `PostSort` by which to sort the `Posts`
-  ///   - location:
-  ///   - topInterval: The interval in which to search for top `Posts` when `postSort` is `.top`
-  ///   - params: Default parameters applicable to every `Listing` returning endpoint on Reddit
-  ///   - queue: The `DispatchQueue` on which the completion handler will be called
-  ///   - completion: The callback function to execute when we get the `Post` `Listing` back from Reddit
-  @discardableResult
-  static func random(sortBy postSort: PostSort, location: Location? = nil, topInterval: TopInterval? = nil,
-                     params: ListingParameters = .init(), queue: DispatchQueue = .main, completion: @escaping (Result<Listing, AFError>) -> Void)
-    -> DataRequest {
-    Illithid.shared.fetchPosts(for: FrontPage.random, sortBy: postSort, location: location, topInterval: topInterval,
-                               params: params, queue: queue, completion: completion)
-  }
 }
 
 public extension Post {
