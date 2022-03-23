@@ -80,17 +80,6 @@ extension Multireddit: PostProvider {
   public var postsPath: String {
     "/user/\(owner)/m/\(name)"
   }
-
-  @discardableResult
-  public func posts(sortBy sort: PostSort, location: Location?, topInterval: TopInterval?,
-                    parameters: ListingParameters, queue _: DispatchQueue = .main,
-                    completion: @escaping (Result<Listing, AFError>) -> Void)
-    -> DataRequest {
-    Illithid.shared.fetchPosts(for: self, sortBy: sort, location: location,
-                               topInterval: topInterval, params: parameters) { result in
-      completion(result)
-    }
-  }
 }
 
 public extension Illithid {

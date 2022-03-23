@@ -51,8 +51,9 @@ public extension Illithid {
    Loads subreddits from the Reddit API
 
    - Parameters:
-     - subredditSort: Subreddit sort method
+     - sort: Subreddit sort method
      - params: Standard listing parameters object
+     - queue: The dispatch queue the completion handler will be called on
      - completion: Completion handler, is passed the listable as an argument
    */
   func subreddits(sortBy sort: SubredditSort = .popular,
@@ -83,16 +84,6 @@ extension Subreddit: PostProvider {
 
   public var postsPath: String {
     "/r/\(displayName)"
-  }
-
-  public func posts(sortBy sort: PostSort, location: Location?, topInterval: TopInterval?,
-                    parameters: ListingParameters, queue: DispatchQueue = .main,
-                    completion: @escaping (Result<Listing, AFError>) -> Void)
-    -> DataRequest {
-    Illithid.shared.fetchPosts(for: self, sortBy: sort, location: location,
-                               topInterval: topInterval, params: parameters, queue: queue) { result in
-      completion(result)
-    }
   }
 }
 

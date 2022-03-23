@@ -243,6 +243,18 @@ public extension Illithid {
   }
 }
 
+public extension PostProvider {
+  func posts(sortBy sort: PostSort, location: Location?, topInterval: TopInterval?,
+             parameters: ListingParameters, queue: DispatchQueue = .main,
+             completion: @escaping (Result<Listing, AFError>) -> Void)
+    -> DataRequest {
+    Illithid.shared.fetchPosts(for: self, sortBy: sort, location: location,
+                               topInterval: topInterval, params: parameters, queue: queue) { result in
+      completion(result)
+    }
+  }
+}
+
 @available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
 public extension Post {
   static func fetch(name: Fullname, queue: DispatchQueue = .main) -> AnyPublisher<Post, AFError> {
