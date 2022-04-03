@@ -48,7 +48,7 @@ public extension RedGif {
     // MARK: Lifecycle
 
     public init(id: String, createDate: Date, hasAudio: Bool, width: Int, height: Int, likes: Int, tags: [String],
-                verified: Bool, views: Int, duration: Int, published: Bool, urls: Urls, userName: String,
+                verified: Bool, views: Int, duration: Double, published: Bool, urls: Urls, userName: String,
                 type: Int, avgColor: String, gallery: String?) {
       self.id = id
       self.createDate = createDate
@@ -111,7 +111,7 @@ public extension RedGif {
     public let tags: [String]
     public let verified: Bool
     public let views: Int
-    public let duration: Int
+    public let duration: Double
     public let published: Bool
     public let urls: Urls
     public let userName: String

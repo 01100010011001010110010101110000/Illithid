@@ -20,6 +20,9 @@ public protocol PostProvider {
   var id: String { get }
   var isNsfw: Bool { get }
   var displayName: String { get }
+  /// The path of the endpoint where posts can be fetched
+  /// - Note: Relative to the Reddit API base URL
+  var postsPath: String { get }
 
   @discardableResult
   func posts(sortBy sort: PostSort, location: Location?,
